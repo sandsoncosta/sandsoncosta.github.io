@@ -92,7 +92,14 @@ Lembre-se de que estas são apenas diretrizes gerais. A melhor escolha para o se
 
 ## Vamos para a prática!
 
+### Exemplo de criação de contas sMSA:
 
+{{< bs/alert primary >}}
+{{< bs/alert-heading "Info!" >}}
+  1. Para meus testes, estou usando o domínio chamado XPTO.LOCAL.
+  <br>
+  2. As contas MSAs só são gerenciadas via Powershell.
+{{< /bs/alert >}}
 
 ```powershell {title="Criando uma conta de serviço sMSA"}
 # Se não passar o Path, ele vai pra OU default que é "Managed Service Accounts"
@@ -125,10 +132,7 @@ $Principal = New-ScheduledTaskPrincipal -UserID 'XPTO\sMSA_SRV-DC$' -LogonType P
 Register-ScheduledTask -TaskName "Agendamento sMSA" -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal
 Write-Output (Get-Date).ToString("d/MMM/yyyy hh:mm:ss tt"); ls
 ```
-
-<p align="center">
-  <img src="schedule.png">
-</p>
+![sMSA](schedule.png)
 
 <p align="center">
   <img src="agendamento.png">
@@ -142,7 +146,16 @@ Resultado:
 
 ### Exemplo de criação de contas gMSA:
 
-
+{{< bs/alert primary >}}
+{{< bs/alert-heading "Info!" >}}
+  1. A chave KDS só se cria apenas uma vez no AD em que vai ser de centralizador das contas de serviço gMSA.
+  <br>
+  2. O comando executado para replicação da KDS logo abaixo, é forçado. Em ambiente de produção, o ideal é aguardar o tempo padrão de 10h.
+  <br>
+  3. O parâmetro `-ManagedPasswordIntervalInDays 10` significa que você está definindo que a senha deve rotacionar a cada 10 dias. O padrão é a cada 30 dias.
+  <br>
+  4. O parâmetro `-PrincipalsAllowedToRetrieveManagedPassword` indica quais máquinas poderão utilizar ela. Você informa as máquinas separadas por vírgula.
+{{< /bs/alert >}}
 
 Antes de se criar uma conta gMSA, é necessário criar um chave raiz chamada KDS Root Key. Ele é feito apenas uma vez por floresta.
 

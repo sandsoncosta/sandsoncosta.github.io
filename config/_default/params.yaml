@@ -9,7 +9,7 @@ hb:
   # js_bundle_name: main # the JS bundle name.
   # css_bundle_name: main # the CSS bundle name.
   
-  full_width: true # when true, the layout takes full width globally.
+  full_width: false # when true, the layout takes full width globally.
 
   header:
     # brand: HB # the brand name, leave it empty to use site's title.
