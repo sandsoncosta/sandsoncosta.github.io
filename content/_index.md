@@ -1,5 +1,5 @@
 ---
-title: HB Theme Template
+title: Sandson Costa
 menu:
   main:
     name: Home
