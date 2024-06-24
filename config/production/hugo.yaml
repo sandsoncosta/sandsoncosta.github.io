@@ -1,3 +1,4 @@
+googleAnalytics: 'G-5VX2WXTCNK' # Google Analytics, please make sure you've imported the Google Analytics module.
 # see https://hugomods.com/en/docs/google-analytics/.
 # googleAnalytics: 'G-XXXXXXXXXX' # Google Analytics, please make sure you've imported the Google Analytics module.
 
@@ -5,7 +6,6 @@
 
 
 
-googleAnalytics: 'G-5VX2WXTCNK' # Google Analytics, please make sure you've imported the Google Analytics module.
 
 
 
