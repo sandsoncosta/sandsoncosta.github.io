@@ -51,7 +51,7 @@ imports:
   - path: github.com/hbstack/docs/modules/content-panel
 
   # other modules
-  # - path: github.com/hugomods/google-analytics
+  - path: github.com/hugomods/google-analytics
   # - path: github.com/hugomods/google-adsense
 
   # recommended modules
