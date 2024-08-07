@@ -5,6 +5,7 @@ draft: false
 description: Identifique quando suas GPOs forem criadas, modificadas, restauradas, movidas ou deletadas.
 noindex: false
 featured: false
+toc: true
 pinned: false
 comments: false
 carousel: true
