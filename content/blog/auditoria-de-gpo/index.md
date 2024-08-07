@@ -38,27 +38,19 @@ Criar uma nova GPO "Auditoria de GPO".
 
 Clicar com o direito e clicar em Edit.
 
-![s](1.png)
-
-<p align="center">
-  <img src="1.png">
-</p>
+![1](1.png)
 
 Seguir para o caminho: *Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy Configuration > Audit Policies > DS Access*.
 
 Clicar 2 vezes em *Audit Directory Service Changes* e marcar somente *Success*.
 
-<p align="center">
-  <img src="2.png">
-</p>
+![2](2.png)
 
 Seguir para o caminho: *Computer Configuration > Policies > Windows Settings > Security Settings > Advanced Audit Policy Configuration > Audit Policies > Object Access*.
 
 Clicar 2 vezes em *Audit File System* e marcar somente *Success*.
 
-<p align="center">
-  <img src="3.png">
-</p>
+![3](3.png)
 
 Force a atualização das políticas de GPO.
 
@@ -81,39 +73,29 @@ Clique com o botão direito em *CN=Policies* e selecione Properties.
 
 Em *Security* clique em *Advanced*.
 
-<p align="center">
-  <img src="4.png">
-</p>
+![4](4.png)
 
 Na janela que abrir, clique em *Auditing*.
 
 Depois clique em *Add*.
 
-<p align="center">
-  <img src="5.png">
-</p>
+![5](5.png)
 
 Na janela que abrir, clique em *Select a principal*.
 
 Na janela que abrir, pesquise por *Everyone* e dê OK.
 
-<p align="center">
-  <img src="6.png">
-</p>
+![6](6.png)
 
 Em *Type* deixe *Success*.
 
 Em *Applies to* deixe *This object and all descendant objects*.
 
-<p align="center">
-  <img src="7.png">
-</p>
+![7](7.png)
 
 Na lista logo abaixo, pesquise por *Create groupPolicyContainer objects* e *Delete groupPolicyContainer objects*, marque as duas opções e dê OK.
 
-<p align="center">
-  <img src="8.png">
-</p>
+![8](8.png)
 
 Pode dar OK em todas as janelas logo após isso.
 
@@ -132,15 +114,11 @@ Clique em *Add*.
 
 Na janela que abrir, clique em *Select a principal*, depois pesquise por *Everyone* novamente e dê OK.
 
-<p align="center">
-  <img src="9.png">
-</p>
+![9](9.png)
 
 Em *Advanced Permissions*, clique em *Show advanced permissions* para listar todas as permissões avançadas. Logo após listar todas as opções, clique em *Full control* e dê OK.
 
-<p align="center">
-  <img src="10.png">
-</p>
+![10](10.png)
 
 Pode dar OK em todas as janelas logo após isso.
 
@@ -156,9 +134,7 @@ Pronto!
 |   5139   |   Um objeto de serviço de diretório foi movido.   |
 |   5141   |  Um objeto de serviço de diretório foi deletado.  |
 
-<p align="center">
-  <img src="11.png">
-</p>
+![11](11.png)
 
 Para ver o nome da GPO via PowerShell:
 ```powershell
