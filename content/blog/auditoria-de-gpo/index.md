@@ -32,7 +32,7 @@ images:
 #         color: '#e24d0e'
 ---
 
-# Criação da GPO
+## Criação da GPO
 
 Criar uma nova GPO "Auditoria de GPO".
 
@@ -63,7 +63,7 @@ Clicar 2 vezes em *Audit File System* e marcar somente *Success*.
 Force a atualização das políticas de GPO.
 
 
-# Configurando a auditoria de objetos groupPolicyContainer usando ADSI Edit
+## Configurando a auditoria de objetos groupPolicyContainer usando ADSI Edit
 
 No menu iniciar pesquise por ADSI Edit e inicie como admin.
 
@@ -117,7 +117,7 @@ Na lista logo abaixo, pesquise por *Create groupPolicyContainer objects* e *Dele
 
 Pode dar OK em todas as janelas logo após isso.
 
-# Configurando a auditoria da pasta SYSVOL
+## Configurando a auditoria da pasta SYSVOL
 
 
 Navegue até *C:\\Windows\\SYSVOL\\domain*.
@@ -146,7 +146,7 @@ Pode dar OK em todas as janelas logo após isso.
 
 Pronto!
 
-# Lista dos EventID gerados
+## Lista dos EventID gerados
 
 | Event ID |                     Descrição                     |
 |:--------:|:-------------------------------------------------:|
