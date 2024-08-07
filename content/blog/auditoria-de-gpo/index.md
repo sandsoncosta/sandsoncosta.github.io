@@ -16,6 +16,8 @@ tags:
  - Windows Server
  - AD
  - GPO
+authors:
+  - sandson
 images:
 #  - 
 # menu:
