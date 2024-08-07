@@ -1,14 +1,14 @@
 ---
 # type: docs 
 title: "Entenda o que são Contas de Serviço e como usá-las: Hands-on - Parte 2"
-date: 2024-06-15T23:40:17-04:00
-featured: true
+date: 2024-06-15T23:40:17-03:00
+featured: false
 draft: false
 comment: true
 toc: true
 reward: true
 pinned: false
-# carousel: false
+carousel: false
 series:
 categories:
   - Active Directory
