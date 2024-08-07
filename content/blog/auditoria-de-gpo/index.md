@@ -1,6 +1,6 @@
 ---
 # type: docs
-title: "Auditoria De GPO"
+title: "Auditoria de GPO"
 date: 2024-08-06T23:40:31-03:00
 featured: true
 draft: false
