@@ -2,13 +2,13 @@
 # type: docs
 title: "Auditoria de GPO"
 date: 2024-08-06T23:40:31-03:00
-featured: true
+featured: false
 draft: false
 comment: true
 toc: true
 reward: true
 pinned: false
-carousel: true
+carousel: false
 description: Identifique quando suas GPOs forem criadas, modificadas, restauradas, movidas ou deletadas.
 series:
 #  - 
