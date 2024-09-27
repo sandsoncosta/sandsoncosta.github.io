@@ -33,6 +33,10 @@ images:
 #         color: '#e24d0e'
 ---
 
+## !!!DISCLAIMER!!!
+
+**O uso dessas ferramentas e métodos abordados aqui contra redes para os quais você não possui permissão explícita é ilegal e pode resultar em consequências legais. É sua responsabilidade garantir que você tenha autorização apropriada antes de realizar qualquer teste. O uso inadequado pode causar danos e resultar em penalidades severas. Ao utilizar essas informações, você concorda em assumir total responsabilidade por suas ações. Lembre-se! Isto é apenas um artigo técnico para fins educacionais.**
+
 ## 1. Introdução
 
 No cenário atual de segurança cibernética, a exfiltração de dados continua sendo uma das ameaças mais graves para as organizações. Técnicas avançadas, muitas vezes discretas, estão sendo desenvolvidas para contornar sistemas de detecção tradicionais. Entre essas técnicas, o uso de protocolos de rede comuns, como o ICMP (Internet Control Message Protocol), torna-se uma maneira engenhosa de transferir dados sem levantar suspeitas.
@@ -73,6 +77,12 @@ for ($i = 0; $i -lt $binaryData.Length; $i += $chunkSize) {
 **4. Fragmentação dos Dados:** A cada iteração do loop `for`, uma parte (`chunk`) do arquivo binário é selecionada para ser enviada. A função `[math]::Min` garante que o script não tente ler além do final do array de bytes.
 
 **5. Envio Via Ping:** Cada `chunk` é então enviado via o método `Send` do objeto `Ping`. Aqui, o IP de destino (`192.168.145.30`) representa a máquina que está recebendo os dados e lá está com o `tcpdump` ativo escutando pacotes `icmp` na rede. O tempo limite para a resposta do ping é definido como 1500 ms.
+
+Com isso, nós temos a saída em pleno funcionamento:
+
+![Exfiltração](exfiltracao.gif)
+
+Em Referências, eu deixo um link muito legal para um artigo no Medium que dá detalhes sobre o pacote ICMP.
 
 ## 4. Onde o script se encaixa na Matriz do MITRE ATT&CK e na Cyber Kill Chain
 
@@ -127,3 +137,13 @@ Para aumentar a furtividade, scripts como este podem utilizar técnicas adiciona
 A técnica descrita neste artigo ilustra como um invasor pode usar ferramentas legítimas para executar ações maliciosas de forma furtiva. O uso de PowerShell combinado com pacotes ICMP é uma abordagem engenhosa para a exfiltração de dados, que pode passar despercebida se não forem implementados controles de segurança adequados.
 
 Este tipo de ataque enfatiza a importância de uma estratégia de defesa em profundidade, onde cada camada de segurança, desde o endpoint até a rede, desempenha um papel muito importante na defesa, detecção e mitigação de ameaças.
+
+## 8. Referências
+
+- [Windows Defender Advanced Threat Protection](https://learn.microsoft.com/en-us/windows/client-management/mdm/windowsadvancedthreatprotection-csp)
+- [Configuration Service Provider](https://learn.microsoft.com/pt-br/windows/client-management/mdm/windowsadvancedthreatprotection-csp)
+- [PowerShell Constrained Language Mode](https://devblogs.microsoft.com/powershell/powershell-constrained-language-mode/)
+- [Método File.ReadAllBytes(String)](https://learn.microsoft.com/pt-br/dotnet/api/system.io.file.readallbytes?view=net-8.0)
+- [Classe Ping](https://learn.microsoft.com/pt-br/dotnet/api/system.net.networkinformation.ping?view=net-8.0)
+- [Método Math.Min](https://learn.microsoft.com/pt-br/dotnet/api/system.net.networkinformation.ping?view=net-8.0)
+- [ICMP Ping Data Exfiltration](https://medium.com/@sam.rothlisberger/icmp-echo-request-data-exfiltration-f41f59fcf87a)
