@@ -10,7 +10,7 @@ pinned: false
 carousel: false
 description: Este artigo aborda a exfiltração de dados via PowerShell e ICMP, explicando como um script envia dados discretamente por pacotes de ping.
 series:
-#  - 
+ - Casos de Uso
 categories:
  - PowerShell
  - Exfiltração de Dados

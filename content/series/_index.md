@@ -1,4 +1,4 @@
-<!-- ---
+---
 ### Quando tiver séries, é pra usar esse modelo de menu.
 title: Series
 menu:
@@ -8,9 +8,10 @@ menu:
       icon:
         vendor: bs
         name: columns
+        color: red
       description: All of the series.
 ---
- -->
+
 
 
 
