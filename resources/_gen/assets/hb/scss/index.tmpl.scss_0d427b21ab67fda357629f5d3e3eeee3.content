@@ -13930,6 +13930,10 @@ html {
   background: var(--hb-primary-bg-subtle);
 }
 
+.hb-docs-nav-link {
+  position: relative;
+}
+
 .hb-docs-nav-links > .hb-docs-nav-links-span-all .hb-docs-nav-link {
   margin-left: 0;
 }
@@ -14147,7 +14151,9 @@ html {
 .hb-featured-img {
   -o-object-fit: cover;
      object-fit: cover;
-  max-height: 480px;
+  -o-object-position: top;
+     object-position: top;
+  height: 480px;
 }
 
 /*! purgecss start ignore */
