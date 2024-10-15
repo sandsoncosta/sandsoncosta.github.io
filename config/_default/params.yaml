@@ -9,7 +9,7 @@ hb:
   js_bundle_name: main # the JS bundle name.
   css_bundle_name: main # the CSS bundle name.
   
-  full_width: false # when true, the layout takes full width globally.
+  full_width: true # when true, the layout takes full width globally.
 
   header:
     # brand: HB # the brand name, leave it empty to use site's title.
@@ -33,6 +33,14 @@ hb:
     # the paginate for categories, tags, series list pages.
     paginate: 12
   blog:
+    # INÍCIO MINHAS CONFIGURAÇÕES
+    # list_style: cascade # para posts sem imagens
+    post_authors:
+      position: bottom
+    list_cols_md: 3
+    # FIM MINHAS CONFIGURAÇÕES
+
+
     sidebar:
       profile:
         # title: Profile title other than site title.
@@ -45,7 +53,7 @@ hb:
           rss: true
       posts:
         recent_count: 5 # the number of recent posts.
-        featured_count: 2 # the number of featured posts.
+        featured_count: 5 # the number of featured posts.
       taxonomies:
         count: true # whether to show the number of posts associated to the item.
         limit: 10 # the maximum number of the item.

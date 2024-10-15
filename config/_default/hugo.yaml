@@ -1,7 +1,7 @@
 baseURL: https://sandsoncosta.github.io/
 title: Sandson Costa
 # Copyright, the {year} is the placeholder of this year.
-copyright: "Copyright © 2024-{year} [Hugo Modules](https://hugomods.com/) and [HB Framework](https://hbstack.dev/). All Rights Reserved."
+copyright: "Copyright © 2024-{year} Sandson Costa. All Rights Reserved."
 defaultContentLanguage: en
 defaultContentLanguageInSubdir: false # disable this to remove the default language code from URL, i.e. /en/docs -> /docs.
 enableRobotsTXT: true
@@ -67,3 +67,9 @@ security:
       - CI$
       - PWD
 
+
+cascade:
+  - _target:
+      kind: page
+    params:
+      sidebar: false

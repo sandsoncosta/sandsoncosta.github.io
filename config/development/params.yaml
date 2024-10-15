@@ -12,4 +12,4 @@ pwa:
 hugopress:
   modules:
     pwa:
-      disable: true
+      disable: false

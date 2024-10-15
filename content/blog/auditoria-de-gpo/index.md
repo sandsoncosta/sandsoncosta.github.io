@@ -11,7 +11,7 @@ pinned: false
 carousel: false
 description: Identifique quando suas GPOs forem criadas, modificadas, restauradas, movidas ou deletadas.
 series:
-#  - 
+ - Auditorias do Windows
 categories:
  - Active Directory
 tags:

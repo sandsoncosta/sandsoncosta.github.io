@@ -24,6 +24,8 @@ tags:
  - Regras de Detecção
  - Análise de Logs
  - Ferramentas de Segurança
+authors:
+  - sandson
 images:
 #  - 
 # menu:
