@@ -30,7 +30,9 @@ Com o aumento do uso de ferramentas e scripts automatizados, o PowerShell passou
 
 O **Script Block Logging** é essencial para identificar atividades maliciosas, pois possibilita o registro de blocos de script em execução, mesmo que estejam ofuscados. Essa auditoria captura scripts legítimos e scripts mal-intencionados, fornecendo visibilidade detalhada das operações internas do PowerShell.
 
-O Script Block Logging irá registar todas as entradas de script do PowerShell como, processamento de comandos, blocos de script e funções que é executado e gerar eventos no Event Viewer que podem ser encontrados em:
+O Script Block Logging irá registar todas as entradas de script do PowerShell como: processamento de comandos, blocos de script e suas funções.
+
+Essas entradas ficam registradas através de eventos, que podem ser visualizadas através do utilitário Event Viewer, no channel citado abaixo:
 
 ```yaml
 Log: Microsoft-Windows-PowerShell/Operational
