@@ -49,6 +49,9 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
+      - name: Install Dart Sass
+        run: sudo snap install dart-sass
+
       - name: Build with Hugo
         env:
           HUGO_ENVIRONMENT: production
@@ -64,9 +67,6 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           path: ./public
-
-      - name: Install Dart Sass
-        run: sudo snap install dart-sass
 
   deploy:
     environment:
