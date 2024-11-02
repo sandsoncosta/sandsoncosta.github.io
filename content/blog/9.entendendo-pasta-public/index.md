@@ -1,7 +1,7 @@
 ---
 title: "Auditoria e gerenciamento de permissões de pasta pública no Windows via GPO"
 date: 2024-10-20T16:12:08-03:00
-draft: false
+draft: true
 description: "Este artigo aborda a importância de restringir/monitorar permissões de escrita na pasta C:\\Users\\Public, em ambientes corporativos, para garantir segurança e controle de acesso."
 noindex: false
 featured: false
