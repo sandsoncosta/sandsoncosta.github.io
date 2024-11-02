@@ -90,7 +90,7 @@ hb:
     created_at: true
     date_format: :date_full
     font_size: .825rem
-    icons: true
+    icons: false
 seo:
   favicons: # see https://hugomods.com/en/docs/seo/#favicons-module
     icon: images/logo.png # use logo as favicon.
