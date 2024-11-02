@@ -5,7 +5,6 @@ hb:
   # override SASS variables, please replace the dash with underline, e.g. `list-group-color` should be `list_group_color`.
   # styles:
   #   primary: '#6610f2'
-  
   js_bundle_name: main # the JS bundle name.
   css_bundle_name: main # the CSS bundle name.
   
@@ -87,7 +86,11 @@ hb:
       # subpath: exampleSite
   # gallery:
   #   thumbnail_size: "x640"
-
+  revision:
+    created_at: true
+    date_format: :date_full
+    font_size: .825rem
+    icons: true
 seo:
   favicons: # see https://hugomods.com/en/docs/seo/#favicons-module
     icon: images/logo.png # use logo as favicon.

@@ -1,7 +1,109 @@
-// This SCSS styles will be compiled into the CSS bundle automatically.
+// figure {
+//     display: block;
+//     margin-block-start: 1em;
+//     margin-block-end: 1em;
+//     margin-inline-start: 40px;
+//     margin-inline-end: 40px;
+//     unicode-bidi: isolate;
+//     margin: 0 auto;
+// }
 
-/*! purgecss start ignore */
+// .kg-bookmark-card, .kg-bookmark-card * {
+//     box-sizing: border-box;
+// }
 
-/*! PUT YOU STYLE HERE TO AVOID GETTING REMOVING BY PURGECSS. */
+.kg-bookmark-card a.kg-bookmark-container, a.kg-bookmark-container:hover {
+    display: flex;
+    background: rgba(65, 71, 77, 1);
+    text-decoration: none;
+    border-radius: .50em !important;
+    border: 5px solid rgba(65, 71, 77, 0.5);
+    // overflow: hidden;
+    color: #fff;
+}
 
-/*! purgecss end ignore */
+.kg-bookmark-card .kg-bookmark-description {
+    font-size: .8em;
+    margin-top: .3em;
+    max-height: none;
+    opacity: .7;
+}
+
+.kg-bookmark-card .kg-bookmark-thumbnail img {
+    border-radius: 0 .2em .2em 0;
+}
+
+// .kg-bookmark-card .kg-bookmark-content {
+//     padding: 1.15em;
+// }
+
+.kg-bookmark-content {
+    padding: 20px;
+}
+
+// .kg-bookmark-card .kg-bookmark-title {
+//     font-size: .9em;
+// }
+
+.kg-bookmark-title {
+    font-weight: 600;
+}
+
+
+
+// .kg-bookmark-card .kg-bookmark-metadata {
+//     font-size: .8em;
+// }
+
+.kg-bookmark-metadata {
+    display: flex;
+    align-items: center;
+    margin-top: 22px;
+    // width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    // white-space: nowrap;
+}
+
+.kg-bookmark-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+}
+
+// .kg-bookmark-metadata>span:last-of-type {
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+// }
+
+.kg-bookmark-metadata>:not(img) {
+    opacity: .7;
+}
+// APLICAR AQUI PARA CADA POST, SE FOR O CASO.
+.kg-bookmark-thumbnail {
+    position: relative;
+    flex-grow: 1;
+    min-width: 50%;
+}
+
+
+
+.kg-bookmark-thumbnail img {
+    top: 0;
+    left: 0;
+    border-radius: 0 2px 2px 0;
+}
+.kg-bookmark-thumbnail img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+img {
+    height: auto;
+}
+// img, picture {
+//     display: block;
+//     max-width: 100%;
+// }

@@ -62,5 +62,15 @@ imports:
   - path: github.com/hbstack/meta/recommended
 
 
+################################################################
+## MY PERSONAL CUSTOM
+################################################################
+
   # blog post author
   - path: github.com/hbstack/blog/modules/post-authors
+  # Blockquote Alerts Module  
+  # - path: github.com/hbstack/blog/modules/blockquote-alerts
+  # Iframes
+  - path: github.com/hbstack/iframe
+  # Revision
+  - path: github.com/hbstack/blog/modules/revision

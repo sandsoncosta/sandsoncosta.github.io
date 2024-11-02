@@ -1,0 +1,18 @@
+QUANDO EU QUISER INCORPORAR UM LINK:
+
+
+<figure class="kg-bookmark-card">
+  <a class="kg-bookmark-container" href="http://localhost/blog/2024/10/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/" target="_blank">
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">Como o Threat Hunting pode contribuir no processo de maturidade de uma empresa - Um Caso de Uso prático</div>
+        <div class="kg-bookmark-description">O artigo explora como o Threat Hunting aprimora a segurança, com um caso prático sobre um Web Application Firewall (WAF) e a importância da detecção proativa.</div>
+          <div class="kg-bookmark-metadata">
+            <img class="kg-bookmark-icon" src="https://sandsoncosta.github.io/images/logo_hu15372378329983084554.webp" alt="">
+              <span>Sandson Costa</span>
+          </div>
+        </div>
+      <div class="kg-bookmark-thumbnail">
+        <img src="https://sandsoncosta.github.io/blog/2024/10/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/featured-sample_hu15151624785549089067.webp" alt="" onerror="this.style.display = 'none'">
+      </div>
+  </a>
+</figure>
