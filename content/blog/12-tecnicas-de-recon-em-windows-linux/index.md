@@ -10,9 +10,12 @@ comments: false
 series:
 #  - 
 categories:
-#  - 
+ - Windows
+ - Linux
 tags:
-#  - 
+ - Recon
+ - Reconnaissance
+ - Reconhecimento
 authors:
  - sandson
 images:
