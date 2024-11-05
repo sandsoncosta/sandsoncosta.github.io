@@ -1,6 +1,6 @@
 ---
-title: "6"
-date: 2024-10-04T12:57:03-03:00
+title: "Dump do LSASS e Exfiltração via ICMP - Parte 2/3 - Do Ataque"
+date: 2024-11-02T12:27:03-03:00
 draft: true
 description: 
 noindex: false
@@ -13,7 +13,8 @@ categories:
 #  - 
 tags:
 #  - 
-images:
+authors:
+  - sandson
 #  - 
 # menu:
 #   main:

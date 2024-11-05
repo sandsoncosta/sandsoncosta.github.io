@@ -14277,6 +14277,12 @@ h6:hover .anchor,
   margin-bottom: 0 !important;
 }
 
+@media (min-width: 992px) {
+  .bookmark-card-img {
+    width: 180px !important;
+  }
+}
+
 .collapse-toggle::before {
   margin-right: 0.25rem;
   border-left: 10px solid;
