@@ -44,7 +44,7 @@ hb:
       profile:
         # title: Profile title other than site title.
         # description: Profile description other than site description.
-        company: ISH
+        company: DELOITTE
         location: Earth
         socials:
           github: sandsoncosta
