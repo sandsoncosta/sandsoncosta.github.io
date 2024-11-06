@@ -29,6 +29,9 @@ images:
 #         name: book
 #         color: '#e24d0e'
 ---
+
+<div class="sharethis-inline-share-buttons"></div>
+
 ## 1. Introdução
 
 O reconhecimento (ou "recon") é uma etapa fundamental nas operações de segurança cibernética. Ele envolve a coleta de informações sobre o sistema e a rede para identificar potenciais vulnerabilidades e comportamentos suspeitos. Equipes de segurança, como Red Teams e Blue Teams, utilizam comandos de reconhecimento para mapear o ambiente e entender a infraestrutura que estão protegendo ou testando.
@@ -463,8 +466,7 @@ Deve-se levar em consideração que, alguns dos comandos listados, são diariame
 Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in/sandsoncosta">LinkedIn</a>.<br>Vou ficar muito contente em receber um feedback seu.
 {{< /bs/alert >}}
 
-<div class="sharethis-inline-share-buttons"></div>
-
+{{< bs/col class="mb-4" offset="0 lg:2" size="12 lg:8" >}}
 <script>
     var idcomments_acct = '4c2fc4459050db44aed299fb009f6f2f';
     var idcomments_post_id;
@@ -472,10 +474,4 @@ Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in
 </script>
 <span id="IDCommentsPostTitle" style="display:none"></span>
 <script type='text/javascript' src='https://www.intensedebate.com/js/genericCommentWrapperV2.js'></script>
-
-<script>
-    var idcomments_acct = '4c2fc4459050db44aed299fb009f6f2f';
-    var idcomments_post_id;
-    var idcomments_post_url;
-</script>
-<script type="text/javascript" src="https://www.intensedebate.com/js/genericLinkWrapperV2.js"></script>
+{{< /bs/col >}}

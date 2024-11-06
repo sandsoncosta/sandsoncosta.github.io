@@ -65,6 +65,7 @@ require (
 	github.com/hbstack/search v0.2.2 // indirect
 	github.com/hbstack/slide v0.4.0 // indirect
 	github.com/hbstack/snackbar v0.1.2 // indirect
+	github.com/hbstack/social-share-buttons v0.4.0 // indirect
 	github.com/hbstack/socials v0.17.0 // indirect
 	github.com/hbstack/syntax-highlighting v0.2.0 // indirect
 	github.com/hbstack/syntax-highlighting/styles/dracula v0.1.1 // indirect

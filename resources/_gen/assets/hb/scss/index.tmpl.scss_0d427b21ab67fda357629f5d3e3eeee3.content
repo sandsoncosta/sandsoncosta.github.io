@@ -14410,3 +14410,8 @@ h6:hover .anchor,
 .hb-revision-contributor-img:hover {
   opacity: 1;
 }
+
+.hb-social-share-button:hover {
+  position: relative;
+  top: -3px;
+}
