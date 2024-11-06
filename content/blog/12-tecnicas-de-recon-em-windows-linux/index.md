@@ -464,3 +464,18 @@ Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in
 {{< /bs/alert >}}
 
 <div class="sharethis-inline-share-buttons"></div>
+
+<script>
+    var idcomments_acct = '4c2fc4459050db44aed299fb009f6f2f';
+    var idcomments_post_id;
+    var idcomments_post_url;
+</script>
+<span id="IDCommentsPostTitle" style="display:none"></span>
+<script type='text/javascript' src='https://www.intensedebate.com/js/genericCommentWrapperV2.js'></script>
+
+<script>
+    var idcomments_acct = '4c2fc4459050db44aed299fb009f6f2f';
+    var idcomments_post_id;
+    var idcomments_post_url;
+</script>
+<script type="text/javascript" src="https://www.intensedebate.com/js/genericLinkWrapperV2.js"></script>

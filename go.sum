@@ -42,6 +42,8 @@ github.com/hbstack/blog/modules/sidebar/profile v1.3.0 h1:0EReIxJF8cbJpiEZfIWbcr
 github.com/hbstack/blog/modules/sidebar/profile v1.3.0/go.mod h1:UcQOQ+dQbHnMcsGEafZ7QanbvaM9N1k9ul/X8jLfNSU=
 github.com/hbstack/blog/modules/sidebar/taxonomies v0.5.0 h1:zv0qlWCIydyVfh8gndDWaadh0dSj1ovOCuzaexYmNQM=
 github.com/hbstack/blog/modules/sidebar/taxonomies v0.5.0/go.mod h1:oHqLXqcB/bp2rx7+Bb2mYubh4CoYlvH0tjR1SNs3+iQ=
+github.com/hbstack/blog/modules/social-share-buttons v0.1.1 h1:9o/TjUPpK3MZGnjECGE+Wo7VdJSV1EOUJ7qGD8mDHn8=
+github.com/hbstack/blog/modules/social-share-buttons v0.1.1/go.mod h1:ofLDQclqvR8vCztqv118x62SEAF2/pgYEd8VBumpKzY=
 github.com/hbstack/blog/modules/toc-scrollspy v0.2.0 h1:UgA7UxoHTOzFDRp1XxhCmCNiSZlfpXqyEBnkPMCMjsM=
 github.com/hbstack/blog/modules/toc-scrollspy v0.2.0/go.mod h1:61D0fK0cilgwUzQm4fhVqfAc0cFYkvTE4pVSP6+FvHI=
 github.com/hbstack/bootstrap v0.2.2 h1:Kiy+XEiyDvH9KVfuS7uWYTDoTLbiww0PWTheEXO/fdM=

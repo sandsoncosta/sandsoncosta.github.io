@@ -37,6 +37,17 @@ hb:
     post_authors:
       position: bottom
     list_cols_md: 3
+    social_share_buttons:
+      alignment: center
+      icons: true
+      labels: false
+      media:
+        - twitter
+        - facebook
+        - linkedin
+        - reddit
+        - telegram
+        - whatsapp
     # FIM MINHAS CONFIGURAÇÕES
 
 

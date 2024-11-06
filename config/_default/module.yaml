@@ -74,3 +74,5 @@ imports:
   - path: github.com/hbstack/iframe
   # Revision
   - path: github.com/hbstack/blog/modules/revision
+  # Social Share Buttons
+  - path: github.com/hbstack/blog/modules/social-share-buttons
