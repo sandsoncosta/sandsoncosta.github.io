@@ -1,7 +1,7 @@
 ---
 title: "Usando o Rclone para Exfiltração de Dados: Técnicas de Hunting, Defesa e Detecção"
 date: 2024-11-05T23:23:51-03:00
-draft: true
+draft: false
 description: 
 noindex: false
 featured: false
