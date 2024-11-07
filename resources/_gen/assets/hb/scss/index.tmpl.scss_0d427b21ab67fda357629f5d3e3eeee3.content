@@ -14415,3 +14415,9 @@ h6:hover .anchor,
   position: relative;
   top: -3px;
 }
+
+.form-floating.required > label::before {
+  color: red;
+  content: "*";
+  margin-right: 0.125rem;
+}

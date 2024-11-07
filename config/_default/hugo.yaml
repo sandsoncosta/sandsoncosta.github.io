@@ -66,6 +66,7 @@ security:
       - ^HUGO
       - CI$
       - PWD
+      - ^COMMENT_ID$
 
 
 cascade:

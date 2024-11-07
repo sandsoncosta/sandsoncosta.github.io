@@ -1,7 +1,7 @@
 ---
 title: "Auditoria e gerenciamento de permissões de pasta pública no Windows via GPO"
 date: 2024-10-20T16:12:08-03:00
-draft: true
+draft: false
 description: "Este artigo aborda a importância de restringir/monitorar permissões de escrita na pasta C:\\Users\\Public, em ambientes corporativos, para garantir segurança e controle de acesso."
 noindex: false
 featured: false
@@ -33,3 +33,9 @@ Para gerenciar permissão em ambientes com muitos usuários, há uma ferramenta 
 ## Desenvolvimento
 
 A pasta C:\Users\Public, por exemplo, permite que todos os usuários tenham acesso de leitura e gravação, o que pode representar um risco de segurança em certos cenários. Para evitar acessos não autorizados ou não monitorados, é essencial restringir essas permissões de acordo com as necessidades da empresa.
+
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

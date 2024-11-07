@@ -147,3 +147,9 @@ Este tipo de ataque enfatiza a importância de uma estratégia de defesa em prof
 - [Classe Ping](https://learn.microsoft.com/pt-br/dotnet/api/system.net.networkinformation.ping?view=net-8.0)
 - [Método Math.Min](https://learn.microsoft.com/pt-br/dotnet/api/system.net.networkinformation.ping?view=net-8.0)
 - [ICMP Ping Data Exfiltration](https://medium.com/@sam.rothlisberger/icmp-echo-request-data-exfiltration-f41f59fcf87a)
+
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

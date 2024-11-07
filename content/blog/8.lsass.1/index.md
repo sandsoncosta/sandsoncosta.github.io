@@ -1,7 +1,7 @@
 ---
 title: "Dump do LSASS e exfiltração via ICMP - Parte 1/3 - Da Concepção"
 date: 2024-10-21T08:15:58-03:00
-draft: true
+draft: false
 description: Explicação do processo de desenvolvimento de uma PoC sobre exfiltração de dados via ICMP usando PowerShell, abordando os desafios e soluções encontrados no desenvolvimento.
 noindex: false
 featured: false
@@ -105,3 +105,9 @@ Depois de muito tentar esse método, eu resolvi pensar simples e fazer o básico
 2. Vou salvar na pasta Public, pois ela tem permissão de escrita independente do usuário.
 
 ## 4. Conclusão
+
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

@@ -114,3 +114,9 @@ Ambas as políticas trazem benefícios claros para aumentar a visibilidade e a s
 Particularmente falando, somente o Script Block Logging é suficiente para compor o SIEM e termos logs sendo executados a nível de powershell. Mas tenha em mente que esse cenário gera muita informação e é necessário um trabalho a quatro mãos para remover falsos-positivos e trabalhar no que realmente importa, anomalias.
 
 Acredite, existem empresas de médio/grande porte que não possuem essa política habilitada. Temos alguns possíveis cenários para isso que pode ser desconhecimento ou pode ser simplesmente contrato de EPS limitado. Portanto, é extremamente necessário colocar na ponta do lápis esse cenário e fazer uma consiência situacional do seu ambiente.
+
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

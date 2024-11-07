@@ -3,3 +3,11 @@ hugo_stats.json
 package-json.lock
 public/
 node_modules/
+tips.txt
+.env
+content/blog/6
+content/blog/8.lsass.1
+content/blog/9.entendendo-a-pasta-public
+content/blog/10-entendendo-como-funcionam-as-permissões-de-pastas-e-arquivos-no-Windows
+content/blog/11-entendendo-como-funcionam-os-atributos-de-pastas-e-arquivos-no-Windows
+content/blog/13-rclone-para-exfiltração

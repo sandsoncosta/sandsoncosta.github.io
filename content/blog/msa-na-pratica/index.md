@@ -189,3 +189,9 @@ That's it!
 
 - [Entenda O Que São Contas De Serviço E Como Usá-Las: Teoria - Parte 1](https://sandsoncosta.github.io/blog/2024/06/entenda-o-que-s%C3%A3o-contas-de-servi%C3%A7o-e-como-us%C3%A1-las-teoria-parte-1/)
 - [Using a Managed Service Account (MSA or gMSA) in ADManager Plus](https://pitstop.manageengine.com/portal/en/kb/articles/using-a-managed-service-account-in-admanager-plus)
+
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

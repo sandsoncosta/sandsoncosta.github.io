@@ -40,7 +40,7 @@ imports:
   - path: github.com/hbstack/blog/modules/content-panel
 
   # docs comments engine
-  - path: github.com/hbstack/docs/modules/giscus
+  # - path: github.com/hbstack/docs/modules/giscus
   # - path: github.com/hbstack/docs/modules/utterances
   # - path: github.com/hbstack/docs/modules/disqus
 
@@ -76,3 +76,5 @@ imports:
   - path: github.com/hbstack/blog/modules/revision
   # Social Share Buttons
   - path: github.com/hbstack/blog/modules/social-share-buttons
+  # Contact Form
+  - path: github.com/hbstack/contact

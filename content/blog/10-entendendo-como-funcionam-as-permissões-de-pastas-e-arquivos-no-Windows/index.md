@@ -1,7 +1,7 @@
 ---
 title: "Entendendo como funcionam as permissões de pastas e arquivos no Windows"
 date: 2024-11-02T20:43:21-03:00
-draft: true
+draft: false
 description: "Permissões NTFS no Windows controlam o acesso a arquivos e pastas, definindo permissões como \"Ler\", \"Modificar\" e \"Controle Total\". Esses controles garantem a segurança dos dados ao permitir ou restringir o acesso, modificação e execução por usuários específicos, sendo configuráveis de forma básica ou avançada."
 noindex: false
 featured: false
@@ -98,3 +98,9 @@ As propriedades atribuídas em arquivos e pastas no sistema operacional são con
 Microsoft. NTFS Permissions Overview.
 
 SANS Institute. NTFS Permissions and Security Best Practices.
+
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

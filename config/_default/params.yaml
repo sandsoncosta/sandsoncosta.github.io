@@ -35,7 +35,7 @@ hb:
     # INÍCIO MINHAS CONFIGURAÇÕES
     # list_style: cascade # para posts sem imagens
     post_authors:
-      position: top
+      position: bottom
     list_cols_md: 3
     social_share_buttons:
       alignment: center
@@ -101,6 +101,12 @@ hb:
     created_at: true
     date_format: :date_full
     font_size: .825rem
+
+  contact:
+    endpoint: "https://formspree.io/f/xwpkobwj"
+    file: false
+    recaptcha_siekey: ""
+
 seo:
   favicons: # see https://hugomods.com/en/docs/seo/#favicons-module
     icon: images/logo.png # use logo as favicon.

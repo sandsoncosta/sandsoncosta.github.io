@@ -466,12 +466,8 @@ Deve-se levar em consideração que, alguns dos comandos listados, são diariame
 Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in/sandsoncosta">LinkedIn</a>.<br>Vou ficar muito contente em receber um feedback seu.
 {{< /bs/alert >}}
 
-{{< bs/col class="mb-4" offset="0 lg:2" size="12 lg:8" >}}
-<script>
-    var idcomments_acct = '4c2fc4459050db44aed299fb009f6f2f';
-    var idcomments_post_id;
-    var idcomments_post_url;
-</script>
-<span id="IDCommentsPostTitle" style="display:none"></span>
-<script type='text/javascript' src='https://www.intensedebate.com/js/genericCommentWrapperV2.js'></script>
-{{< /bs/col >}}
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

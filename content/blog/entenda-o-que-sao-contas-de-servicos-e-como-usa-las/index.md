@@ -113,3 +113,9 @@ Escolha o tipo de MSA correto: Selecione sMSA ou gMSA com base em suas necessida
 - [GoHacking Active Directory Defense](https://gohacking.com.br/curso/gohacking-active-directory-defense)
 - Livro: Active Directory: Designing, Deploying, and Running Active Directory. O'Reilly
 <!-- https://learn.microsoft.com/en-us/windows-server/security/delegated-managed-service-accounts/delegated-managed-service-accounts-overview#dmsa-and-gmsa-comparison -->
+
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->

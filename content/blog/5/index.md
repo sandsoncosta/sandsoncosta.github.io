@@ -3,7 +3,7 @@ title: "Como o Threat Hunting pode contribuir no processo de maturidade de uma e
 date: 2024-10-01T12:23:25-03:00
 featured: false
 draft: false
-comment: true
+comment: false
 toc: true
 reward: true
 pinned: false
@@ -108,3 +108,8 @@ Este estudo de caso destaca a importância do Threat Hunting na maturidade de se
 
 [TaHiTI: a threat hunting methodology](https://www.betaalvereniging.nl/wp-content/uploads/TaHiTI-Threat-Hunting-Methodology-whitepaper.pdf)
 
+---
+<!-- begin wwww.htmlcommentbox.com -->
+  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+ <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
+<!-- end www.htmlcommentbox.com -->
