@@ -7,9 +7,9 @@ tips.txt
 .env
 6/
 8.lsass.1/
-/9.entendendo-pasta-public/
+9\.entendendo-pasta-public/
 10-entendendo-como-funcionam-as-permissões-de-pastas-e-arquivos-no-Windows/
 11-entendendo-como-funcionam-os-atributos-de-pastas-e-arquivos-no-Windows/
-/12-tecnicas-de-recon-em-windows-linux/
+12-tecnicas-de-recon-em-windows-linux/
 13-rclone-para-exfiltração/
 /content/about/
