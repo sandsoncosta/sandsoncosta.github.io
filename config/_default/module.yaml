@@ -78,3 +78,7 @@ imports:
   - path: github.com/hbstack/blog/modules/social-share-buttons
   # Contact Form
   - path: github.com/hbstack/contact
+  # PWA Installer
+  - path: github.com/hbstack/pwa-installer
+  # Staticman Comments
+  - path: github.com/hbstack/blog/modules/staticman

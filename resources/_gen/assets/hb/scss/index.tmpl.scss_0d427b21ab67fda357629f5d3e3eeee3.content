@@ -14421,3 +14421,33 @@ h6:hover .anchor,
   content: "*";
   margin-right: 0.125rem;
 }
+
+#pwa-installer {
+  z-index: 1030;
+  transition: opacity 1.5s ease-in-out;
+}
+#pwa-installer.dismissing {
+  opacity: 0;
+}
+
+.staticman-comment-avatar {
+  height: 48px;
+  width: 48px;
+}
+
+.staticman-comment-avatar-none::before {
+  content: attr(data-first-char);
+  font-size: 1.25rem;
+}
+
+.staticman-comment-header {
+  font-size: 0.785rem;
+}
+
+.staticman-comment-form-message {
+  min-height: 120px !important;
+}
+
+.staticman-comment-body pre {
+  margin-bottom: 0 !important;
+}

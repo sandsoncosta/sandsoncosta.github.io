@@ -7,8 +7,8 @@ tips.txt
 .env
 6/
 8.lsass.1/
-9.entendendo-a-pasta-public/
+9.entendendo-pasta-public/
 10-entendendo-como-funcionam-as-permissões-de-pastas-e-arquivos-no-Windows/
 11-entendendo-como-funcionam-os-atributos-de-pastas-e-arquivos-no-Windows/
 13-rclone-para-exfiltração/
-about/
+/content/about/
