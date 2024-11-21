@@ -12,3 +12,5 @@ tips.txt
 11-entendendo-como-funcionam-os-atributos-de-pastas-e-arquivos-no-Windows/
 /content/about/
 14-medusa-ransomware/
+config/_default/params.en.yaml
+content/blog/15-cve-mremoteng/index.en.md

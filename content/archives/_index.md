@@ -1,5 +1,5 @@
 ---
-title: Archives
+title: Arquivos
 menu:
   main:
     identifier: archives
