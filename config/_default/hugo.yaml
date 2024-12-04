@@ -13,7 +13,8 @@ title_sections_depth: 0 # the depth of sections on the title.
 title_sections_depth_dir: end # when start, the depth is counting from the root sections.
 
 permalinks:
-  blog: /blog/:year/:month/:title
+  # blog: /blog/:year/:month/:title
+  blog: /blog/:title
 
 outputs:
   home:
