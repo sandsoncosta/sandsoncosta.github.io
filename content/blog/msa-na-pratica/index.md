@@ -134,15 +134,11 @@ Write-Output (Get-Date).ToString("d/MMM/yyyy hh:mm:ss tt"); ls
 ```
 ![sMSA](schedule.png)
 
-<p align="center">
-  <img src="agendamento.png">
-</p>
+<img src="agendamento.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
 
 Resultado:
 
-<p align="center">
-  <img src="resultado.png">
-</p>
+<img src="resultado.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
 
 ### Exemplo de criação de contas gMSA:
 
@@ -177,9 +173,7 @@ Test-ADServiceAccount "sMSA_SRV-DC"
 
 Para o meu teste com o gMSA, eu utilizei software de Gestão de AD, chamado ADManger, da Manage Engine. É um software que você é capaz de criar usuários via web de forma muito simples.
 
-<p align="center">
-  <img src="msa.png">
-</p>
+<img src="msa.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
 
 Com isso você não se preocupa com gerenciamento de senhas.
 

