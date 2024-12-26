@@ -76,13 +76,16 @@ Execute o comando:
 ```
 Essa configuração irá mostrar as notificações sempre que uma regra Sigma der _match_ com algum evento no Windows e também ele configura um Dashboard que você pode consultar em `http://localhost:17494/ui/dashboard/overview`. Esse Dashboard é local e não é possível gerenciá-lo com a versão Lite.
 
-<figure style="text-align: center;">
-  <video width="640" height="340" controls>
+<figure style="display: flex; flex-direction: column; align-items: center; margin: 0 auto; max-width: 100%;">
+  <video style="width: 100%; max-width: 640px; height: auto;" controls>
     <source src="exemplo.mp4" type="video/mp4">
     Seu navegador não suporta a tag de vídeo.
   </video>
-  <figcaption><i>Exemplo do Aurora identificando uma execução PowerShell encodado e notificação no System Tray.</i></figcaption>
+  <figcaption style="margin-top: 8px; text-align: center; font-style: italic;">
+    Exemplo do Aurora identificando uma execução PowerShell encodado e notificação no System Tray.
+  </figcaption>
 </figure>
+
 
 ### 3.4. Para uma instalação sem notificação no _system tray_
 
@@ -185,6 +188,36 @@ Para incluir novas regras é bem simples, basta ir ao caminho `C:/Program Files/
 ## 4. Observações
 
 Os sistemas de proteção identificam os arquivos `.yml` como maliciosos, então, é necessário colocar em exceção a pasta descompactada (eu costumo colocar em uma pasta `C:/aurora`) e o caminho `C:/Program Files/Aurora-Agent`.
+
+### 4.1. Exemplo de logs JSON
+
+Log de exemplo com integração direta ao SIEM:
+
+```txt
+<13>Dec 26 17:34:08 192.168.56.10 {"CommandLine":"\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -ep bypass -e cABvAHcAZQByAHMAaABlAGwAbAAuAGUAeABlACAAUwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgACIAYwBhAGwAYwAuAGUAeABlACIA","Company":"Microsoft Corporation","Computer":"kingslanding","Correlation_ActivityID":"{00000000-0000-0000-0000-000000000000}","CurrentDirectory":"C:\\Users\\vagrant\\","Description":"Windows PowerShell","DirectoryTableBase":"0x8F53A000","EventID":"1","Execution_ProcessID":"8672","Execution_ThreadID":"8320","ExitStatus":"259","FileAge":"2294d13h53m33s","FileCreationDate":"2018-09-15T00:14:14","FileVersion":"10.0.17763.1 (WinBuild.160101.0800)","Flags":"0","GrandparentCommandLine":"C:\\Windows\\Explorer.EXE","GrandparentImage":"C:\\Windows\\explorer.exe","GrandparentProcessId":"7888","Hashes":"MD5=7353F60B1739074EB17C5F4DDDEFE239,SHA1=6CBCE4A295C163791B60FC23D285E6D84F28EE4C,SHA256=DE96A6E69944335375DC1AC238336066889D9FFC7D73628EF4FE1B1B160AB32C,IMPHASH=741776AACCFC5B71FF59832DCDCACE0F","Image":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","ImageFileName":"powershell.exe","Keywords":"0x0","Level":"0","Match_Strings":"' -e ' in CommandLine, \\powershell.exe in Image","Module":"Sigma","Opcode":"1","OriginalFileName":"PowerShell.EXE","ParentCommandLine":"\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" ","ParentId":"0x21E0","ParentImage":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","ParentProcessId":"8672","ParentUser":"SEVENKINGDOMS\\vagrant","ProcessId":"2736","ProcessTree":"C:\\Windows\\explorer.exe|C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe|C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","Product":"Microsoft® Windows® Operating System","Provider_Guid":"{3D6FA8D0-FE05-11D0-9DDA-00C04FD7BA7C}","Provider_Name":"SystemTraceProvider-Process","Rule_Author":"frack113","Rule_Description":"Commandline to launch powershell with a base64 payload","Rule_FalsePositives":"Unknown","Rule_Id":"fb843269-508c-4b76-8b8d-88679db22ce7","Rule_Level":"medium","Rule_Link":"https://github.com/SigmaHQ/sigma/blob/r2024-12-19/rules/windows/process_creation/proc_creation_win_powershell_encode.yml","Rule_Modified":"2022-01-02","Rule_Path":"public\\windows\\process_creation\\proc_creation_win_powershell_encode.yml","Rule_References":"https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1059.001/T1059.001.md#atomic-test-20---powershell-invoke-known-malicious-cmdlets, https://unit42.paloaltonetworks.com/unit42-pulling-back-the-curtains-on-encodedcommand-powershell-attacks/, https://mikefrobbins.com/2017/06/15/simple-obfuscation-with-powershell-using-base64-encoding/","Rule_Sigtype":"public","Rule_Title":"Suspicious Execution of Powershell with Base64","SessionId":"1","Task":"0","TimeCreated_SystemTime":"2024-12-26T14:34:06.1325873-08:00","Timestamp":"2074-02-28T09:48:58","UniqueProcessKey":"0xFFFFE68EDBA57080","User":"SEVENKINGDOMS\\vagrant","UserSID":"\\\\SEVENKINGDOMS\\vagrant","UtcTime":"2024-12-26 22:34:06","Version":"4","Winversion":"17763","aurora_eventid":1,"level":"notice","msg":"Sigma match found","time":"2024-12-26T14:34:08-08:00"}
+```
+
+Log de exemplo coletado pelo `Application`:
+
+```txt
+<13>Dec 26 17:40:00 192.168.56.10 {"EventTime":"2024-12-26 14:39:59","Hostname":"kingslanding.sevenkingdoms.local","Keywords":36028797018963968,"EventType":"INFO","SeverityValue":2,"Severity":"INFO","EventID":1,"SourceName":"AuroraAgent","Task":0,"RecordNumber":3818,"ProcessID":0,"ThreadID":0,"Channel":"Application","Message":"{\"CommandLine\":\"\\\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\\" -ep bypass -e cABvAHcAZQByAHMAaABlAGwAbAAuAGUAeABlACAAUwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgACIAYwBhAGwAYwAuAGUAeABlACIA\",\"Company\":\"Microsoft Corporation\",\"Computer\":\"kingslanding\",\"Correlation_ActivityID\":\"{00000000-0000-0000-0000-000000000000}\",\"CurrentDirectory\":\"C:\\\\Users\\\\vagrant\\\\\",\"Description\":\"Windows PowerShell\",\"DirectoryTableBase\":\"0x634F2000\",\"EventID\":\"1\",\"Execution_ProcessID\":\"8996\",\"Execution_ThreadID\":\"5260\",\"ExitStatus\":\"259\",\"FileAge\":\"2294d13h53m33s\",\"FileCreationDate\":\"2018-09-15T00:14:14\",\"FileVersion\":\"10.0.17763.1 (WinBuild.160101.0800)\",\"Flags\":\"0\",\"GrandparentCommandLine\":\"C:\\\\Windows\\\\Explorer.EXE\",\"GrandparentImage\":\"C:\\\\Windows\\\\explorer.exe\",\"GrandparentProcessId\":\"7888\",\"Hashes\":\"MD5=7353F60B1739074EB17C5F4DDDEFE239,SHA1=6CBCE4A295C163791B60FC23D285E6D84F28EE4C,SHA256=DE96A6E69944335375DC1AC238336066889D9FFC7D73628EF4FE1B1B160AB32C,IMPHASH=741776AACCFC5B71FF59832DCDCACE0F\",\"Image\":\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\",\"ImageFileName\":\"powershell.exe\",\"Keywords\":\"0x0\",\"Level\":\"0\",\"Match_Strings\":\"' -e ' in CommandLine, \\\\powershell.exe in Image\",\"Module\":\"Sigma\",\"Opcode\":\"1\",\"OriginalFileName\":\"PowerShell.EXE\",\"ParentCommandLine\":\"\\\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\\" \",\"ParentId\":\"0x2324\",\"ParentImage\":\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\",\"ParentProcessId\":\"8996\",\"ParentUser\":\"SEVENKINGDOMS\\\\vagrant\",\"ProcessId\":\"1732\",\"ProcessTree\":\"C:\\\\Windows\\\\explorer.exe|C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe|C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\",\"Product\":\"Microsoft® Windows® Operating System\",\"Provider_Guid\":\"{3D6FA8D0-FE05-11D0-9DDA-00C04FD7BA7C}\",\"Provider_Name\":\"SystemTraceProvider-Process\",\"Rule_Author\":\"frack113\",\"Rule_Description\":\"Commandline to launch powershell with a base64 payload\",\"Rule_FalsePositives\":\"Unknown\",\"Rule_Id\":\"fb843269-508c-4b76-8b8d-88679db22ce7\",\"Rule_Level\":\"medium\",\"Rule_Link\":\"https://github.com/SigmaHQ/sigma/blob/r2024-12-19/rules/windows/process_creation/proc_creation_win_powershell_encode.yml\",\"Rule_Modified\":\"2022-01-02\",\"Rule_Path\":\"public\\\\windows\\\\process_creation\\\\proc_creation_win_powershell_encode.yml\",\"Rule_References\":\"https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1059.001/T1059.001.md#atomic-test-20---powershell-invoke-known-malicious-cmdlets, https://unit42.paloaltonetworks.com/unit42-pulling-back-the-curtains-on-encodedcommand-powershell-attacks/, https://mikefrobbins.com/2017/06/15/simple-obfuscation-with-powershell-using-base64-encoding/\",\"Rule_Sigtype\":\"public\",\"Rule_Title\":\"Suspicious Execution of Powershell with Base64\",\"SessionId\":\"1\",\"Task\":\"0\",\"TimeCreated_SystemTime\":\"2024-12-26T14:39:57.0745575-08:00\",\"Timestamp\":\"2074-02-28T09:48:58\",\"UniqueProcessKey\":\"0xFFFFE68ED8CB9080\",\"User\":\"SEVENKINGDOMS\\\\vagrant\",\"UserSID\":\"\\\\\\\\SEVENKINGDOMS\\\\vagrant\",\"UtcTime\":\"2024-12-26 22:39:57\",\"Version\":\"4\",\"Winversion\":\"17763\",\"level\":\"notice\",\"msg\":\"Sigma match found\",\"time\":\"2024-12-26T14:39:59-08:00\"}\n","Opcode":"Info","EventReceivedTime":"2024-12-26 14:39:59","SourceModuleName":"in","SourceModuleType":"im_msvistalog"}
+```
+
+### 4.2. Exemplos de regras Sigma em ação e integrados ao SIEM
+
+Eventos da execução de comando em base64 identificados por regras Sigma:
+
+<img src="rules.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+
+Eventos da resposta de matar o processo malicioso em execução do comando em base64 identificados por regras Sigma:
+
+<img src="response.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+
+Eventos identificados por regras Sigma da execução do Mimikatz em memória. Nesse exemplo não coloquei em _active response_:
+
+<img src="mimi.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+
+Como pode ser visto e como mencionei mais acima, ele pode gerar muitos eventos, por isso é necessário um trabalho de refinamento.
 
 ## 5. Conclusão
 
