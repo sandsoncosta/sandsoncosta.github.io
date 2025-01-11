@@ -82,3 +82,5 @@ imports:
   - path: github.com/hbstack/pwa-installer
   # Staticman Comments
   - path: github.com/hbstack/blog/modules/staticman
+  # Code Block
+  - path: github.com/hbstack/code-block-panel

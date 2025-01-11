@@ -26,6 +26,8 @@ tags:
  - Segurança de Endpoints
  - Automação de Segurança
 images:
+authors:
+ - sandson
 ---
 ## 1. Introdução
 

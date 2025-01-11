@@ -38,14 +38,14 @@ O reconhecimento (ou "recon") é uma etapa fundamental nas operações de segura
 
 Neste artigo, abordamos uma lista abrangente de comandos de reconhecimento em Windows e Linux, com foco em casos de uso práticos tanto para Blue Team quanto para Red Team, além de dar uma visão para o Threat Hunting e Engenharia de Detecção.
 
-###### Leia também!
+###### **Leia também!**
 
 {{< bs/bookmark-card
-url="https://sandsoncosta.github.io/blog/2024/10/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/"
+url="https://sandsoncosta.github.io/blog/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/"
 title="Como o Threat Hunting pode contribuir no processo de maturidade de uma empresa - Um Caso de Uso prático" 
-img="https://sandsoncosta.github.io/blog/2024/10/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/featured-sample_hu15151624785549089067.webp" 
+img="https://sandsoncosta.github.io/blog/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/featured-sample_hu15151624785549089067.webp" 
 author="Sandson Costa"
-authorImg="https://media.licdn.com/dms/image/v2/C4E03AQG1ijVuqWP5mw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1572869751467?e=1732752000&v=beta&t=p72NbGQyfBo-VJ8jTyFLTUux0G5FEt-NbH8AIbq0L1Q"
+authorImg="https://sandsoncosta.github.io/authors/sandson/image.884b34573e50c208bd581343f0944b81.jpg"
 authorIcon="pencil-square"
 authorIconVendor="bootstrap"
 >}}
