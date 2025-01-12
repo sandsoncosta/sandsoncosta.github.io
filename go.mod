@@ -72,8 +72,19 @@ require (
 	github.com/hbstack/socials v0.17.0 // indirect
 	github.com/hbstack/staticman-comments v0.3.0 // indirect
 	github.com/hbstack/syntax-highlighting v0.2.0 // indirect
+	github.com/hbstack/syntax-highlighting/styles/abap v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/algol v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/average v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/base16-snazzy v0.1.2 // indirect
 	github.com/hbstack/syntax-highlighting/styles/dracula v0.1.1 // indirect
+	github.com/hbstack/syntax-highlighting/styles/github v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/github-dark v0.1.2 // indirect
 	github.com/hbstack/syntax-highlighting/styles/gruvbox v0.1.1 // indirect
+	github.com/hbstack/syntax-highlighting/styles/monokai v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/rrt v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/swapoff v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/vim v0.1.2 // indirect
+	github.com/hbstack/syntax-highlighting/styles/xcode-dark v0.1.2 // indirect
 	github.com/hbstack/toc-scrollspy v0.2.0 // indirect
 	github.com/henrygd/bigger-picture v1.1.19 // indirect
 	github.com/hugomods/ascii v0.1.0 // indirect

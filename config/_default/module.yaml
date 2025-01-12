@@ -11,6 +11,7 @@ imports:
   # syntax highlighting, see https://hbstack.dev/en/docs/modules/syntax-highlighting/.
   # - path: github.com/hbstack/syntax-highlighting/styles/github-dark
   - path: github.com/hbstack/syntax-highlighting/styles/dracula
+
   # icons modules
   - path: github.com/hugomods/icons/vendors/font-awesome
   # - path: github.com/hugomods/icons/vendors/mdi

@@ -75,3 +75,7 @@ cascade:
       kind: page
     params:
       sidebar: false
+    
+params:
+  code_block_panel:
+    max_lines: 30
