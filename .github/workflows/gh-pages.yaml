@@ -63,13 +63,10 @@ jobs:
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"          
 
-      - name: List output directory
-        run: ls -l ./public  # Verifica se o diretório ./public existe e contém arquivos
-
       - name: Upload artifact
-        # uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v1
         # uses: actions/upload-artifact@v4
-        uses: actions/upload-pages-artifact@v3
+        # uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
 
