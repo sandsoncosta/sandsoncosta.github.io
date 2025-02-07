@@ -27,16 +27,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: "18"
 
@@ -44,7 +44,7 @@ jobs:
         run: sudo snap install dart-sass && sudo snap alias dart-sass sass
         
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v4
+        uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: "latest"
           extended: true
@@ -64,7 +64,7 @@ jobs:
             --baseURL "${{ steps.pages.outputs.base_url }}/"          
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v1
         with:
           path: ./public
 
@@ -77,4 +77,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v2
