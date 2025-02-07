@@ -79,6 +79,7 @@ hb:
         - docs
         - blog
         - tutorials
+    # COMENTÀRIOS DO BLOG
     giscus:
       repo: sandsoncosta/sandsoncosta.github.io
       repo_id: R_kgDOMJ83FQ
