@@ -122,7 +122,7 @@ O Firefox também possui uma configuração via GPO. Basta seguir os mesmos exem
 
 ## 5. Bloqueando via Firewall ou Proxy
 
-Uma abordagem mais restritiva é bloquear a instalação de extensões via firewall ou proxy, bloqueando seus domínios.
+Outra abordagem mais restritiva é bloquear a instalação de extensões via firewall ou proxy, bloqueando seus domínios.
 
 Adicionar as URLs de extensões à lista de bloqueios:
 
