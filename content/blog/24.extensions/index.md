@@ -118,7 +118,7 @@ O Edge (baseado no Chromium) segue um processo semelhante ao Chrome. Basta segui
 
 ## 4. Bloqueando Extensões no Mozilla Firefox
 
-O Firefox também possui configuração via GPO. Basta seguir os mesmos exemplos anteriores. Baixar o ADMX e configurar. As políticas são bem intuitivas, também basta ler o resumo na política para entender.
+O Firefox também possui uma configuração via GPO. Basta seguir os mesmos exemplos anteriores. Baixar o ADMX e configurar. As políticas são bem intuitivas, também basta ler o resumo na política para entender.
 
 ## 5. Bloqueando via Firewall ou Proxy
 
@@ -151,7 +151,7 @@ C:\Users\vagrant\AppData\Local\Google\Chrome\User Data\Default\Extensions\ghbmnn
 C:\Users\vagrant\AppData\Local\Google\Chrome\User Data\Default\Extensions\nmmhkkegccagdldgiimedpiccmgmieda
 ```
 
-Para Edge, substitua `Google\Chrome` por `Microsoft\Edge`.
+Para o Microsoft Edge, substitua `Google\Chrome` por `Microsoft\Edge`.
 
 ### 6.2. Mozilla Firefox
 
