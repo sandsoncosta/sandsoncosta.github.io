@@ -1,3 +1,27 @@
+name: GitHub Pages
+
+on:
+  # auto deploy when pushing to specified branches.
+  push:
+    branches:
+      - main
+
+  # allow deploying manually.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,13 +61,14 @@ jobs:
             --gc \
             --enableGitInfo \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
-        
+            --baseURL "${{ steps.pages.outputs.base_url }}/"          
+
       - name: List output directory
         run: ls -l ./public  # Verifica se o diretório ./public existe e contém arquivos
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        # uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           path: ./public
 
