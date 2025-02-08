@@ -6,7 +6,7 @@ description: "Guia detalhado para bloquear extensões no Chrome, Edge e Firefox 
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:
