@@ -20,6 +20,8 @@ github.com/hbstack/base v0.6.2 h1:ihsxMroTujvjVnKZwueujELNXGo9gsCQdrBrJ32zkuU=
 github.com/hbstack/base v0.6.2/go.mod h1:eO3xP3CJ2Dwc38+FjVqZuzmvT8dYF2D2Dw4Sx4pi9Ng=
 github.com/hbstack/bigger-picture v0.10.1 h1:EgUYZgSGhl4KwKVqryf6ncB2QY4YYgOqTpDW6+5tq14=
 github.com/hbstack/bigger-picture v0.10.1/go.mod h1:wZpRrOlTFrt2lO3tl9Y7cIAJbAJN1MdvRu0UsbCnkaE=
+github.com/hbstack/blockquote-alerts v0.1.1 h1:49whrdBAo3Bf/ZMF74rpHFAYY0N4pGtWKbgve7DhX+M=
+github.com/hbstack/blockquote-alerts v0.1.1/go.mod h1:QGRvi0JnQokhF5KhjWKGQzC0HwdKq3QPDyR8hZ8Q1qU=
 github.com/hbstack/blog v0.38.0 h1:8Q88168t8c2s8eA5DCAebJtQG8h1Zuxcrt+42I+rRmY=
 github.com/hbstack/blog v0.38.0/go.mod h1:mSWZq1M68aJSjGPv+yfbduABOSNbpBJ9HAM/EIKWxfQ=
 github.com/hbstack/blog v0.39.0 h1:oDXW1YEMESEZM4FxbHfHOS5XEdmSh94HKw78ZPG5GGo=
@@ -28,6 +30,8 @@ github.com/hbstack/blog/modules/breadcrumb v0.1.23 h1:MgUR88vv4cs/M1/cVBKUInFw3D
 github.com/hbstack/blog/modules/breadcrumb v0.1.23/go.mod h1:smQySqXDtUv2pP7bb+XBr+QGNFxhDGN0fLmQkOIWa5g=
 github.com/hbstack/blog/modules/content-panel v0.1.21 h1:g43IVjn3O6QCQSvCbgr9iYCgZcI5XG8YAiuVPb269Ok=
 github.com/hbstack/blog/modules/content-panel v0.1.21/go.mod h1:fVnvVtnfo3R78jnGLgckfC43j7rYMMN+l1PhU9E6Jas=
+github.com/hbstack/blog/modules/disqus v0.1.20 h1:h7IKmKnxVoI9uP95v1rzVtlDTYNuDhUY2CSO+U/ldUQ=
+github.com/hbstack/blog/modules/disqus v0.1.20/go.mod h1:nRgiu2tPVVsWnzRZECPwvKj0BsZkCc6OF5eDVEdK4XE=
 github.com/hbstack/blog/modules/featured-image v0.2.21 h1:G4nwll995EsnEAJOBUKJMjH12HtJ0YFPL0nH8m7qneI=
 github.com/hbstack/blog/modules/featured-image v0.2.21/go.mod h1:+gxtGAEh7aXDDKQA0wWzdi9HPLcqCSRtRp63F+NN8QU=
 github.com/hbstack/blog/modules/giscus v0.1.24 h1:GeucCT1a8HizwqEW74yuLNEETrShbXXkrI3WKHawK20=
