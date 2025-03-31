@@ -2,7 +2,7 @@
 title: "Como habilitar Two-Factor Authentication (2FA) no Windows com o MultiOTP"
 date: 2025-03-25T14:59:33-03:00
 draft: false
-description: "Neste artigo, vamos implementar a autenticação de dois fatores para autenticação de usuários no domínio usando o MultiOTP, que é Open-Source, elevando a segurança de sua empresa a outro nível, mesmo que suas senhas sejam vazadas."
+description: "Neste artigo, vamos implementar a autenticação de dois fatores para autenticação de usuários no domínio usando o MultiOTP, que é Open-Source."
 noindex: false
 featured: false
 pinned: false
@@ -280,9 +280,11 @@ Caso queira executar diretamente no powerhsell sem baixar o script, basta execut
   <figcaption><i><strong>Figura 10.</strong> Tela de solicitação do OTP.</i></figcaption>
 </figure>
 
-## 7. Recomendações
+## 7. Observações e Recomendações
 
 É importante fazer a implementação progressiva, selecionando poucos usuários ou equipes menos críticas para implantar aos poucos em todo o ambiente.
+
+Outro ponto importante é que ele, por ser um _Credential Provider_, não oferece proteção para autenticações via terminal como, PSSession ou uso de ferramentas maliciosas como Impacket. Ele fornece proteção para autenticação local e remota como o RDP.
 
 ## Referências
 
