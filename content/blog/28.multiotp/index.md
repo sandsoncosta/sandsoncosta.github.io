@@ -6,7 +6,7 @@ description: "Neste artigo, vamos implementar a autenticação de dois fatores p
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:
@@ -308,4 +308,5 @@ Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in
 [^2]: Seção 5.1.1 Memorized Secrets do NIST Special Publication 800-63B. Ver referências.
 [^3]: Referência do NIST dedicada exclusiva para a arquitetura Zero Trust. Ver referências.
 
+{{ partial "giscus/script" . }}
 <div class="giscus">YOUR COMMENTS WILL BE PLACED INSIDE</div>
