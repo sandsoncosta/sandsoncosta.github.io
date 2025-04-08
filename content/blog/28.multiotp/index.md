@@ -10,9 +10,14 @@ comments: true
 series:
  - 
 categories:
- - 
+ - Windows
+ - 2FA
+ - MFA
 tags:
- - 
+ - otp
+ - 2fa
+ - mfa
+ - windows
 authors:
  - sandson
 #images:
