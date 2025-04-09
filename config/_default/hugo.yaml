@@ -41,6 +41,10 @@ markup:
     noClasses: false
     lineNos: true
     lineNumbersInTable: false
+  tableOfContents:
+    endLevel: 5
+    ordered: false
+    startLevel: 1
 
 # see https://gohugo.io/content-management/related/#configure-related-content
 related:

@@ -305,13 +305,7 @@ Outro ponto importante é que ele, por ser um _Credential Provider_, não oferec
 Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in/sandsoncosta">LinkedIn</a>.<br>Vou ficar muito contente em receber um feedback seu.
 {{< /bs/alert >}}
 
-{{ partial "giscus/script" . }}
-<div class="giscus">YOUR COMMENTS WILL BE PLACED INSIDE</div>
-
 ---
 [^1]: Esta referência foi retirada do site Aiqon. Ver referências.
 [^2]: Seção 5.1.1 Memorized Secrets do NIST Special Publication 800-63B. Ver referências.
 [^3]: Referência do NIST dedicada exclusiva para a arquitetura Zero Trust. Ver referências.
-
-{{ partial "giscus/script" . }}
-<div class="giscus">YOUR COMMENTS WILL BE PLACED INSIDE</div>
