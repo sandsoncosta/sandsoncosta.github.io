@@ -15,9 +15,7 @@ require (
 	github.com/hbstack/blog v0.39.0 // indirect
 	github.com/hbstack/blog/modules/breadcrumb v0.1.23 // indirect
 	github.com/hbstack/blog/modules/content-panel v0.1.21 // indirect
-	github.com/hbstack/blog/modules/disqus v0.1.20 // indirect
 	github.com/hbstack/blog/modules/featured-image v0.2.21 // indirect
-	github.com/hbstack/blog/modules/giscus v0.1.24 // indirect
 	github.com/hbstack/blog/modules/heading-sign v0.1.23 // indirect
 	github.com/hbstack/blog/modules/post-authors v0.1.0 // indirect
 	github.com/hbstack/blog/modules/post-nav v0.4.0 // indirect
@@ -29,7 +27,6 @@ require (
 	github.com/hbstack/blog/modules/social-share-buttons v0.1.1 // indirect
 	github.com/hbstack/blog/modules/staticman v0.1.21 // indirect
 	github.com/hbstack/blog/modules/toc-scrollspy v0.2.0 // indirect
-	github.com/hbstack/blog/modules/utterances v0.1.20 // indirect
 	github.com/hbstack/bootstrap v0.2.2 // indirect
 	github.com/hbstack/breadcrumb v0.8.0 // indirect
 	github.com/hbstack/bs-tooltip v0.1.1 // indirect
@@ -50,7 +47,6 @@ require (
 	github.com/hbstack/form v0.2.0 // indirect
 	github.com/hbstack/gallery v0.13.1 // indirect
 	github.com/hbstack/gallery/modules/breadcrumb v0.1.1 // indirect
-	github.com/hbstack/giscus v0.1.1 // indirect
 	github.com/hbstack/hb v0.16.0 // indirect
 	github.com/hbstack/header v0.16.5 // indirect
 	github.com/hbstack/header/modules/language-picker v0.1.26 // indirect
@@ -75,19 +71,8 @@ require (
 	github.com/hbstack/socials v0.17.2 // indirect
 	github.com/hbstack/staticman-comments v0.3.0 // indirect
 	github.com/hbstack/syntax-highlighting v0.2.1 // indirect
-	github.com/hbstack/syntax-highlighting/styles/abap v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/algol v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/average v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/base16-snazzy v0.1.2 // indirect
 	github.com/hbstack/syntax-highlighting/styles/dracula v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/github v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/github-dark v0.1.2 // indirect
 	github.com/hbstack/syntax-highlighting/styles/gruvbox v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/monokai v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/rrt v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/swapoff v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/vim v0.1.2 // indirect
-	github.com/hbstack/syntax-highlighting/styles/xcode-dark v0.1.2 // indirect
 	github.com/hbstack/toc-scrollspy v0.2.0 // indirect
 	github.com/henrygd/bigger-picture v1.1.19 // indirect
 	github.com/hugomods/ascii v0.1.0 // indirect
@@ -125,7 +110,6 @@ require (
 	github.com/hugomods/shortcodes v0.24.0 // indirect
 	github.com/hugomods/simple-icons v13.21.0+incompatible // indirect
 	github.com/hugomods/snackbar v0.1.2 // indirect
-	github.com/hugomods/twikoo v0.1.0 // indirect
 	github.com/hugomods/workbox v0.1.0 // indirect
 	github.com/jakearchibald/idb v8.0.1+incompatible // indirect
 	github.com/krisk/Fuse v7.0.0+incompatible // indirect
