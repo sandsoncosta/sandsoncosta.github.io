@@ -12,10 +12,11 @@ description: "O artigo explora como o Threat Hunting aprimora a segurança nas e
 series:
  - Casos de Uso
 categories:
- - Threat Hunting
+ - Segurança e Defesa
+
+tags:
  - Engenharia de Detecção
  - Resposta a Incidentes
-tags:
  - Threat Hunting
  - Maturidade de Segurança
  - Falsos Positivos

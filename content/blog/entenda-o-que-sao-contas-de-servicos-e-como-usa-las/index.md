@@ -12,11 +12,13 @@ noindex: false
 comments: true
 series:
 categories:
-  - Active Directory
+  - Windows
 tags: 
-  - Windows Server
-  - AD
+  - Active Directory
   - Service Accounts
+  - Windows Server
+  - Melhores Práticas
+  - Segurança e Defesa
 authors:
   - sandson
 images: []

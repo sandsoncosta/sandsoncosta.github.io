@@ -11,14 +11,21 @@ series:
  - 
 categories:
  - Windows
- - Enterprise
- - Segurança
+ - Segurança e Defesa
+ - Linux
 tags:
- - bloqueio
- - extensões
- - navegadores
- - firewall
- - registros
+ - Extensões
+ - Browsers
+ - Firewall
+ - Registros
+ - Ferramentas de Segurança
+ - GPO
+ - Threat Hunting
+ - Maturidade de Segurança
+ - Segurança Multiplataforma
+ - Ferramentas de Segurança
+ - Melhores Práticas
+ - Active Directory
 authors:
  - sandson
 #images:

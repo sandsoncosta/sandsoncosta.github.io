@@ -10,11 +10,14 @@ comments: false
 series:
  - Auditorias do Windows
 categories:
- - Active Directory
+ - Windows
+ - Segurança e Defesa
 tags:
+ - Active Directory
  - Windows Server
- - AD
  - GPO
+ - Logs do Windows
+ - PowerShell
 authors:
   - sandson
 images:
