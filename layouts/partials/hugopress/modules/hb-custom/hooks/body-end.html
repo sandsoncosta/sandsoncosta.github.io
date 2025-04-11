@@ -1,4 +1,6 @@
 {{/* Put custom HTML markup before the end of <body>. */}}
-
-{{ partial "giscus/script" . }}
-<div class="giscus">YOUR COMMENTS WILL BE PLACED INSIDE</div>
+    <h2>Comments</h2>
+    <hr />
+    <div class="giscus"></div>
+    <hr />
+    {{ partial "giscus/script-with-options" .Site.Params.blog.giscus }}

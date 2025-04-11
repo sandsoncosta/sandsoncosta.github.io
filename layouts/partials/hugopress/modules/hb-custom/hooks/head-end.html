@@ -21,3 +21,8 @@ if(!window.hcb_user){hcb_user={};} (
 ();
 </script>
 <!-- end www.htmlcommentbox.com -->
+<h2>Comments</h2>
+<hr />
+<div class="giscus"></div>
+<hr />
+{{ partial "giscus/script-with-options" .Site.Params.blog.giscus }}
