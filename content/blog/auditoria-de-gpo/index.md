@@ -13,14 +13,11 @@ description: Identifique quando suas GPOs forem criadas, modificadas, restaurada
 series:
  - Auditorias do Windows
 categories:
-  - Windows
-tags: 
-  - Active Directory
-  - Service Accounts
-  - Windows Server
-  - Melhores Práticas
-  - Segurança e Defesa
-  - GPO
+ - Active Directory
+tags:
+ - Windows Server
+ - AD
+ - GPO
 authors:
   - sandson
 images:

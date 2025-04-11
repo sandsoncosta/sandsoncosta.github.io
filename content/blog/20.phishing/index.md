@@ -10,13 +10,12 @@ comments: false
 series:
 #  - 
 categories:
- - Inteligência e Análise
-tags:
- - Threat Intelligence
- - Análise de Ameaças
  - Phishing
- - Melhores Práticas
- - Proteção 
+tags:
+ - análise
+ - phishing
+ - melhores práticas
+ - proteção 
 images:
 authors:
  - sandson

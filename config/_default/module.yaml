@@ -83,5 +83,3 @@ imports:
   - path: github.com/hbstack/blog/modules/staticman
   # Code Block
   - path: github.com/hbstack/code-block-panel
-  # PWA
-  # - path: github.com/hugomods/pwa

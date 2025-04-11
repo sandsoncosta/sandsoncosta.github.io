@@ -1,5 +1,5 @@
 ---
-title: "Exfiltração de dados usando PowerShell e ICMP: Uma abordagem técnica"
+title: "Exfiltração de Dados Usando PowerShell e ICMP: Uma Abordagem Técnica"
 date: 2024-09-27T15:07:00-03:00
 featured: false
 draft: false
@@ -12,18 +12,13 @@ description: Este artigo aborda a exfiltração de dados via PowerShell e ICMP, 
 series:
  - Casos de Uso
 categories:
- - Windows
- - Ataques e Exploração
+ - PowerShell
+ - Exfiltração
 tags:
  - ICMP
  - MITRE ATT&CK
  - Cyber Kill Chain
  - Segurança de Rede
- - C2
- - Exploração
- - Simulação
- - PoC
- - Exfiltração
 authors:
   - sandson
 images:

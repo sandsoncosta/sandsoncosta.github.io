@@ -124,6 +124,7 @@ hb:
     pwa_installer:
     delay: 5
     dismissed_period: 604800
+
 seo:
   favicons: # see https://hugomods.com/en/docs/seo/#favicons-module
     icon: images/logo.png # use logo as favicon.
