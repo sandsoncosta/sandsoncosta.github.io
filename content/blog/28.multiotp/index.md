@@ -11,13 +11,14 @@ series:
  - 
 categories:
  - Windows
- - 2FA
- - MFA
+ - Segurança e Defesa
+ - Ferramentas e Automação
 tags:
- - otp
- - 2fa
- - mfa
- - windows
+ - OTP
+ - MFA
+ - Maturidade de Segurança
+ - Segurança Multiplataforma
+ - Ferramentas de Segurança
 authors:
  - sandson
 #images:

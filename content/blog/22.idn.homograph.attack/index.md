@@ -10,9 +10,11 @@ comments: false
 series:
 #  - 
 categories:
-#  - 
+ - Inteligência e Análise
 tags:
-#  - 
+ - Análise de Ameaças
+ - Indicadores de Comprometimento
+ - Threat Hunting
 images:
 authors:
  - sandson

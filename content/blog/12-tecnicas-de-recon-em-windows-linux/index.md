@@ -12,10 +12,19 @@ series:
 categories:
  - Windows
  - Linux
+ - Ataques e Exploração
+ - Segurança e Defesa
 tags:
  - Recon
  - Reconnaissance
  - Reconhecimento
+ - Threat Hunting
+ - Engenharia de Detecção
+ - Regras de Detecção
+ - SIEM
+ - Maturidade de Segurança
+ - Logs do Windows
+ - Exploração
 authors:
  - sandson
 images:

@@ -10,10 +10,11 @@ comments: false
 series:
 #  - 
 categories:
- - Threat Hunting
- - EDR
- - Engenharia de Detecção
- - Regras Sigma
+ - Segurança e Defesa
+ - Ataques e Exploração
+ - Resposta a Incidentes
+ - Inteligência e Análise
+ - Ferramentas e Automação
  - Windows
 tags:
  - Sigma

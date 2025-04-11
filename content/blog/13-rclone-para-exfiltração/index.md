@@ -10,16 +10,14 @@ comments: false
 series:
 #  - 
 categories:
- - Ransomware
  - Windows
- - Exfiltração
 tags:
+ - Ransomware
  - rclone
  - exfiltração
  - c2
  - criptografia
- - hunting
- - windows
+ - Threat Hunting
 images:
 #  - 
 authors:
