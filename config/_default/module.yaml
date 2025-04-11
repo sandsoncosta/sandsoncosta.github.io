@@ -84,4 +84,4 @@ imports:
   # Code Block
   - path: github.com/hbstack/code-block-panel
   # PWA
-  - path: github.com/hugomods/pwa
+  # - path: github.com/hugomods/pwa
