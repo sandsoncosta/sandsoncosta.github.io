@@ -2,7 +2,7 @@
 title: "Análise minuciosa de ofuscação PowerShell: De um script caótico ao \"Start-Process calc.exe\""
 date: 2025-04-09T12:15:38-03:00
 draft: false
-description: 
+description: "Análise prática de um script PowerShell ofuscado, revelando passo a passo da sua lógica até executar calc.exe com Start-Process. Ideal para estudos de Threat Hunting."
 noindex: false
 featured: false
 pinned: false
@@ -36,7 +36,7 @@ Você pode armazenar todos os tipos de valores em variáveis do PowerShell. Por 
 
 Uma variável é uma unidade de memória na qual os valores são armazenados. No PowerShell, as variáveis são representadas por strings de texto que começam com um cifrão `$`, como `$a`, `$process` ou `$my_var`.
 
-Os nomes de variáveis não diferenciam maiúsculas de minúsculas e podem incluir espaços e **caracteres**. Mas, os nomes de variáveis que incluem caracteres especiais e espaços são difícil de usar e deve ser evitado. Para obter mais informações, consulte Nomes de variáveis que incluem caracteres especiais.
+Os nomes de variáveis não diferenciam maiúsculas de minúsculas e podem incluir espaços e **caracteres**. Mas, os nomes de variáveis que incluem caracteres especiais e espaços são difícil de usar e deve ser evitado. Para obter mais informações, consulte **about_Variables** na seção **Referências**.
 
 Há vários tipos diferentes de variáveis no PowerShell:
 
@@ -82,15 +82,15 @@ ${~~~~~~~~~~~} # 0
 ```
 Isso inicializa `${~~~~~~~~~~~}` como `0`. O `+$()` é uma forma de forçar a conversão para número inteiro.
 
-Logo em seguida, várias variáveis são definidas usando incremento (++) sobre ${~~~~~~~~~~~}:
+Logo em seguida, várias variáveis são definidas usando incremento `(++)` sobre `${~~~~~~~~~~~}`:
 ```powershell
-${~~~~~~~~~~~}=+$();       #
-${~~~~}=${~~~~~~~~~~~};      #
-${~~}=++${~~~~~~~~~~~};      #
-${~~~~~}=++${~~~~~~~~~~~};       #
-${~}=++${~~~~~~~~~~~};       #
-${~~~~~~~~~~}=++${~~~~~~~~~~~};      #
-${~~~}=++${~~~~~~~~~~~};       #
+${~~~~~~~~~~~}=+$();            # 0
+${~~~~}=${~~~~~~~~~~~};         # 0
+${~~}=++${~~~~~~~~~~~};         # 1
+${~~~~~}=++${~~~~~~~~~~~};      # 2
+${~}=++${~~~~~~~~~~~};          # 3
+${~~~~~~~~~~}=++${~~~~~~~~~~~}; # 4
+${~~~}=++${~~~~~~~~~~~};        # 5
 ${~~~~~~~~~}=++${~~~~~~~~~~~};  # 6
 ${~~~~~~}=++${~~~~~~~~~~~};     # 7
 ${~~~~~~~}=++${~~~~~~~~~~~};    # 8
@@ -122,7 +122,7 @@ ${~~~~~~~~~~~~} = "[" +                 #               '['
 
 - `$(@{})` é um hash table vazio. Mas como PowerShell trata tudo como objeto, isso gera a string `System.Collections.Hashtable`, e podemos indexar nela.
 - `${~~~~~~} = 7` → `'C'` (7º caractere de `System.Collections.Hashtable`)
-- `${~~} + ${~~~~~~~~} = 1 + 9 = 10` → `'h'`
+- `${~~} + ${~~~~~~~~} = 1 + 9 = 10` → `'H'`
 - `${~~~~~} + ${~~~~} = 2 + 0 = 2` → `'a'`
 - `$?` retorna `True`, que em string é `'True'` → `[1] = 'r'`
 
@@ -130,7 +130,7 @@ ${~~~~~~~~~~~~} = "[" +                 #               '['
 
 Todo o resto vai seguir o mesmo padrão, até chegar na string que vamos ver na próxima seção.
 
-## 3.4. Construção da Função `[Char]().Invoke(...)`
+## 3.4. Construção da Função `Invoke-Expression`
 
 Esse trecho:
 
@@ -163,7 +163,18 @@ O trecho ofuscado na seção anterior e neste seção está sendo construída di
 
 A parte final do script é responsável por montar caractere por caractere, invocando `[Char]` com valores numéricos: `[CHar]99+[CHar]97+[CHar]108+[CHar]99+[CHar]46+[CHar]101+[CHar]120+[CHar]101`.
 
-# 4. Desafio
+# 4. O que vemos no SIEM
+
+Muita gente usa PowerShell pra evasão, achando que só por estar ofuscado tá stealth. Pode até ser até certo ponto, esse modelo pode até se evadir de certas defesas, mas em ambientes maduros, PowerShell não é o vilão — ele pode estar habilitado, mas com logging avançado, regras de detecção bem afiadas e integração com o SIEM. Mesmo scripts super ofuscados, acabam sendo desofuscados em tempo real pelo próprio PowerShell, como vimos aqui. No log podemos identificar pelo <mark>EventID 4104</mark> pelo Channel <mark>**Microsoft-Windows-PowerShell/Operational**</mark>, se habilitado a auditoria no ambiente, é claro. 
+
+Na imagem abaixo, vemos as mesmas informações que debugamos aqui neste artigo. É um sequenciamento desde o primeiro script ofuscado até o script real. Resultado? O analista vê tudo que foi executado. Legal, não acha?
+
+<figure style="text-align: center;">
+  <img src="siem.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 3.</strong> Exemplo de log ofuscado executado no terminal que conseguimos ver no SIEM.</i></figcaption>
+</figure>
+
+# 5. Desafio
 
 Segue um exemplo para você brincar. Tente não executar e desofuscar o comando. Pode usar o CyberChef para ajudar no decode:
 
@@ -171,18 +182,17 @@ Segue um exemplo para você brincar. Tente não executar e desofuscar o comando.
 ${**********}=  +$()  ;${*******}=${**********};${********}  =  ++  ${**********};  ${*********}  =(${**********}  =  ${**********}+${********}  )  ;${***********}  =(  ${**********}=  ${**********}+${********})  ;${****}=(${**********}  =${**********}  +  ${********});${******}=  (${**********}  =  ${**********}  +${********}  )  ;  ${***}  =(${**********}  =${**********}  +  ${********})  ;  ${*}=(${**********}  =${**********}+  ${********}  )  ;  ${*****}  =(${**********}  =  ${**********}+  ${********}  )  ;  ${************}=(${**********}=  ${**********}+  ${********}  );${**}  ="["  +"$(@{})"[${*}]  +  "$(@{  })"[  "${********}"  +"${************}"]+  "$(  @{}  )"["${*********}"  +"${*******}"]+"$?"[  ${********}  ]  +"]";  ${**********}="".("$(  @{  })"[  "${********}${****}"]+"$(@{  }  )  "[  "${********}${***}"  ]+  "$(@{  }  )  "[  ${*******}]  +  "$(  @{})  "[  ${****}]+  "$?  "[${********}  ]+"$(@{})  "[  ${***********}]);  ${**********}="$(  @{})  "[  "${********}${****}"]+  "$(  @{})"[  ${****}  ]+  "${**********}"[  "${*********}${*}"  ]  ;"${**********}(${**}${********}${*******}${********}  +  ${**}${************}${************}+${**}${********}${*******}${****}+${**}${********}${********}${********}+  ${**}${***********}${*********}+  ${**}${***********}${****}+  ${**}${*}${*}  +${**}${********}${********}${*}+  ${**}${********}${*******}${******}  +  ${**}${********}${********}${***}+${**}${********}${********}${********}  +  ${**}${***********}${*********}+${**}${************}${*****}  +  ${**}${********}${*******}${********}+${**}${********}${*******}${************}+${**}${***********}${****})  "|&${**********}
 ```
 
-# 5. Conclusão
+# 6. Conclusão
 
 Mais importante do que escolher a melhor ferramenta de ofuscação é entender como ela funciona e melhor ainda, como desenvolver a sua própria ferramenta ou ofuscação. Olhar uma ofuscação maluca e ver o payload rodar é interessante, mas entender o raciocínio por trás da criação, o fluxo lógico e o porquê de cada passo… isso é o que transforma um operador em analista. Ver um payload passando por antivírus e EDR pode impressionar, mas conhecer as camadas que o tornam furtivo — e por que funcionam — é outro nível. As técnicas mudam. As ferramentas se atualizam. Mas os conceitos permanecem. Assim como um músico que entende a teoria por trás da melodia, quem domina a lógica da evasão não depende de scripts prontos: ele cria, adapta e evolui. Entender o fluxo, o raciocínio e a engenharia por trás de cada linha maliciosamente pensada não te torna apenas um executor. Te torna um estrategista.
 
-# 6. Referências
+# 7. Referências
 
 - [PowerShell Documentation](https://learn.microsoft.com/en-us/powershell/?view=powershell-7.5)
 - [about_Variables](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_variables?view=powershell-7.5)
 - [about_Automatic_Variables](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables?view=powershell-7.5)
 - [about_Preference_Variables](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.5)
 - [about_Hash_Tables](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_hash_tables?view=powershell-7.4)
-- [Bohannon, Daniel. Invoke-Obfuscation](https://github.com/danielbohannon/Invoke-Obfuscation)
 
 {{< bs/alert warning >}}
 {{< bs/alert-heading "Encontrou algum erro? Quer sugerir alguma mudança ou acrescentar algo?" >}}
