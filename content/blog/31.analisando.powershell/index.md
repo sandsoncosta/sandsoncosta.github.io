@@ -25,7 +25,6 @@ authors:
  - sandson
 #images:
 ---
-
 # 1. Introdução
 
 A ofuscação é uma técnica usada com frequência em scripts maliciosos para dificultar a análise estática e esconder a intenção real do código. Neste artigo, vamos analisar um simples script PowerShell altamente ofuscado, demonstrar passo a passo como ele foi construído, desofuscá-lo e mostrar o resultado final: a execução do `calc.exe` via `Start-Process`.
@@ -54,6 +53,7 @@ Aqui temos nosso script de exemplo para estudar:
 # Comando: "Start-Process calc.exe" totalmente ofuscado
 ${~~~~~~~~~~~}  =+$(  );${~~~~}  =${~~~~~~~~~~~};${~~}=  ++  ${~~~~~~~~~~~}  ;  ${~~~~~}=++  ${~~~~~~~~~~~};${~}=  ++  ${~~~~~~~~~~~};${~~~~~~~~~~}=  ++${~~~~~~~~~~~};  ${~~~}  =++${~~~~~~~~~~~};${~~~~~~~~~}=++${~~~~~~~~~~~};${~~~~~~}  =  ++  ${~~~~~~~~~~~}  ;  ${~~~~~~~}=++  ${~~~~~~~~~~~}  ;  ${~~~~~~~~}  =  ++${~~~~~~~~~~~}  ;  ${~~~~~~~~~~~~}  ="["+"$(  @{  }  )  "[  ${~~~~~~}  ]+  "$(@{  })"["${~~}"  +  "${~~~~~~~~}"]  +"$(@{  }  )"["${~~~~~}"  +"${~~~~}"]  +"$?"[${~~}]+  "]"  ;  ${~~~~~~~~~~~}  =  "".("$(  @{})"[  "${~~}"  +  "${~~~~~~~~~~}"  ]  +  "$(  @{}  )  "[  "${~~}"+  "${~~~~~~~~~}"  ]  +  "$(  @{}  )"[${~~~~}  ]+  "$(@{}  )"[${~~~~~~~~~~}]  +"$?  "[${~~}  ]  +"$(  @{}  )  "[${~}]  )  ;  ${~~~~~~~~~~~}="$(  @{})"["${~~}"+  "${~~~~~~~~~~}"  ]+  "$(  @{}  )"[  ${~~~~~~~~~~}]+  "${~~~~~~~~~~~}"["${~~~~~}"  +  "${~~~~~~}"];  "  ${~~~~~~~~~~~}(${~~~~~~~~~~~~}${~~~~~~~}${~}+  ${~~~~~~~~~~~~}${~~}${~~}${~~~~~~~~~}+  ${~~~~~~~~~~~~}${~~~~~~~~}${~~~~~~}  +${~~~~~~~~~~~~}${~~}${~~}${~~~~~~~~~~}  +  ${~~~~~~~~~~~~}${~~}${~~}${~~~~~~~~~}+${~~~~~~~~~~~~}${~~~~~~~~~~}${~~~}+  ${~~~~~~~~~~~~}${~~~~~~~}${~~~~}+  ${~~~~~~~~~~~~}${~~}${~~}${~~~~~~~~~~}  +${~~~~~~~~~~~~}${~~}${~~}${~~}+  ${~~~~~~~~~~~~}${~~~~~~~~}${~~~~~~~~}+  ${~~~~~~~~~~~~}${~~}${~~~~}${~~}+  ${~~~~~~~~~~~~}${~~}${~~}${~~~}  +  ${~~~~~~~~~~~~}${~~}${~~}${~~~}  +  ${~~~~~~~~~~~~}${~}${~~~~~}  +  ${~~~~~~~~~~~~}${~~~~~~~~}${~~~~~~~~}+${~~~~~~~~~~~~}${~~~~~~~~}${~~~~~~}+${~~~~~~~~~~~~}${~~}${~~~~}${~~~~~~~}  +${~~~~~~~~~~~~}${~~~~~~~~}${~~~~~~~~}  +  ${~~~~~~~~~~~~}${~~~~~~~~~~}${~~~~~~~~~}  +${~~~~~~~~~~~~}${~~}${~~~~}${~~}  +  ${~~~~~~~~~~~~}${~~}${~~~~~}${~~~~}  +  ${~~~~~~~~~~~~}${~~}${~~~~}${~~}  )  "|&  ${~~~~~~~~~~~}
 ```
+
 A primeira vista é uma coisa de outro mundo, mas é mais simples do que parece... tecnicamente falando 😅.
 
 ## 3.1. Criação de uma variável qualquer
@@ -76,13 +76,16 @@ Embora seja tecnicamente válido, não é uma boa prática usar esse tipo de nom
 ## 3.2. Inicialização e Contadores
 
 A linha abaixo inicia a criação de um contador numérico:
+
 ```powershell
 ${~~~~~~~~~~~} = +$();
 ${~~~~~~~~~~~} # 0
 ```
+
 Isso inicializa `${~~~~~~~~~~~}` como `0`. O `+$()` é uma forma de forçar a conversão para número inteiro.
 
 Logo em seguida, várias variáveis são definidas usando incremento `(++)` sobre `${~~~~~~~~~~~}`:
+
 ```powershell
 ${~~~~~~~~~~~}=+$();            # 0
 ${~~~~}=${~~~~~~~~~~~};         # 0
@@ -96,11 +99,13 @@ ${~~~~~~}=++${~~~~~~~~~~~};     # 7
 ${~~~~~~~}=++${~~~~~~~~~~~};    # 8
 ${~~~~~~~~}=++${~~~~~~~~~~~};   # 9
 ```
+
 Essas variáveis representam números de 0 a 9 e serão usadas como índices para acessar caracteres em strings, arrays e variáveis automáticas.
 
 ## 3.3. Construção de [Char]
 
 Logo após essa criação dos inicializadores e contadores, temos uma concatenação:
+
 ```powershell
 ${~~~~~~~~~~~~}  ="["+"$(  @{  }  )  "[  ${~~~~~~}  ]+  "$(@{  })"["${~~}"  +  "${~~~~~~~~}"]  +"$(@{  }  )"["${~~~~~}"  +"${~~~~}"]  +"$?"[${~~}]+  "]"  ;
 ```
@@ -113,6 +118,7 @@ ${~~~~~~~~~~~~} = "[" +                 #               '['
     "$?"[${~~}] +                       # 1 =           'r'
     "]";                                #               ']'
 ```
+
 <figure style="text-align: center;">
   <img src="terminal.gif" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
   <figcaption><i><strong>Figura 2.</strong> Execução do script para prova técnica.</i></figcaption>
@@ -151,11 +157,13 @@ Se pegarmos o comando anterior e executar somente os `[CHar]` que está entre pa
 ```powershell
 [CHar]83+[CHar]116+[CHar]97+[CHar]114+[CHar]116+[CHar]45+[CHar]80+[CHar]114+[CHar]111+[CHar]99+[CHar]101+[CHar]115+[CHar]115+[CHar]32+[CHar]99+[CHar]97+[CHar]108+[CHar]99+[CHar]46+[CHar]101+[CHar]120+[CHar]101
 ```
+
 Temos:
 
 ```powershell
 Start-Process calc.exe
 ```
+
 O trecho ofuscado na seção anterior e neste seção está sendo construída dinamicamente:
 
 - Os índices recuperam letras de strings padrão como `$( @{} )` e `$?`, formando a string `Start-Process calc.exe`.
@@ -165,7 +173,7 @@ A parte final do script é responsável por montar caractere por caractere, invo
 
 # 4. O que vemos no SIEM
 
-Muita gente usa PowerShell pra evasão, achando que só por estar ofuscado tá stealth. Pode até ser até certo ponto, esse modelo pode até se evadir de certas defesas, mas em ambientes maduros, PowerShell não é o vilão — ele pode estar habilitado, mas com logging avançado, regras de detecção bem afiadas e integração com o SIEM. Mesmo scripts super ofuscados, acabam sendo desofuscados em tempo real pelo próprio PowerShell, como vimos aqui. No log podemos identificar pelo <mark>EventID 4104</mark> pelo Channel <mark>**Microsoft-Windows-PowerShell/Operational**</mark>, se habilitado a auditoria no ambiente, é claro. 
+Muita gente usa PowerShell pra evasão, achando que só por estar ofuscado tá stealth. Pode até ser até certo ponto, esse modelo pode até se evadir de certas defesas, mas em ambientes maduros, PowerShell não é o vilão — ele pode estar habilitado, mas com logging avançado, regras de detecção bem afiadas e integração com o SIEM. Mesmo scripts super ofuscados, acabam sendo desofuscados em tempo real pelo próprio PowerShell, como vimos aqui. No log podemos identificar pelo `<mark>`EventID 4104`</mark>` pelo Channel `<mark>`**Microsoft-Windows-PowerShell/Operational**`</mark>`, se habilitado a auditoria no ambiente, é claro.
 
 Na imagem abaixo, vemos as mesmas informações que debugamos aqui neste artigo. É um sequenciamento desde o primeiro script ofuscado até o script real. Resultado? O analista vê tudo que foi executado. Legal, não acha?
 
@@ -194,14 +202,19 @@ Mais importante do que escolher a melhor ferramenta de ofuscação é entender c
 - [about_Preference_Variables](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.5)
 - [about_Hash_Tables](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_hash_tables?view=powershell-7.4)
 
+
+<div class="giscus"></div>
+
+
 {{< bs/alert warning >}}
 {{< bs/alert-heading "Encontrou algum erro? Quer sugerir alguma mudança ou acrescentar algo?" >}}
-Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in/sandsoncosta">LinkedIn</a>.<br>Vou ficar muito contente em receber um feedback seu.
+Por favor, entre em contato comigo pelo meu `<a href="https://www.linkedin.com/in/sandsoncosta">`LinkedIn`</a>`.`<br>`Vou ficar muito contente em receber um feedback seu.
 {{< /bs/alert >}}
 
 ---
+
 <!-- begin wwww.htmlcommentbox.com -->
-  <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
+
+<div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">Widget</a> is loading comments...</div>
  <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
 <!-- end www.htmlcommentbox.com -->
-

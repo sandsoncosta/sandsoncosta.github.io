@@ -81,26 +81,26 @@ hb:
         - tutorials
     # COMENTÁRIOS DO BLOG
     giscus:
-      endpoint: https://giscus.app/
+      # endpoint: https://giscus.app/
       repo: sandsoncosta/sandsoncosta.github.io
       repo_id: R_kgDOMNgMqg
       category: General
       category_id: DIC_kwDOMNgMqs4Coox_
       mapping: pathname
       theme: noborder_dark
-      input_position: top
+      # input_position: top
       reactions: true
 
   docs:
     giscus:
-      endpoint: https://giscus.app/
+      # endpoint: https://giscus.app/
       repo: sandsoncosta/sandsoncosta.github.io
       repo_id: R_kgDOMNgMqg
       category: General
       category_id: DIC_kwDOMNgMqs4Coox_
       mapping: pathname
       theme: noborder_dark
-      input_position: top
+      # input_position: top
       reactions: true
   content_panel:
     repo:
