@@ -2,7 +2,7 @@
 title: "Qual a diferença entre vulnerabilidade e falha de segurança?"
 date: 2025-04-22T00:26:48-03:00
 draft: false
-description: "Entenda como a Matriz GUT ajuda a priorizar ações críticas, reduzir riscos e otimizar tarefas, avaliando gravidade, urgência e tendência para tomar decisões estratégicas." 
+description: "Vulnerabilidade é uma fraqueza potencial enquanto falha de segurança é quando um controle existente falha e o ataque tem sucesso. Nem toda vulnerabilidade vira falha." 
 noindex: false
 featured: false
 pinned: false
@@ -36,7 +36,7 @@ A vulnerabilidade é uma fraqueza ou deficiência em um sistema, procedimento ou
 
 Enquanto vulnerabilidades são condições pré-existentes antes de um ataque, falhas de segurança são amostras práticas de que um controle implementado falhou e não respondeu conforme o esperado.
 
-Neste artigo, proponho uma experiência de aprendizado particular, com estudos de caso reais e exercícios práticos para reforçar a compreensão e aplicação desses conceitos.
+Neste artigo, proponho uma experiência de aprendizado particular, com estudos de caso simples, porém exercícios práticos para reforçar a compreensão e aplicação desses conceitos.
 
 # 2. Definições fundamentais
 
@@ -44,17 +44,17 @@ Neste artigo, proponho uma experiência de aprendizado particular, com estudos d
 
 Uma vulnerabilidade é uma condição particular de fraqueza em um sistema, em procedimentos de segurança, em controles internos ou na implementação de um software que pode ser explorada por uma fonte de ameaça. Ela pode se manifestar como problemas de codificação, configurações incorretas ou lacunas em processos de controle interno. Vulnerabilidades geralmente são identificadas através de auditorias, varreduras automatizadas ou _pentest_ e, quando públicas que afeta serviços globais, catalogadas em bases de dados pública como o CVE (Common Vulnerabilities and Exposures).
 
-A vulnerabilidade pode ou não ser explorada. Se não houver um vetor de ataque viável ou o controle de segurança funcionar, a vulnerabilidade não resulta em comprometimento. É como uma porta da casa aberta para um roubo... está aberta, mas pode ter um portão de ferro trancado no cadeado que impede ao invasor o acesso.
+A vulnerabilidade pode ou não ser explorada. Se não houver um vetor de ataque viável ou o controle de segurança funcionar, a vulnerabilidade não resulta em comprometimento. É como uma porta da casa aberta, existe a possibilidade de ser invadida por alguém, mas... pode ter um portão de ferro trancado no cadeado que impede ao invasor o acesso.
 
 **Exemplo:** Um servidor com uma versão desatualizada do Apache, com uma vulnerabilidade conhecida, mas que só está acessível via localhost e está atrás de um WAF. O sistema é vulnerável, mas não está exposto.
 
 ## 2.2. O que é Falha de Segurança?
 
-Falha de segurança, ou falha de controle de segurança, é o momento em que um mecanismo projetado para prevenir, detectar ou mitigar um ataque não consegue fazê-lo, resultando em um incidente de segurança. Essas falhas podem ocorrer por problemas operacionais, falhas de configuração, bugs em sistemas de defesa ou limitações de design. Ao contrário de vulnerabilidades, que são estado latente, falhas de segurança são eventos observáveis que indicam a quebra de um controle de segurança.
+Falha de segurança ou falha de controle de segurança, é o momento em que um mecanismo projetado para prevenir, detectar ou mitigar um ataque não consegue fazê-lo, resultando em um incidente de segurança. Essas falhas podem ocorrer por problemas operacionais, falhas de configuração, bugs em sistemas de defesa ou limitações de design. Ao contrário de vulnerabilidades, que são estado latente, falhas de segurança são eventos observáveis que indicam a quebra de um controle de segurança.
 
 A falha de segurança sempre vai resultar em um incidente, permitindo que o ataque aconteça. O atacante passa pelas defesas, seja por má configuração, falha operaciona, por vulnerabilidade explorável ou simplesmente não existir proteção. Dessa vez temos duas hipóteses: ou não existe portão na casa ou o cadeado do portão é fácil de ser arrombado ou de repente a chave estava no cadeado 🤷‍♂️.
 
-**Exemplo:** EDR instalado, firewall configurado… mas o atacante usou PowerShell codificado em base64, o script passou, e o ransomware criptografou tudo. Aqui houve uma falha no mecanismo de detecção, falha de segurança clara. É um exemplo tosco, eu sei... mas faz sentido.
+**Exemplo:** EDR instalado, firewall configurado… mas o atacante usou PowerShell codificado em base64, o script passou e o ransomware criptografou tudo. Aqui houve uma falha no mecanismo de detecção, falha de segurança clara. É um exemplo tosco, eu sei... mas faz sentido.
 
 ## 2.3. Tabela de comparação
 
@@ -65,6 +65,16 @@ A falha de segurança sempre vai resultar em um incidente, permitindo que o ataq
 |     Estado     |           Existe antes do ataque           |                   Manifesta durante ou após o ataque                  |
 |    Detecção    | Scans de vulnerabilidade, testes periódicos |          Monitoramento de logs, alertas de SIEM, resposta a incidentes          |
 |   Tratamento   |        Patching, hardening, code review       |      Revisão pós-incidente, reforço de controles, atualização de processos      |
+
+<br>
+
+Ah, mas pera lá! SQL Injection é uma falha de segurança! 
+
+Se você chegou a pensar isso, você tem um excelente ponto! E esse exemplo é perfeito para entender a sutil diferença entre vulnerabilidade x falha de segurança.
+
+Um SQL Injection é uma vulnerabilidade, ponto. Por quê? Ele é uma **fraqueza** no código (falta de validação de parâmetros) que **pode ser explorada** por um atacante e manipular consultas SQL. Mas! Ela só vira uma **falha de segurança** quando o ataque acontece **efetivamente**, ou seja, a exploração é **bem-sucedida**.
+
+Beleza! Entendido até aqui, mas então quer dizer que um SQL Injection sempre vai ser uma falha de segurança? Não, nem sempre. Mesmo que uma vulnerabilidade exista, ela pode não virar uma falha de segurança se houver defesas eficazes como WAF bloqueando payloads maliciosos ou validações adicionais no backend do código que rejeitam entradas inesperadas, por exemplo.
 
 # 3. Casos de uso prático
 
@@ -101,7 +111,7 @@ Toda falha de segurança compromete o ambiente. Nem toda vulnerabilidade resulta
 
 Para manter a resiliência do ambiente, algumas boas práticas são indispensáveis. A primeira delas é garantir que vulnerabilidades sejam corrigidas o mais rápido possível, por meio de atualizações, reconfiguração e hardening. Em paralelo, é fundamental realizar avaliações periódicas para validar a eficácia dos controles de segurança existentes, como firewalls, autenticação multifator, monitoramento de logs e segmentações de rede. Por fim, a execução de testes reais, simulando ataques e falhas internas, é uma maneira eficaz de antecipar problemas antes que eles sejam explorados por atacantes reais.
 
-# Referências
+# 6. Referências
 
 - [Vulnerability (computer security)](https://en.wikipedia.org/wiki/Vulnerability_%28computer_security%29)
 - [vulnerability - Glossary - NIST Computer Security Resourcer Center](https://csrc.nist.gov/glossary/term/vulnerability)
