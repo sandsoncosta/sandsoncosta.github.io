@@ -1,7 +1,7 @@
 ---
-title: "Matriz GUT aplicada à Segurança da Informação: Como priorizar ações críticas em ambientes sob pressão"
+title: "[PUBLICAR]Matriz GUT aplicada à Segurança da Informação: Como priorizar ações críticas em ambientes sob pressão"
 date: 2025-04-11T13:26:48-03:00
-draft: true
+draft: false
 description: "Entenda como a Matriz GUT ajuda a priorizar ações críticas, reduzir riscos e otimizar tarefas, avaliando gravidade, urgência e tendência para tomar decisões estratégicas." 
 noindex: false
 featured: false
@@ -91,7 +91,7 @@ A definição de critérios para a Matrix GUT, não necessariamente precisa ser 
 
 <br>
 
-| Nota | Urgência (U)                                                    |
+| Pontuação | Urgência (U)                                                    |
 | ---- | ---------------------------------------------------------------- |
 | 5    | Se não agir agora, perde-se rastreabilidade ou há impacto real |
 | 3    | Pode esperar horas, mas com monitoramento                        |
@@ -99,7 +99,7 @@ A definição de critérios para a Matrix GUT, não necessariamente precisa ser 
 
 <br>
 
-| Nota | Tendência (T)                                 |
+| Pontuação | Tendência (T)                                 |
 | ---- | ---------------------------------------------- |
 | 5    | Alta chance de escalar para incidente crítico |
 | 3    | Risco de crescimento lento se ignorado         |
@@ -161,5 +161,5 @@ A Matriz GUT, adaptada para o contexto de um SOC ou qualquer outro time, vai mui
 
 {{< bs/alert warning >}}
 {{< bs/alert-heading "Encontrou algum erro? Quer sugerir alguma mudança ou acrescentar algo?" >}}
-Por favor, entre em contato comigo pelo meu `<a href="https://www.linkedin.com/in/sandsoncosta">`LinkedIn `</a>`.`<br>`Vou ficar muito contente em receber um feedback seu.
+Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in/sandsoncosta">LinkedIn</a>.<br>Vou ficar muito contente em receber um feedback seu.
 {{< /bs/alert >}}

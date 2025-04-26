@@ -6,7 +6,7 @@ description: "Neste artigo, vamos implementar a autenticação de dois fatores p
 noindex: false
 featured: false
 pinned: false
-comments: true
+comments: false
 series:
  - 
 categories:

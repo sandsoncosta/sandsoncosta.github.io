@@ -76,7 +76,7 @@ hb:
       # taxonomies: false # remove the taxonomies stat from the homepage.
       featured_posts: 5 # the number of the featured posts.
       main_sections: # leave it empty to include all regular pages.
-        - docs
+        # - docs
         - blog
         - tutorials
     # COMENTÁRIOS DO BLOG
@@ -102,7 +102,11 @@ hb:
   #     # theme: noborder_dark
   #     # input_position: top
   #     # reactions: true
-  # content_panel:
+    content_panel:
+      enable: true
+      toc: true
+      collapsed: true
+
     repo:
       service: github # github or gitlab.
       # repo: hbstack/theme
