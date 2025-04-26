@@ -118,9 +118,6 @@ Para manter a resiliência do ambiente, algumas boas práticas são indispensáv
 - [Vulnerabilities - NVD - National Institute of Standards and Technology](https://nvd.nist.gov/vuln)
 - [What is Security Control Failure?](https://www.attackiq.com/glossary/what-is-security-control-failure/)
 - [Ending the Era of Security Control Failure](https://www.attackiq.com/lp/ending-the-era-of-security-control-failure/)
-- [vulnerability - NIST](https://csrc.nist.gov/glossary/term/vulnerability)
-- [vulnerability - NIST](https://csrc.nist.gov/glossary/term/vulnerability)
-- [vulnerability - NIST](https://csrc.nist.gov/glossary/term/vulnerability)
 
 {{< bs/alert warning >}}
 {{< bs/alert-heading "Encontrou algum erro? Quer sugerir alguma mudança ou acrescentar algo?" >}}
