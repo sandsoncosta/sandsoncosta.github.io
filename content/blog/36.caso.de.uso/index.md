@@ -1,5 +1,5 @@
 ---
-title: "Regra de Detecção não é Caso de Uso - Entenda de uma vez por todas"
+title: "[PUBLICAR]Regra de Detecção não é Caso de Uso - Entenda de uma vez por todas"
 date: 2025-05-08T00:26:48-03:00
 draft: false
 description: "Regras de detecção são lógicos. Casos de uso são conceitos. Confundir os dois enfraquece a operação de segurança. Saiba por que usar os termos certos importa na prática do SOC." 
@@ -10,7 +10,7 @@ comments: false
 series:
  - 
 categories:
- - SS
+ - publicar
 tags:
  -
 authors:
