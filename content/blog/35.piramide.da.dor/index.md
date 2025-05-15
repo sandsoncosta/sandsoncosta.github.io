@@ -102,7 +102,7 @@ Para o atacante, quanto mais alto o nível do indicador detectado (ex: TTPs), ma
 
 Para o defensor, lidar com indicadores do topo da pirâmide é mais complexo, pois exige mais capacidade analítica, contexto, e maturidade técnica.
 
-Em oputras palavras, a pirâmide causa mais dor ao atacante quanto mais alto for o nível do indicador detectado. Para o defensor, também exige mais esforço e capacidade quanto mais alto na pirâmide ele opera, ou seja, quanto mais você sobe a pirâmide, mais custoso fica para os dois lados: Pro atacante fica mais difícil mudar TTPs do que mudar um hash. Pro defensor fica mais difícil detectar e responder a TTPs do que a um IP.
+Em outras palavras, a pirâmide causa mais dor ao atacante quanto mais alto for o nível do indicador detectado. Para o defensor, também exige mais esforço e capacidade quanto mais alto na pirâmide ele opera, ou seja, quanto mais você sobe a pirâmide, mais custoso fica para os dois lados: Pro atacante fica mais difícil mudar TTPs do que mudar um hash. Pro defensor fica mais difícil detectar e responder a TTPs do que a um IP.
 
 Isso pode parecer ruim ou um paradoxo: Quanto mais alto subimos na pirâmide, mais difícil também fica para nós defensores!? Mas é justamente aí que está a estratégia. Quanto maior o esforço do nosso lado, maior o impacto e o custo imposto ao adversário, pois uma vez que identificamos os TTPs, a partir dali teremos novas ideias e estratégias para mapear outras hipóteses, que é onde entre o perfil de um Threat Hunter.
 
@@ -146,13 +146,13 @@ Em resumo, atacar o topo da pirâmide significa elevar o custo para o atacante �
 
 A qualidade da inteligência influencia diretamente quão alto podemos atingir na pirâmide.
 
-- **Boas práticas:** Correlacionar alertas de EDR/XDR para identificar padrões de movimento lateral, persistência, evasão. Utilizar frameworks como MITRE ATT&CK para mapear as TTPs observadas.
+- **Boas práticas:** Correlacionar alertas de EDR/XDR para identificar padrões de movimentação lateral, persistência, evasão. Utilizar frameworks como MITRE ATT&CK para mapear as TTPs observadas.
 - **Exemplo prático:** Um adversário persistente (APT29) é detectado usando Golden Ticket Attack (T1558.001).
 - **Análise:** Em vez de focar no hash da ferramenta usada (mimikatz.exe), caçamos a criação de tickets Kerberos anômalos no ambiente.
 
 ## 5.3. Compartilhamento de Inteligência de Ameaças
 
-Organizações que produzem inteligẽncia e compartilham não apenas IOCs, mas TTPs, aumentam o custo para o atacante em escala, pois existe a possibilidade de identificar ataques iniciais em curso, observar lacunas que carecem de novas defesas ou novas regras. Ou seja, quanto mais cedo e mais amplo for o escopo de TTPs observadas e produzidas, mais ineficaz e caro se torna para o agente de ameaça a incursão no objetivo final de ataque.
+Organizações que produzem inteligência e compartilham não apenas IOCs, mas TTPs, aumentam o custo para o atacante em escala, pois existe a possibilidade de identificar ataques iniciais em curso, observar lacunas que carecem de novas defesas ou novas regras. Ou seja, quanto mais cedo e mais amplo for o escopo de TTPs observadas e produzidas, mais ineficaz e caro se torna para o agente de ameaça a incursão no objetivo final de ataque.
 
 Nesse cenário, se não possui equipe dedicada, contratar serviços de terceiros, como um MSSP, por exemplo, pode contribuir para sua operação de segurança.
 
