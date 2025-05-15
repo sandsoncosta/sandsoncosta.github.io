@@ -36,7 +36,7 @@ hb:
     # list_style: cascade # para posts sem imagens
     post_authors:
       position: bottom
-    list_cols_md: 3
+    list_cols_md: 4
     social_share_buttons:
       alignment: center
       icons: true

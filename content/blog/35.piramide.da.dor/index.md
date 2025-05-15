@@ -34,7 +34,7 @@ authors:
 
 É muito provável que você já tenha ouvido inúmeras vezes sobre a **Pirâmide da Dor (Pyramid of Pain)**. Talvez tenha lido algo no LinkedIn, visto em uma palestra ou escutado sobre o tema em alguma conversa técnica... enfim... O meu objetivo aqui não é repetir o que já foi dito em dezenas de artigos, mas trazer uma perspectiva realmente **técnica** da coisa, mostrando **como cada nível da pirâmide pode ser aplicado na prática**, especialmente no contexto de análise de ameaças e inteligência cibernética.
 
-A **Pirâmide da Dor (Pyramid of Pain)**, criada por **David J. Bianco**, é mais do que uma simples categorização de indicadores de ameaça, quando usada de forma estratégica, ela permite que analistas e organizações aumentem significativamente o custo operacional dos atacantes, forçando-os a mudar não apenas artefatos superficiais, mas suas táticas, técnicas e procedimentos (TTPs). Isso é claramente ilustrado no exemplo abaixo:
+A **Pirâmide da Dor**, criada por **David J. Bianco**, é mais do que uma simples categorização de indicadores de ameaça, quando usada de forma estratégica, ela permite que analistas e organizações aumentem significativamente o custo operacional dos atacantes, forçando-os a mudar não apenas artefatos superficiais, mas suas táticas, técnicas e procedimentos (TTPs). Isso é claramente ilustrado no exemplo abaixo:
 
 <figure style="text-align: center;">
   <img src="image.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
@@ -78,7 +78,7 @@ Então, neste artigo, vamos entender **como aplicar objetivamente a Pirâmide da
 - **Exemplos:** Strings específicas em binários, caminhos de instalação incomuns, headers de pacotes anormais.
 - **Impacto:** Moderado a alto
 - **Dificuldade de mudança:** Difícil
-- **Descrição:** Requer que o atacante altere partes do seu malware ou infraestrutura, como por exemplo, alterar a pasta de entrega da carga maliciosa, alterar o header de requisição da infra do C2 ou URI de comando.
+- **Descrição:** Requer que o atacante altere partes do seu malware ou infraestrutura, como por exemplo, alterar a pasta de entrega da payload, alterar o header de requisição da infra do C2 ou URI de comando.
 
 **Tools**
 
