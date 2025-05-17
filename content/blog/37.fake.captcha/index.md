@@ -10,9 +10,22 @@ comments: false
 series:
  - 
 categories:
- - publicar
+ - Windows
+ - Segurança e Defesa
+ - Ataques e Exploração
+ - Resposta a Incidentes
 tags:
- -
+ - Resposta a Incidentes
+ - Análise de Logs
+ - Registros
+ - Threat Hunting
+ - Detecção de Ameaças
+ - C2
+ - Phishing
+ - Exploração
+ - Logs do Windows
+ - Scripts
+ - PowerShell
 authors:
  - sandson
 #images:
