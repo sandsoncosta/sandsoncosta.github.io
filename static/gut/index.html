@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz GUT</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="https://github.com/sandsoncosta/matriz-gut" target="_blank" class="github-link">
+        <svg class="github-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+        GitHub
+    </a>
+
+    <header>
+        <h1>Matriz GUT</h1>
+        <p>Priorize ações críticas em ambientes sob pressão</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Adicionar Nova Atividade</h2>
+            <form id="activity-form">
+                <div class="form-group">
+                    <label for="description">Descrição da Atividade</label>
+                    <input type="text" id="description" placeholder="Ex: Atualizar SIEM, Corrigir parser de log..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="justification">Justificativa (opcional)</label>
+                    <textarea id="justification" rows="2" placeholder="Por que esta atividade é importante?"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gravity">Gravidade (G)</label>
+                        <select id="gravity" required>
+                            <option value="">Selecione</option>
+                            <option value="1">1 - Sem impacto ou muito leve</option>
+                            <option value="2">2 - Impacto leve</option>
+                            <option value="3">3 - Impacto moderado</option>
+                            <option value="4">4 - Impacto alto</option>
+                            <option value="5">5 - Impacto crítico</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="urgency">Urgência (U)</label>
+                        <select id="urgency" required>
+                            <option value="">Selecione</option>
+                            <option value="1">1 - Pode esperar</option>
+                            <option value="2">2 - Pouco urgente</option>
+                            <option value="3">3 - Moderadamente urgente</option>
+                            <option value="4">4 - Urgente (24h)</option>
+                            <option value="5">5 - Extremamente urgente</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tendency">Tendência (T)</label>
+                        <select id="tendency" required>
+                            <option value="">Selecione</option>
+                            <option value="1">1 - Não irá piorar</option>
+                            <option value="2">2 - Pouca chance de piora</option>
+                            <option value="3">3 - Pode piorar lentamente</option>
+                            <option value="4">4 - Alta chance de agravamento</option>
+                            <option value="5">5 - Certamente irá piorar rapidamente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Adicionar Atividade</button>
+                    <button type="button" id="clear-form" class="btn-warning">Limpar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Matriz GUT</h2>
+            <div class="button-group">
+                <button id="export-csv" class="btn-success">Exportar para CSV</button>
+                <button id="clear-all" class="btn-danger">Limpar Tudo</button>
+                <button id="show-help" class="btn-primary">Ajuda</button>
+                <button id="load-examples" class="btn-warning">Carregar Exemplos</button>
+            </div>
+            <table id="gut-table">
+                <thead>
+                    <tr>
+                        <th data-sort="description">Atividade</th>
+                        <th data-sort="gravity" class="number-cell">G</th>
+                        <th data-sort="urgency" class="number-cell">U</th>
+                        <th data-sort="tendency" class="number-cell">T</th>
+                        <th data-sort="gut" class="number-cell">GUT</th>
+                        <th data-sort="none">Justificativa</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="activities-table-body">
+                    <!-- Activities will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Como usar a Matriz GUT</h3>
+            
+            <h4>Critérios de avaliação:</h4>
+            <p><strong>Gravidade (G):</strong> O quão sério é o impacto se nada for feito?</p>
+            <p><strong>Urgência (U):</strong> Qual é a necessidade de agir rapidamente?</p>
+            <p><strong>Tendência (T):</strong> Há chances do problema piorar com o tempo?</p>
+            
+            <h4>Escala (1 a 5):</h4>
+            <p>Cada critério é avaliado de 1 (baixo) a 5 (alto).</p>
+            <p>A prioridade é calculada multiplicando G × U × T.</p>
+            
+            <h4>Dicas:</h4>
+            <ul>
+                <li>Use critérios objetivos para avaliação.</li>
+                <li>A tabela é ordenada automaticamente pela pontuação GUT.</li>
+                <li>Adicione uma justificativa para cada atividade para referência futura.</li>
+                <li>Você pode exportar seus dados para CSV para uso em outras ferramentas.</li>
+                <li>Todos os dados são armazenados localmente no seu navegador.</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 Sistema Matriz GUT para Segurança da Informação | 
+        <a href="https://github.com/your-username/matriz-gut" target="_blank">Código fonte no GitHub</a>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
