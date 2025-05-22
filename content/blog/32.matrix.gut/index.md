@@ -10,9 +10,12 @@ comments: false
 series:
  - 
 categories:
- - publicar
+ - Ferramentas e Automação
+ - Gestão
 tags:
- - 
+ - Maturidade de Segurança
+ - Melhores Práticas
+ - gestão
 authors:
  - sandson
 #images:
