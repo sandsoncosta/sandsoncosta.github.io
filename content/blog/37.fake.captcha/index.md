@@ -493,3 +493,10 @@ Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in
 {{< /bs/alert >}}
 
 [^1]: Em um contexto de malware ou C2 (Command & Control), um `beacon` é uma comunicação feita por uma máquina comprometida para o servidor do atacante, com o objetivo de sinalizar que está ativa ou como um "sinal de vida (Healthy)", para confirmar que a infecção foi bem-sucedida. Além de confirmar a presença do malware, ele pode enviar informações básicas do sistema e aguardar comandos. No nosso caso, o `beacon` é enviado quando o script executa um `curl` para o C2 hxxps://upload[.]cloudflair.org/beacon, funcionando como um "check-in" inicial informando que o malware foi ativado/executado com sucesso.
+
+
+    <h2>Comments</h2>
+    <hr />
+    <div class="giscus"></div>
+    <hr />
+    {{ partial "giscus/script-with-options" .Site.Params.blog.giscus }}
