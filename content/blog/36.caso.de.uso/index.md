@@ -1,5 +1,5 @@
 ---
-title: "[standby]Regra de Detecção não é Caso de Uso: Entenda de uma vez por todas"
+title: "Regra de Detecção não é Caso de Uso: Entenda de uma vez por todas"
 date: 2025-05-08T00:26:48-03:00
 draft: false
 description: "Regras de detecção são lógica técnica. Casos de uso são conceitos estratégicos. Confundir os dois enfraquece a operação de segurança. Saiba por que usar os termos corretos importam, na teoria e na prática do SOC." 
@@ -10,9 +10,18 @@ comments: false
 series:
  - 
 categories:
- - publicar
+ - Segurança e Defesa
+ - Resposta a Incidentes
 tags:
- -
+ - Threat Hunting
+ - Engenharia de Detecção
+ - Regras de Detecção
+ - Falsos Positivos
+ - SIEM
+ - Maturidade de Segurança
+ - Melhores Práticas
+ - Resposta a Incidentes
+ - Detecção de Ameaças
 authors:
  - sandson
 #images:
