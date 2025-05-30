@@ -476,6 +476,10 @@ O uso correto de ambos os conceitos garante:
 
 Lembre-se: **você não escreve um caso de uso no SIEM. Você escreve uma regra.** Mas essa regra deve sempre nascer de um caso de uso bem estruturado e justificado estrategicamente.
 
+# **7. Referências**
+
+- [GoHacking Security Operation Center Foundations - GoHacking](https://gohacking.com.br/curso/gohacking-security-operation-center-foundations)
+
 {{< bs/alert warning >}}
 {{< bs/alert-heading "Encontrou algum erro? Quer sugerir alguma mudança ou acrescentar algo?" >}}
 Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in/sandsoncosta">LinkedIn</a>.<br>Vou ficar muito contente em receber um feedback seu.
