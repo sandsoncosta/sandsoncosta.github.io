@@ -32,7 +32,7 @@ Em um Centro de Operações de Segurança (SOC) é muito comum no dia a dia ouvi
 
 Este artigo demonstra de forma prática e objetiva as diferenças entre **caso de uso** e **regra de detecção**, e por que é importante saber diferenciá-los para construir um SOC mais maduro e eficiente.
 
-# **2. Fundamentos Conceituais**
+# **2. Fundamentos conceituais**
 
 ## 2.1. O que é um Caso de Uso?
 
@@ -67,7 +67,7 @@ Os elementos que caracterizam uma regra de detecção são:
 
 ## 2.3. Comparação estruturada
 
-### _2.3.1. Visão Geral_
+### _2.3.1. Visão geral_
 
 | Aspecto                 | Caso de Uso                                | Regra de Detecção                          |
 | :-----------------------: | :------------------------------------------: | :------------------------------------------: |
@@ -78,7 +78,7 @@ Os elementos que caracterizam uma regra de detecção são:
 | **Ponto de Partida**    | Necessidade do negócio / risco             | Lógica de correlação baseada em eventos    |
 | **Quem constrói**       | Especialista de Segurança / Arquiteto      | Analista Técnico / Engenheiro de Detecção  |
 
-### _2.3.2. Análise Técnica Detalhada_
+### _2.3.2. Análise técnica detalhada_
 
 | **Critério**                                | **Regra de Detecção**                                      | **Caso de Uso**                                                      |
 | ------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -91,7 +91,7 @@ Os elementos que caracterizam uma regra de detecção são:
 | **Precisa de dados estruturados?**          | ✅ Sim. Só funciona com logs padronizados e bem definidos.  | ❌ Não. Pode ser projetado mesmo sem log implementado ainda.          |
 | **Serve como base para criação de regras?** | ❌ Não. É o produto final da lógica.                        | ✅ Sim. É o ponto de partida para desenvolver regras.                 |
 
-# **3. Exemplos Práticos**
+# **3. Exemplos práticos**
 
 Abaixo vou descrever 4 casos de uso e 5 regras de detecção, levando em consideração que mais de uma regra pode compor um único caso de uso.
 
@@ -134,7 +134,7 @@ As regras associadas aqui são apenas ilustrativas ao conteúdo do artigo, não 
 **Regras associadas:**
 - **Regra 3:** Possible Coin Miner CPU Priority Param
 
-### _3.1.3. Exfiltração de Dados com Uso Indevido do Wget_
+### _3.1.3. Exfiltração de dados com uso indevido do Wget_
 
 - **Objetivo:** Detectar comandos que usam `wget` para exfiltrar arquivos sensíveis como `/etc/shadow`.
 - **Contexto:** Exfiltração de dados via ferramentas legítimas é uma técnica evasiva que pode indicar comprometimento avançado e violação de dados críticos.
@@ -148,7 +148,7 @@ As regras associadas aqui são apenas ilustrativas ao conteúdo do artigo, não 
 **Regras associadas:**
 - **Regra 4:** Data Exfiltration with Wget
 
-### _3.1.4. Uso de Ferramentas Administrativas para Ações Maliciosas_
+### _3.1.4. Uso de ferramentas administrativas para ações maliciosas_
 
 - **Objetivo:** Detectar o uso de ferramentas administrativas que indicam potencial abuso, como `PsExec` ou `Procdump`.
 - **Contexto:** Ferramentas legítimas usadas maliciosamente para execução remota, extração de credenciais ou movimentação lateral, representando risco elevado à segurança corporativa.
@@ -397,7 +397,7 @@ O objetivo desta seção é apresentar o cenário ideal de distribuição de res
 - Manter documentação atualizada e versionada dos casos de uso
 - Revisar periodicamente a eficácia dos casos de uso implementados
 
-## 4.2. Quem Cria as Regras de Detecção?
+## 4.2. Quem cria as Regras de Detecção?
 
 **Perfis Responsáveis:**
 - **Engenheiro de Detecção:** Especialista em implementação de regras e correlações
@@ -419,7 +419,7 @@ O objetivo desta seção é apresentar o cenário ideal de distribuição de res
 - Documentar regras com comentários técnicos
 - Manter versionamento e controle de mudanças
 
-## 4.3. Modelo de Colaboração
+## 4.3. Modelo de colaboração
 
 **Fluxo Ideal:**
 1. **Identificação da Necessidade** → SOC Manager/Arquiteto identifica gap de detecção
@@ -436,7 +436,7 @@ O objetivo desta seção é apresentar o cenário ideal de distribuição de res
 - **Analistas → Ambos:** Feedback operacional, falsos positivos e melhorias
 - **Threat Intel → Criador:** Atualizações sobre TTPs e contexto de ameaças
 
-## 4.4. Relacionamento Prático: Do Caso de Uso à Regra de Detecção
+## 4.4. Relacionamento prático: Do Caso de Uso à Regra de Detecção
 
 Um exemplo de fluxo de trabalho maduro seria:
 
@@ -447,16 +447,16 @@ Um exemplo de fluxo de trabalho maduro seria:
 5. **Validação:** Testa-se se as regras atendem ao objetivo do caso de uso
 6. **Refinamento:** Ajustes baseados em falsos positivos e eficácia
 
-# **5. Impacto na Maturidade do SOC**
+# **5. Impacto na maturidade do SOC**
 
-## 5.1. SOC Imaturo
+## 5.1. SOC imaturo
 - Foca apenas na criação de regras sem contexto estratégico
 - Não documenta casos de uso
 - Dificuldade para justificar investimentos em segurança
 - Alto número de falsos positivos
 - Baixa eficiência operacional
 
-## 5.2. SOC Maduro
+## 5.2. SOC maduro
 - Desenvolve casos de uso alinhados com riscos do negócio
 - Cria regras baseadas em casos de uso bem definidos
 - Documenta e versiona ambos os artefatos
