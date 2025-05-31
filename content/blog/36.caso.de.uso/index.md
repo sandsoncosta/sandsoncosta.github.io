@@ -403,7 +403,6 @@ O objetivo desta seção é apresentar o cenário ideal de distribuição de res
 - **Engenheiro de Detecção:** Especialista em implementação de regras e correlações
 - **Analista SOC Sênior:** Experiência prática em ferramentas SIEM/EDR
 - **DevSecOps Engineer:** Conhecimento em automação e versionamento de regras
-- **Detection Engineer:** Especialização específica em desenvolvimento de detecções
 
 **Competências Necessárias:**
 - **Expertise técnica:** Domínio em linguagens de consulta (KQL, SPL, Sigma, etc.)
