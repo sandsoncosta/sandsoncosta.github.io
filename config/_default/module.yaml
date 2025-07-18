@@ -30,7 +30,6 @@ imports:
   - path: github.com/hbstack/blog/modules/sidebar/taxonomies
 
   # blog comments engine
-  - path: github.com/hbstack/blog/modules/giscus
   # - path: github.com/hbstack/giscus
   # - path: github.com/hugomods/giscus
   # - path: github.com/hbstack/blog/modules/disqus
@@ -77,11 +76,15 @@ imports:
   # Social Share Buttons
   - path: github.com/hbstack/blog/modules/social-share-buttons
   # Contact Form
-  - path: github.com/hbstack/contact
+  # - path: github.com/hbstack/contact
   # PWA Installer
   - path: github.com/hbstack/pwa-installer
   # Staticman Comments
-  - path: github.com/hbstack/blog/modules/staticman
+  # - path: github.com/hbstack/blog/modules/staticman
   # Code Block
   - path: github.com/hbstack/code-block-panel
   - path: github.com/hbstack/docs
+  - path: github.com/hbstack/progress-bar
+  - path: github.com/hbstack/bootstrap
+  # - path: github.com/hbstack/shortcodes
+  - path: github.com/hbstack/shortcodes
