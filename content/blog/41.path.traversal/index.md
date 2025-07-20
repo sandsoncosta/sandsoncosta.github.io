@@ -522,9 +522,9 @@ Com essa wordlist conseguimos encontrar o arquivo. Com isso, identificamos a res
 
 ## 2.11. Escalação de privilégios e última flag
 
-Agora, falta a última flag, que é a `proof.txt`. Eu pensei em algumas possibilidades dessa flag estar em algum lugar no banco, já que encontramos o login, né.
+Agora, falta a última flag, que é a `proof.txt`. Eu pensei em algumas possibilidades dessa flag estar em algum lugar no banco, já que encontramos o login.
 
-De posso do acesso ao banco, tentei explorar fazendo algumas consultas, mas não encontrei nada...
+De posse do acesso ao banco, tentei explorar fazendo algumas consultas, mas não encontrei nada...
 
 ```bash
 ┌──(kali㉿kali)-[~]
@@ -646,6 +646,10 @@ Extreme{c4b59fd60e36bb9026a2455021325e1684e83b7e}
 {{< /bs/toggle >}}
 
 E com isso, finalmente identificamos a resposta da nossa última flag! **Desafio 5**: `Extreme{c4b59fd60e36bb9026a2455021325e1684e83b7e}`.
+
+## 2.12. Exploit público
+
+Depois de já ter concluído o CTF com esse método de shell por dentro do banco de dados, foi que eu pensei em procurar algum exploit público. Depois de já ter feito eu encontrei um exploit público para uma <kbd>CVE-2019-9193</kbd>. O link para o exploit está nas referências.
 
 # 3. Análise técnica das falhas, explorações e mitigações
 
@@ -948,6 +952,150 @@ Isso confirma que **qualquer caminho que comece com `/image`** é direcionado pa
 6. Apache retorna página padrão: "It works!"
 
 Esse mesmo conceito se aplica para o diretório `/tshirt../`.
+
+### 3.3. Conceito de `../../`
+
+O path `../` significa "voltar um diretório" na estrutura de arquivos. Quando utilizado em cadeia, `../../` permite navegar para diretórios superiores.
+
+Como funciona na prática:
+
+{{< bs/toggle name=exemplo style=pills fill=false alignment=left >}}
+{{< bs/toggle-item "Estrutura exemplo" >}}
+{{< highlight bash >}}
+# Estrutura exemplo
+/var/www/html/
+├── app/
+│   ├── images/
+│   │   ├── photo.jpg
+│   │   └── thumb/
+│   │       └── small.jpg
+│   └── uploads/
+└── config/
+    └── database.conf
+{{< /highlight >}}
+{{< /bs/toggle-item >}}
+
+{{< bs/toggle-item "Navegação de diretório" >}}
+{{< highlight bash >}}
+# Partindo de: /var/www/html/app/images/thumb/
+
+../                    # /var/www/html/app/images/
+../../                 # /var/www/html/app/
+../../../              # /var/www/html/
+../../../../           # /var/www/
+../../../../../        # /var/
+{{< /highlight >}}
+  {{< /bs/toggle-item >}}
+{{< /bs/toggle >}}
+
+# 4. Melhores práticas e mitigações para os cenários encontrados no CTF
+
+## 4.1. Mitigações para Path Traversal
+
+* **Normalização e validação de caminhos no backend:**
+    - Sempre sanitizar a entrada do usuário antes de concatenar com qualquer caminho de arquivo.
+    - Usar funções seguras de resolução de caminho e validar se o caminho final está dentro do diretório permitido.
+
+* **Negação de acesso a caminhos relativos:**
+    - Rejeite explicitamente entradas que contenham `..`, `%2e`, `%2f`, `..%2f`, etc.
+
+* **Controle rigoroso no proxy reverso:**
+    - Usar diretivas como `try_files` no lugar de `alias` quando possível.
+    - Utilize `deny all;` e `internal;` para bloquear acesso direto a arquivos internos.
+
+* **Configuração segura de alias e proxy_pass:**
+    - Evitar expor diretórios inteiros via `proxy_pass`sem validação de path.
+
+## 4.2. Proteção contra Directory Listing
+
+* **Desabilitar listagem de diretórios:**
+    - Sempre desabilitar o auindex no servidor web.
+
+* **Controlar rigorosamente o conteúdo público:**
+    - Apenas arquivos estritamente necessários devem estar acessíveis.
+    - Separar diretórios públicos de internos com permissões distintas.
+
+## 4.3. Exposição de arquivos sensíveis
+
+* **Bloquear acesso via web a arquivos sensíveis:**
+
+```nginx
+location ~ /\.(?!well-known).* {
+    deny all;
+}
+```
+```apache
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+```
+
+* **Mover arquivos de configuração para diretórios inacessíveis pela web:**
+    - Nunca mantenha arquivos como `.env`, `nginx.conf` ou `.htpasswd` dentro da pasta `root/alias` do servidor.
+
+* **Revisar permissões de arquivo e diretório no servidor:**
+    - O usuário que executa o servidor web deve ter acesso somente ao que for estritamente necessário.
+
+## 4.4. Fortalecer a autenticação e proteção de rotas
+
+No cenário deste CTF, a autenticação estava em _plain text_ e atenticação _basic_. Mas para cenários reais estas práticas são importantes.
+
+* **Não manter arquivos de autenticação acessíveis publicamente.**
+* **Utilizar autenticação forte com rate-limiting:**
+    - Implemente limites por IP para tentativas de login.
+    - Utilize autenticação multifator (MFA), se possível.
+* **Se possível, utilizar frameworks que encapsulam a autenticação em vez de `.htpasswd`.**
+
+## 4.5. Melhorar a configuração do NGINX
+
+* **Desabilitar configurações padrão não utilizadas.**
+* **Especificar diretivas de segurança adicionais.**
+* **Evitar uso de `alias` junto com `proxy_pass` sem checagem de path.**
+* **Revisar todas as regras do NGINX e aplicar negação explícita a arquivos críticos.**
+
+## 4.6. Mitigar execução de comandos via banco
+
+* **Restringir permissões no banco de dados:**
+    - Desativar o uso de extensões como as usadas no CTF.
+    - O usuário `postgres` não deve ser acessível via rede.
+* **Rodar o PostgreSQL com menor privilégio possível:**
+    - O processo do banco não deve ter permissões de root nem pertencer ao grupo sudo.
+* **Segmentar acesso à rede:**
+    - O acesso ao PostgreSQL deve estar acessível somente para IPs autorizados.
+* **Auditar comandos executados e acessos ao banco.**
+
+## 4.7. Hardening geral do servidor
+
+* **Desabilitar recursos não utilizados.**
+* **Utilizar containers com imagens mínimas e seguras.**
+* **Utilizar AppArmor, SELinux ou outros mecanismos de controle de acesso no SO.**
+* **Configurar logs de acesso e erros com alertas para comportamento suspeito.**
+* **Atualizações regulares do sistema e das dependências.**
+
+# 5. Simulação do cenário via Docker
+
+Acesse o link: https://github.com/sandsoncosta/CTF---Security-Misconfiguration e clone o repositório. Execute o script com o sudo. O script automagicamente criará o compose e todos os containers para replicar o cenário do CTF.
+
+A box foi realizada no site da Extreme Hacking, caso não queira simular localmente, basta acessar o site, se cadastrar e jogar.
+
+# 6. Referências
+
+- [RFC 3986 – Uniform Resource Identifier (URI): Generic Syntax](https://datatracker.ietf.org/doc/html/rfc3986)
+- [How nginx processes a request - Nginx](https://nginx.org/en/docs/http/request_processing.html)
+- [Converting rewrite rules - Nginx](https://nginx.org/en/docs/http/converting_rewrite_rules.html)
+- [Nginx Proxy Module - Nginx](https://nginx.org/en/docs/http/ngx_http_proxy_module.html)
+- [Path Traversal - OWASP](https://owasp.org/www-community/attacks/Path_Traversal)
+- [Path Traversal - PortSwigger](https://portswigger.net/web-security/file-path-traversal)
+- [The Threat of Directory Traversal Attacks - Accunetix](https://www.acunetix.com/blog/articles/directory-traversal/)
+- [RCE to program - HackTricks](https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-postgresql.html)
+- [Input Validation Cheat Sheet - OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
+- [Password Storage Cheat Sheet - OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+- [Secrets Management Cheat Sheet - OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
+- [Logging Cheat Sheet - OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)
+- [A05:2021 – Security Misconfiguration - OWASP Top 10:2021](https://owasp.org/Top10/A05_2021-Security_Misconfiguration/)
+- [NIST SP 800-53 Rev. 5 - Security and Privacy Controls for Information Systems and Organizations](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final)
+- [RCE to program](https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-postgresql.html)
+- [CVE-2019-9193 - GitHub](https://github.com/b4keSn4ke/CVE-2019-9193)
 
 ---
 {{< bs/alert warning >}}
