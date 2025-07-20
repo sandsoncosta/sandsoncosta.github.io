@@ -45,7 +45,7 @@ Ao longo deste artigo, veremos:
 - Uma explicação teórica e prática sobre `Path Traversal`.
 - A diferença técnica entre diretórios `/image/../` e `/image../` e como isso influencia o comportamento do servidor.
 - Como identificar essa vulnerabilidade durante a análise de uma aplicação.
-####- Como simular o ambiente de exploração usando Docker.
+- Como simular o ambiente de exploração usando Docker.
 - Utilização de ferramentas como `ffuf` e `curl` para descoberta e exploração.
 - Análise detalhada das falhas encontradas e suas mitigações.
 - Escalação de privilégios através do PostgreSQL.
