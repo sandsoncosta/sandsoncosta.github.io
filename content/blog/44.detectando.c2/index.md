@@ -3,7 +3,7 @@ title: "Detectando técnicas de C2: Guia prático para Analistas de SOC"
 url: "/blog/detectando-tecnicas-de-c2"
 date: 2026-01-08T16:07:00-03:00
 draft: false
-description: "Um guia prático para identificar técnicas de C2."
+description: "Guia completo para identificar técnicas de Command and Control (C2) em ambientes Windows."
 noindex: false
 featured: false
 pinned: false
@@ -48,17 +48,40 @@ Eu recomendo a leitura com o tema claro, devido a quantidade de tópicos e subt�
 
 # TL;DR
 
-Este guia apresenta **10 técnicas de Command & Control (C2)** utilizadas por atacantes, incluindo métodos com `netsh` (ainda amplamente usado), Sliver C2, pivoting com domínios, DNS tunneling e WireGuard.
+O artigo foca em **técnicas de preparação e facilitação de canais C2** que acontecem **antes** da comunicação efetiva com o servidor de comando e controle, muitas vezes usando ferramentas nativas do Windows (LOLBins).
 
-Cada técnica inclui:
-- Simulação prática em ambiente controlado
-- Regras SIEM prontas para implementação imediata
-- Indicadores de comprometimento (IoCs) específicos
-- Correlações inteligentes para reduzir falsos positivos
+Algumas técnicas abordadas e pontos de detecção importantes:
 
-Você aprenderá a detectar desde técnicas legadas (netsh port forwarding) até métodos evasivos modernos (DNS C2, in-memory execution, WireGuard tunneling).
+| #  | Técnica                                      | Ferramenta/Meio              | Objetivo principal                              | Nível de detecção | Principais eventos/indicadores para detectar                  | Dificuldade atual |
+|----|----------------------------------------------|------------------------------|--------------------------------------------------|-------------------|------------------------------------------------------------------|-------------------|
+| 1  | Desabilitar Task Offload (IPv4/IPv6)         | netsh                        | Estabilizar tráfego, evitar interferência HW    | Médio             | netsh … taskoffload=disabled                                    | Baixa–Média       |
+| 2  | Desabilitar Task Offload / Checksum Offload  | PowerShell                   | Mesmo do item 1, mas via cmdlets modernos       | Médio–Alto        | Set-NetOffloadGlobalSetting, Disable-NetAdapterChecksumOffload | Baixa             |
+| 3  | Port Forwarding / Port Proxy                 | netsh interface portproxy    | Pivoting interno, redirecionar tráfego C2       | Alto              | netsh … portproxy add … (muitas abreviações e posicionais)     | Média–Alta        |
+| 4  | Manipulação de Firewall (regras + disable)   | netsh advfirewall            | Liberar tráfego C2 ou mascarar como legítimo    | Médio–Alto        | netsh advfirewall firewall add rule …                           | Média             |
+| 5  | Manipulação de Firewall via PowerShell       | PowerShell cmdlets           | Mesmo do item 4                                 | Alto              | New-NetFirewallRule, Set-NetFirewallProfile -Enabled False      | Baixa–Média       |
+| 6A | Pivoting clássico (netsh + implant)          | netsh + binário C2 (ex: Sliver) | Pivoting interno usando ferramenta nativa     | Alto              | netsh portproxy + binário em pasta suspeita + tráfego externo  | Média–Alta        |
+| 6B | Pivoting nativo (Sliver native pivoting)     | Apenas binário do C2         | Pivoting sem deixar rastro óbvio no Windows     | Muito alto        | Quase nenhum log nativo comum → depende muito de EDR/XDR       | Muito alta        |
 
-O framework completo de simulação permite validar suas detecções antes de colocá-las em produção.
+**Resumo das recomendações práticas mais importantes:**
+
+1. **Prioridade alta hoje**  
+   - Detectar **netsh portproxy** (todas as variações possíveis – tem dezenas)  
+   - Detectar desativação de **task offload** (netsh e PowerShell)  
+   - Monitorar criação/alteração de regras de **firewall** suspeitas (especialmente outbound para IPs específicos)
+
+2. **Blind spots críticos atuais**  
+   - Pivoting nativo (Sliver, Covenant, etc) → quase nenhum log nos canais tradicionais do Windows  
+   - Redirecionamento via **netsh portproxy** em nível de kernel → **não aparece no Sysmon Event ID 3** (conexão real some)  
+   - Uso de **localhost** no portproxy → conexão final praticamente invisível nos logs comuns
+
+3. **Melhores estratégias de detecção realistas (ordem sugerida)**
+
+   1. Regras robustas para **netsh** (portproxy, taskoffload, advfirewall)  
+   2. Monitoramento comportamental de PowerShell administrativo (4104)  
+   3. Correlação: processo em pasta suspeita + tráfego de saída para IP externo  
+   4. Firewall/NGFW logs (tráfego real que saiu do host pivot)  
+   5. Sysmon Event ID 13 (modificações no registry de portproxy)  
+   6. (se possível) EDR/XDR com análise comportamental em kernel
 
 # Introdução
 
