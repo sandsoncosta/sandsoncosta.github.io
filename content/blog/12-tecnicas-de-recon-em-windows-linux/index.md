@@ -52,7 +52,7 @@ Neste artigo, abordamos uma lista abrangente de comandos de reconhecimento em Wi
 {{< bs/bookmark-card
 url="https://sandsoncosta.github.io/blog/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/"
 title="Como o Threat Hunting pode contribuir no processo de maturidade de uma empresa - Um Caso de Uso prático" 
-img="https://sandsoncosta.github.io/blog/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/featured-sample_hu15151624785549089067.webp" 
+img="https://sandsoncosta.github.io/blog/como-o-threat-hunting-pode-contribuir-no-processo-de-maturidade-de-uma-empresa-um-caso-de-uso-pr%C3%A1tico/featured-sample.71f385fcfb4d0e92ee73cf5a20466d58.png" 
 author="Sandson Costa"
 authorImg="https://sandsoncosta.github.io/authors/sandson/image.884b34573e50c208bd581343f0944b81.jpg"
 authorIcon="pencil-square"

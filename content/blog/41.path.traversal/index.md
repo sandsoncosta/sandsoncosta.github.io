@@ -1016,19 +1016,7 @@ Como funciona na prática:
 
 ## 4.3. Exposição de arquivos sensíveis
 
-* **Bloquear acesso via web a arquivos sensíveis:**
-
-```nginx
-location ~ /\.(?!well-known).* {
-    deny all;
-}
-```
-```apache
-<FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
-```
-
+* **Bloquear acesso via web a arquivos sensíveis.**
 * **Mover arquivos de configuração para diretórios inacessíveis pela web:**
     - Nunca mantenha arquivos como `.env`, `nginx.conf` ou `.htpasswd` dentro da pasta `root/alias` do servidor.
 

@@ -173,7 +173,7 @@ A parte final do script é responsável por montar caractere por caractere, invo
 
 # 4. O que vemos no SIEM
 
-Muita gente usa PowerShell pra evasão, achando que só por estar ofuscado tá stealth. Pode até ser até certo ponto, esse modelo pode até se evadir de certas defesas, mas em ambientes maduros, PowerShell não é o vilão — ele pode estar habilitado, mas com logging avançado, regras de detecção bem afiadas e integração com o SIEM. Mesmo scripts super ofuscados, acabam sendo desofuscados em tempo real pelo próprio PowerShell, como vimos aqui. No log podemos identificar pelo `<mark>`EventID 4104`</mark>` pelo Channel `<mark>`**Microsoft-Windows-PowerShell/Operational**`</mark>`, se habilitado a auditoria no ambiente, é claro.
+Muita gente usa PowerShell pra evasão, achando que só por estar ofuscado tá stealth. Pode até ser até certo ponto, esse modelo pode até se evadir de certas defesas, mas em ambientes maduros, PowerShell não é o vilão — ele pode estar habilitado, mas com logging avançado, regras de detecção bem afiadas e integração com o SIEM. Mesmo scripts super ofuscados, acabam sendo desofuscados em tempo real pelo próprio PowerShell, como vimos aqui. No log podemos identificar pelo <mark>EventID 4104</mark> pelo Channel <mark>**Microsoft-Windows-PowerShell/Operational**</mark>, se habilitado a auditoria no ambiente, é claro.
 
 Na imagem abaixo, vemos as mesmas informações que debugamos aqui neste artigo. É um sequenciamento desde o primeiro script ofuscado até o script real. Resultado? O analista vê tudo que foi executado. Legal, não acha?
 

