@@ -1318,20 +1318,20 @@ Soluções EDR/XDR modernas conseguem capturar atividade em nível de kernel **s
 
 # Referências
 
-- [BishopFox — Sliver C2](https://github.com/BishopFox/sliver)
-- [MITRE ATT&CK&reg;](https://attack.mitre.org/)
-- [Network shell (netsh) | Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/netsh)
-- [Sysmon v15.15 | Microsoft Learn](https://learn.microsoft.com/pt-br/sysinternals/downloads/sysmon)
-- [Information about the TCP Chimney Offload, Receive Side Scaling, and Network Direct Memory Access features in Windows Server 2008 | Microsoft Learn](https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/information-about-tcp-chimney-offload-rss-netdma-feature)
-- [Sliver C2 Leveraged by Many Threat Actors | Cybereason](https://www.cybereason.com/blog/sliver-c2-leveraged-by-many-threat-actors)
-- [Sliver: Intro to An Awesome C2 Framework | Medium](https://barrymalone.medium.com/sliver-an-awesome-c2-framework-c0257f2f52e4n)
-- [What is Command and Control (C&C or C2) in Cybersecurity? | Zenarmor](https://www.zenarmor.com/docs/network-security-tutorials/what-is-command-and-control-c2)
-- [How to Detect C2 Infrastructure: Best Practices for Command and Control Traffic Identification | Hunt.io](https://hunt.io/glossary/detect-c2)
-- [Disable TCP offloading and RSS settings | AWS Prescriptive Guidance](https://docs.aws.amazon.com/prescriptive-guidance/latest/sql-server-ec2-best-practices/tcp-rss.html)
-- [How to Disable Offloading Features to Improve Connectivity | FLIR Latitude](https://flir.custhelp.com/app/answers/detail/a_id/5200/~/flir-latitude---how-to-disable-offloading-features-to-improve-connectivity)
-- [Don't use commands, use code: the tale of Netsh & PortProxy | Adepts of 0xCC](https://adepts.of0x.cc/netsh-portproxy-code/)
-- [Configuring Port Forwarding in Windows | Windows OS Hub](https://woshub.com/port-forwarding-in-windows/)
-- [Port-Forwarding with Windows for the Win | SANS](https://isc.sans.edu/diary/27934)
+- [BishopFox — Sliver C2](https://github.com/BishopFox/sliver?utm_source=sandsoncosta.github.io)
+- [MITRE ATT&CK&reg;](https://attack.mitre.org/?utm_source=sandsoncosta.github.io)
+- [Network shell (netsh?utm_source=sandsoncosta.github.io) | Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/netsh?utm_source=sandsoncosta.github.io)
+- [Sysmon v15.15 | Microsoft Learn](https://learn.microsoft.com/pt-br/sysinternals/downloads/sysmon?utm_source=sandsoncosta.github.io)
+- [Information about the TCP Chimney Offload, Receive Side Scaling, and Network Direct Memory Access features in Windows Server 2008 | Microsoft Learn](https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/information-about-tcp-chimney-offload-rss-netdma-feature?utm_source=sandsoncosta.github.io)
+- [Sliver C2 Leveraged by Many Threat Actors | Cybereason](https://www.cybereason.com/blog/sliver-c2-leveraged-by-many-threat-actors?utm_source=sandsoncosta.github.io)
+- [Sliver: Intro to An Awesome C2 Framework | Medium](https://barrymalone.medium.com/sliver-an-awesome-c2-framework-c0257f2f52e4n?utm_source=sandsoncosta.github.io)
+- [What is Command and Control (C&C or C2?utm_source=sandsoncosta.github.io) in Cybersecurity? | Zenarmor](https://www.zenarmor.com/docs/network-security-tutorials/what-is-command-and-control-c2?utm_source=sandsoncosta.github.io)
+- [How to Detect C2 Infrastructure: Best Practices for Command and Control Traffic Identification | Hunt.io](https://hunt.io/glossary/detect-c2?utm_source=sandsoncosta.github.io)
+- [Disable TCP offloading and RSS settings | AWS Prescriptive Guidance](https://docs.aws.amazon.com/prescriptive-guidance/latest/sql-server-ec2-best-practices/tcp-rss.html?utm_source=sandsoncosta.github.io)
+- [How to Disable Offloading Features to Improve Connectivity | FLIR Latitude](https://flir.custhelp.com/app/answers/detail/a_id/5200/~/flir-latitude---how-to-disable-offloading-features-to-improve-connectivity?utm_source=sandsoncosta.github.io)
+- [Don't use commands, use code: the tale of Netsh & PortProxy | Adepts of 0xCC](https://adepts.of0x.cc/netsh-portproxy-code/?utm_source=sandsoncosta.github.io)
+- [Configuring Port Forwarding in Windows | Windows OS Hub](https://woshub.com/port-forwarding-in-windows/?utm_source=sandsoncosta.github.io)
+- [Port-Forwarding with Windows for the Win | SANS](https://isc.sans.edu/diary/27934?utm_source=sandsoncosta.github.io)
 
 ---
 {{< bs/alert warning >}}
