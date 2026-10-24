@@ -12076,11 +12076,19 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
   }
 }
 .hb-header-nav {
-  background-color: var(--sc-header-bg) !important;
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  backdrop-filter: saturate(160%) blur(14px);
+  background-color: transparent !important;
   border-bottom: 1px solid var(--sc-line);
   min-height: 3.5rem;
+}
+.hb-header-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--sc-header-bg);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  pointer-events: none;
 }
 .hb-header-nav .navbar-brand {
   font-family: var(--sc-mono);
@@ -12137,6 +12145,19 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
 
 .offcanvas {
   background-color: var(--hb-body-bg);
+}
+@media (max-width: 991.98px) {
+  .offcanvas {
+    border-left: 1px solid var(--sc-line) !important;
+  }
+  .offcanvas .offcanvas-header {
+    border-bottom: 1px solid var(--sc-line);
+  }
+  .offcanvas .offcanvas-title {
+    font-family: var(--sc-mono);
+    font-weight: 700;
+    font-size: 1rem;
+  }
 }
 
 .hb-main {

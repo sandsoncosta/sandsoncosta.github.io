@@ -124,11 +124,23 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 // 3. Cabeçalho
 // -----------------------------------------------------------------------------
 .hb-header-nav {
-  background-color: var(--sc-header-bg) !important;
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  backdrop-filter: saturate(160%) blur(14px);
+  // O fundo translúcido com desfoque fica num pseudo-elemento: backdrop-filter
+  // no próprio nav vira contêiner dos filhos position: fixed e prende o menu
+  // lateral (offcanvas) do mobile dentro da barra.
+  background-color: transparent !important;
   border-bottom: 1px solid var(--sc-line);
   min-height: 3.5rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--sc-header-bg);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    backdrop-filter: saturate(160%) blur(14px);
+    pointer-events: none;
+  }
 
   .navbar-brand {
     font-family: var(--sc-mono);
@@ -195,6 +207,20 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .offcanvas {
   background-color: var(--#{$prefix}body-bg);
+
+  @include media-breakpoint-down(lg) {
+    border-left: 1px solid var(--sc-line) !important;
+
+    .offcanvas-header {
+      border-bottom: 1px solid var(--sc-line);
+    }
+
+    .offcanvas-title {
+      font-family: var(--sc-mono);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -1232,4 +1258,3 @@ img {
     width: 100%;
   }
 }
-
