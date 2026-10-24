@@ -1,0 +1,96 @@
+
+backend:
+  name: github
+  repo: sandsoncosta/sandsoncosta.github.io
+  branch: main
+  base_url: https://sandson-decap-auth.sandson-costa.workers.dev/
+  auth_endpoint: auth
+
+locale: pt
+
+media_folder: "static/images/uploads"
+public_folder: "/images/uploads"
+
+publish: true
+
+collections:
+  - name: "blog"
+    label: "Artigos do Blog"
+    label_singular: "Artigo"
+    folder: "content/blog"
+    create: true
+    extension: "md"
+    format: "frontmatter"
+    slug: "{{slug}}"
+    preview_path: "blog/{{slug}}"
+
+    fields:
+      - label: "Título"
+        name: "title"
+        widget: "string"
+
+      - label: "URL personalizada"
+        name: "url"
+        widget: "string"
+        required: false
+        hint: "Exemplo: /blog/nome-do-artigo"
+
+      - label: "Data de publicação"
+        name: "date"
+        widget: "datetime"
+        format: "YYYY-MM-DDTHH:mm:ssZ"
+
+      - label: "Rascunho"
+        name: "draft"
+        widget: "boolean"
+        default: true
+
+      - label: "Descrição"
+        name: "description"
+        widget: "text"
+
+      - label: "Não indexar nos buscadores"
+        name: "noindex"
+        widget: "boolean"
+        default: false
+
+      - label: "Destaque"
+        name: "featured"
+        widget: "boolean"
+        default: false
+
+      - label: "Fixar artigo"
+        name: "pinned"
+        widget: "boolean"
+        default: false
+
+      - label: "Comentários"
+        name: "comments"
+        widget: "boolean"
+        default: false
+
+      - label: "Séries"
+        name: "series"
+        widget: "list"
+        required: false
+        default: []
+
+      - label: "Categorias"
+        name: "categories"
+        widget: "list"
+        required: false
+
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+
+      - label: "Autores"
+        name: "authors"
+        widget: "list"
+        default:
+          - "sandson"
+
+      - label: "Conteúdo"
+        name: "body"
+        widget: "markdown"
