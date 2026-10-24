@@ -1,0 +1,28 @@
+{{- /*
+  Bloco de doação. Contexto: dict "Page" <página> "Variant" "post"|"sidebar".
+  Configuração em params: donate.* (ver config/_default/params.yaml).
+  Um post pode esconder o bloco do fim do texto com `donate: false` no front matter.
+*/ -}}
+{{- $cfg := default dict site.Params.donate }}
+{{- $url := $cfg.paypal }}
+{{- $variant := default "post" .Variant }}
+{{- $enabled := ne (index $cfg $variant) false }}
+{{- $pageOff := and (eq $variant "post") (eq .Page.Params.donate false) }}
+{{- if and $url $enabled (not $pageOff) }}
+  {{- $title := default "Gostou do conteúdo?" $cfg.title }}
+  {{- $text := default "Se este material te ajudou, considere apoiar o blog com uma doação." $cfg.text }}
+  {{- $button := default "Doar com PayPal" $cfg.button }}
+  <div class="sc-donate sc-donate-{{ $variant }} hb-module">
+    <div class="sc-donate-icon" aria-hidden="true">
+      {{- partial "icons/icon" (dict "vendor" "bootstrap" "name" "cup-hot") -}}
+    </div>
+    <div class="sc-donate-body">
+      <p class="sc-donate-title">{{ $title }}</p>
+      <p class="sc-donate-text">{{ $text }}</p>
+    </div>
+    <a class="sc-donate-btn" href="{{ $url }}" target="_blank" rel="noopener external">
+      {{- partial "icons/icon" (dict "vendor" "bootstrap" "name" "paypal") -}}
+      <span>{{ $button }}</span>
+    </a>
+  </div>
+{{- end }}

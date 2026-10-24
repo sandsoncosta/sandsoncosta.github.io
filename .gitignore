@@ -18,9 +18,11 @@ content\blog\15-cve-mremoteng\index.en.md
 27.engenharia.e.blue.team
 29.criando.seu.proprio.port.scan
 34.capev2
-38.metodo.de.aprendizagem.acelerada
 39.playbook.e.runbook
 40.passwd.not.required
 42.sysmon.eid.23
-45.infra.de.c2
 43.kerberoasting
+44.detectando.c2
+45.infra.de.c2
+46.hunting.powershell
+47.sss

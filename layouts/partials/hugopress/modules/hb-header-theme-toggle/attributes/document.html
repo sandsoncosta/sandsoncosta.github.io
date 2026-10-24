@@ -1,0 +1,7 @@
+{{- /*
+  Tema inicial para quem ainda não escolheu nada no botão de tema.
+  Valores: "dark", "light" ou "auto" (segue o sistema). Configure em params: hb.color.
+*/ -}}
+{{- return dict
+  "data-bs-theme" (default "dark" site.Params.hb.color)
+-}}

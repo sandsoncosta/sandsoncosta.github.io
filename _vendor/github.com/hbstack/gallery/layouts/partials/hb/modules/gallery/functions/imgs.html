@@ -1,0 +1,6 @@
+{{- $imgs := slice }}
+{{- range where site.RegularPages "Type" "gallery" }}
+  {{- $page := . }}
+  {{- $imgs = $imgs | append (partialCached "hb/modules/gallery/functions/page-imgs" $page $page) }}
+{{- end }}
+{{- return partial "hb/modules/gallery/functions/sort-imgs" $imgs -}}

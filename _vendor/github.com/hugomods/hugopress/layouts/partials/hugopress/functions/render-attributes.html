@@ -1,0 +1,31 @@
+{{- $name := .Name }}
+{{- $page := .Page }}
+{{- $unique := .Unique | default false }}
+{{- $modules := partialCached "hugopress/functions/attributes" $name $name }}
+{{- $attributes := newScratch }}
+{{- range $modules }}
+  {{- $attrs := slice }}
+  {{- if site.Params.hugopress.debug }}
+    {{- warnf "[hugopress] [%s] rendering attribute: %q." .module .name }}
+  {{- end }}
+  {{- $ctx := dict "Page" $page }}
+  {{- if .cacheable }}
+    {{- $attrs = partialCached .partial $ctx }}
+  {{- else }}
+    {{- $attrs = partial .partial $ctx }}
+  {{- end }}
+  {{- range $name, $value := $attrs }}
+    {{- if not ($attributes.Get $name) }}
+      {{/* set name value directly if not exists. */}}
+      {{- $attributes.Set $name (slice $value) }}
+    {{- else if and (not $unique) (not (in ($attributes.Get $name) $value)) }}
+      {{/* append the new value for the corresponding name. */}}
+      {{- $attributes.Add $name (slice $value) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $tmp := slice }}
+{{- range $name, $value := $attributes.Values }}
+  {{- $tmp = $tmp | append (printf `%s="%s"` $name (delimit $value " ")) }}
+{{- end }}
+{{- delimit $tmp " " | safeHTML -}}

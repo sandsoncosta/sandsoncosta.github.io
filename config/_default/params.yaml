@@ -5,15 +5,17 @@ hb:
   # override SASS variables, please replace the dash with underline, e.g. `list-group-color` should be `list_group_color`.
   # styles:
   #   primary: '#6610f2'
+  color: dark # tema inicial: dark, light ou auto (segue o sistema).
   js_bundle_name: main # the JS bundle name.
   css_bundle_name: main # the CSS bundle name.
   
-  full_width: true # when true, the layout takes full width globally.
+  full_width: false # when true, the layout takes full width globally.
 
   header:
     # brand: HB # the brand name, leave it empty to use site's title.
     brand: Sandson Costa # the brand name, leave it empty to use site's title.
-    logo_bg: '#712cf9' # logo background color, used by logo with transparent background.
+    full_width: false # cabeçalho alinhado ao conteúdo
+    logo_bg: '#0b0f14' # logo background color, used by logo with transparent background.
     # see https://hbstack.dev/en/docs/modules/socials/.
     socials:
       github: sandsoncosta
@@ -36,7 +38,8 @@ hb:
     # list_style: cascade # para posts sem imagens
     post_authors:
       position: bottom
-    list_cols_md: 4
+    list_cols_md: 2
+    post_thumbnail_height: 200px
     social_share_buttons:
       alignment: center
       icons: true
@@ -73,7 +76,7 @@ hb:
     # post_thumbnail: false # whether to show the thumbnails.
     # post_date_format: ":date_long" # see https://gohugo.io/functions/dateformat/#datetime-formatting-layouts.
     home: # homepage settings.
-      # taxonomies: false # remove the taxonomies stat from the homepage.
+      taxonomies: false # remove the taxonomies stat from the homepage.
       featured_posts: 5 # the number of the featured posts.
       main_sections: # leave it empty to include all regular pages.
         # - docs
@@ -130,6 +133,16 @@ hb:
     delay: 5
     dismissed_period: 604800
 
+# Bloco de doação (fim dos posts e barra lateral). Deixe paypal vazio para esconder.
+# Um post específico pode esconder o bloco com `donate: false` no front matter.
+donate:
+  paypal: "https://www.paypal.com/donate/?business=SKCAMGH6T8Y4A&no_recurring=0&currency_code=USD" # ex.: https://www.paypal.com/donate/?hosted_button_id=XXXX ou https://paypal.me/seuusuario
+  post: true
+  sidebar: true
+  title: "Gostou do conteúdo?"
+  text: "Se este material te ajudou, considere apoiar o blog com uma doação. Isso ajuda a manter o laboratório e os próximos artigos."
+  button: "Doar com PayPal"
+
 seo:
   favicons: # see https://hugomods.com/en/docs/seo/#favicons-module
     icon: images/logo.png # use logo as favicon.
@@ -138,8 +151,8 @@ seo:
 pwa:
   debug: false
   manifest:
-    background_color: '#712cf9'
-    theme_color: '#712cf9'
+    background_color: '#0b0f14'
+    theme_color: '#0b0f14'
     short_name: 'Sandson Costa'
 
 # see https://hugomods.com/search/configurations/.
@@ -166,13 +179,20 @@ hugopress:
         # see layouts/partials/hugopress/modules/hb-custom/hooks/hb-blog-sidebar.html.
         hb-blog-sidebar:
           cacheable: true
-          weight: 1
+          weight: 2
+        # see layouts/partials/hugopress/modules/hb-custom/hooks/hb-blog-post-content-end.html.
+        hb-blog-post-content-end:
+          weight: 2 # depois da revisão e dos botões de compartilhar (weight 1).
     # change the order of sidebar modules.
+    hb-blog-sidebar-profile:
+      hooks:
+        hb-blog-sidebar:
+          weight: 1
     hb-blog-sidebar-taxonomies:
       hooks:
         hb-blog-sidebar:
-          weight: 3
+          weight: 4
     hb-blog-sidebar-posts:
       hooks:
         hb-blog-sidebar:
-          weight: 2
+          weight: 3
