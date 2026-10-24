@@ -7,7 +7,7 @@ description: "Guia completo para identificar técnicas de Command and Control (C
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

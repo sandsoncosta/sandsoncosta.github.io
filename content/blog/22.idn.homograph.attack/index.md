@@ -1,4 +1,4 @@
----
+﻿---
 title: "IDN Homograph Attack: Definição, conceitos e demonstração prática"
 date: 2025-01-14T00:58:09-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "O artigo aborda o que é o IDN Homograph Attack, como funciona, se
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
 #  - 
 categories:

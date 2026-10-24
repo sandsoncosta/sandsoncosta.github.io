@@ -1,4 +1,4 @@
----
+﻿---
 title: "A Pirâmide da Dor na prática: Usando Inteligência Cibernética para maximizar o impacto contra adversários"
 date: 2025-04-22T00:26:48-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "A Pirâmide da Dor oferece uma abordagem estratégica para enfrent
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

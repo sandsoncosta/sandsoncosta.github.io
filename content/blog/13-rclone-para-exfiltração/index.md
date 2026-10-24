@@ -1,4 +1,4 @@
----
+﻿---
 title: "Usando o Rclone para exfiltração de dados: Técnicas de hunting, defesa e detecção"
 date: 2024-11-05T23:23:51-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Exploramos como o Rclone pode ser usado na exfiltração de dados,
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
 #  - 
 categories:

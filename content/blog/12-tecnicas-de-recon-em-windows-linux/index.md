@@ -1,4 +1,4 @@
----
+﻿---
 title: "Técnicas de Recon em Windows e Linux: Casos de Uso para Red Team, Blue Team e Threat Hunting"
 date: 2024-11-05T10:17:41-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Neste artigo, abordamos uma lista abrangente de comandos de reconh
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
 #  - 
 categories:

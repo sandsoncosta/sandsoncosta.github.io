@@ -1,4 +1,4 @@
----
+﻿---
 title: "Como habilitar Two-Factor Authentication (2FA) no Windows com o MultiOTP"
 date: 2025-03-25T14:59:33-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Neste artigo, vamos implementar a autenticação de dois fatores p
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

@@ -1,4 +1,4 @@
----
+﻿---
 title: "Análise minuciosa de ofuscação PowerShell: De um script caótico ao \"Start-Process calc.exe\""
 date: 2025-04-09T12:15:38-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Análise prática de um script PowerShell ofuscado, revelando pass
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

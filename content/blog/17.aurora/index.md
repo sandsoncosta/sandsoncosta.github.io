@@ -1,4 +1,4 @@
----
+﻿---
 title: "Aurora e Sigma Rules: Melhorando a eficiência e visibilidade na detecção de ameaças em Windows"
 date: 2024-12-25T12:57:03-03:00
 draft: false
@@ -6,7 +6,7 @@ description: Aurora, combinado com regras Sigma, aprimora a detecção de ameaç
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
 #  - 
 categories:

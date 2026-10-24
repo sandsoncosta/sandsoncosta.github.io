@@ -1,4 +1,4 @@
----
+﻿---
 title: "Habilitando Políticas de Auditoria no PowerShell"
 date: 2024-10-05T13:30:29-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "A habilitação das políticas de auditoria do PowerShell, como Sc
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - Auditorias do Windows
 categories:

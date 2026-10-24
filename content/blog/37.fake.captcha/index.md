@@ -1,4 +1,4 @@
----
+﻿---
 title: "Exploração de um ClickFix: Rastreando o que um Fake CAPTCHA faz"
 date: 2025-05-08T00:26:48-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Modelo de ataque que permeia no ambiente é o fake captcha, també
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

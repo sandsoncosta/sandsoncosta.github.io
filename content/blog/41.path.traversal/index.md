@@ -1,4 +1,4 @@
----
+﻿---
 title: "CTF: De um Path Traversal ao acesso root"
 date: 2025-07-17T13:50:00-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Descubra como vulnerabilidades de Path Traversal funcionam, desde 
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

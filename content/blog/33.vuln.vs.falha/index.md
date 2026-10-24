@@ -1,4 +1,4 @@
----
+﻿---
 title: "Qual a diferença entre vulnerabilidade e falha de segurança?"
 date: 2025-04-22T00:26:48-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Vulnerabilidade é uma fraqueza potencial enquanto falha de segura
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

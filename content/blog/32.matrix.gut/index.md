@@ -1,4 +1,4 @@
----
+﻿---
 title: "Matriz GUT aplicada à Segurança da Informação: Como priorizar ações críticas em ambientes sob pressão"
 date: 2025-05-22T00:26:48-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Entenda como a Matriz GUT ajuda a priorizar ações críticas, red
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:

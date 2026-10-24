@@ -1,4 +1,4 @@
----
+﻿---
 title: "Phishing: A engenhosa arma dos cibercriminosos"
 date: 2025-01-13T11:52:05-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Neste artigo, mostro uma breve análise em um site com o único in
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
 #  - 
 categories:

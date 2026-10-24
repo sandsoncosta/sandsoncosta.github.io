@@ -1,4 +1,4 @@
----
+﻿---
 title: "Regra de Detecção não é Caso de Uso: Entenda de uma vez por todas"
 date: 2025-05-30T00:26:48-03:00
 draft: false
@@ -6,7 +6,7 @@ description: "Regras de detecção são lógica técnica. Casos de uso são conc
 noindex: false
 featured: false
 pinned: false
-comments: false
+comments: true
 series:
  - 
 categories:
