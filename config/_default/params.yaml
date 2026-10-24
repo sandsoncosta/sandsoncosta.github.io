@@ -65,7 +65,7 @@ hb:
           linkedin: sandsoncosta
           rss: true
       posts:
-        recent_count: 5 # the number of recent posts.
+        recent_count: 0 # the number of recent posts.
         featured_count: 5 # the number of featured posts.
       taxonomies:
         count: true # whether to show the number of posts associated to the item.
@@ -89,6 +89,8 @@ hb:
       repo: sandsoncosta/sandsoncosta.github.io
       repo_id: R_kgDOMNgMqg
       category: General
+      languages_mapping:
+        pt-br: pt # o Giscus não reconhece "pt-br"
       
       # mapping: pathname
       # theme: noborder_dark
@@ -102,6 +104,8 @@ hb:
       repo_id: R_kgDOMNgMqg
       category: General
       category_id: DIC_kwDOMNgMqs4Coox_
+      languages_mapping:
+        pt-br: pt
       # mapping: pathname
       # theme: noborder_dark
       # input_position: top

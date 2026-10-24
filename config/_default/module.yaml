@@ -30,7 +30,8 @@ imports:
   - path: github.com/hbstack/blog/modules/sidebar/taxonomies
 
   # blog comments engine
-  # - path: github.com/hbstack/giscus
+  - path: github.com/hbstack/blog/modules/giscus # comentários nos posts (lê hb.blog.giscus)
+  - path: github.com/hbstack/docs/modules/giscus # comentários nas docs (lê hb.docs.giscus)
   # - path: github.com/hugomods/giscus
   # - path: github.com/hbstack/blog/modules/disqus
   # - path: github.com/hbstack/blog/modules/utterances

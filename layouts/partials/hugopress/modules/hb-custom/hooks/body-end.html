@@ -1,1 +1,27 @@
 {{/* Put custom HTML markup before the end of <body>. */}}
+{{- /*
+  Giscus: o módulo do HB escolhe o tema pelo sistema quando o visitante ainda não
+  usou o botão de tema. Como o blog abre em "dark" por padrão (hb.color), isso
+  pode deixar os comentários claros numa página escura. Aqui o tema do iframe
+  passa a seguir o data-bs-theme da página. Trocas posteriores no botão de tema
+  continuam sendo tratadas pelo próprio módulo (evento hb:theme).
+*/ -}}
+<script>
+(() => {
+  const ORIGIN = 'https://giscus.app'
+  const send = () => {
+    const frame = document.querySelector('iframe.giscus-frame')
+    if (!frame) return
+    const theme = document.documentElement.getAttribute('data-bs-theme') === 'light' ? 'light' : 'dark'
+    frame.contentWindow.postMessage({ giscus: { setConfig: { theme } } }, ORIGIN)
+  }
+  let synced = false
+  window.addEventListener('message', (e) => {
+    if (synced || e.origin !== ORIGIN || !e.data || !e.data.giscus) return
+    synced = true
+    send()
+    // o módulo do HB reaplica o tema do sistema ~2s após o carregamento
+    setTimeout(send, 2500)
+  })
+})()
+</script>
