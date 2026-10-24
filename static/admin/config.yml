@@ -14,83 +14,726 @@ public_folder: "/images/uploads"
 publish: true
 
 collections:
-  - name: "blog"
-    label: "Artigos do Blog"
-    label_singular: "Artigo"
-    folder: "content/blog"
-    create: true
-    extension: "md"
-    format: "frontmatter"
-    slug: "{{slug}}"
-    preview_path: "blog/{{slug}}"
-
-    fields:
-      - label: "Título"
-        name: "title"
-        widget: "string"
-
-      - label: "URL personalizada"
-        name: "url"
-        widget: "string"
-        required: false
-        hint: "Exemplo: /blog/nome-do-artigo"
-
-      - label: "Data de publicação"
-        name: "date"
-        widget: "datetime"
-        format: "YYYY-MM-DDTHH:mm:ssZ"
-
-      - label: "Rascunho"
-        name: "draft"
-        widget: "boolean"
-        default: true
-
-      - label: "Descrição"
-        name: "description"
-        widget: "text"
-
-      - label: "Não indexar nos buscadores"
-        name: "noindex"
-        widget: "boolean"
-        default: false
-
-      - label: "Destaque"
-        name: "featured"
-        widget: "boolean"
-        default: false
-
-      - label: "Fixar artigo"
-        name: "pinned"
-        widget: "boolean"
-        default: false
-
-      - label: "Comentários"
-        name: "comments"
-        widget: "boolean"
-        default: false
-
-      - label: "Séries"
-        name: "series"
-        widget: "list"
-        required: false
-        default: []
-
-      - label: "Categorias"
-        name: "categories"
-        widget: "list"
-        required: false
-
-      - label: "Tags"
-        name: "tags"
-        widget: "list"
-        required: false
-
-      - label: "Autores"
-        name: "authors"
-        widget: "list"
-        default:
-          - "sandson"
-
-      - label: "Conteúdo"
-        name: "body"
-        widget: "markdown"
+  - name: "artigos"
+    label: "Artigos existentes"
+    files:
+      - name: "artigo-0001"
+        label: "12-tecnicas-de-recon-em-windows-linux"
+        file: "content/blog/12-tecnicas-de-recon-em-windows-linux/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0002"
+        label: "13-rclone-para-exfiltração"
+        file: "content/blog/13-rclone-para-exfiltração/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0003"
+        label: "14-medusa-ransomware"
+        file: "content/blog/14-medusa-ransomware/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0004"
+        label: "15-cve-mremoteng"
+        file: "content/blog/15-cve-mremoteng/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0005"
+        label: "17.aurora"
+        file: "content/blog/17.aurora/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0006"
+        label: "19.anonymous.logon"
+        file: "content/blog/19.anonymous.logon/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0007"
+        label: "20.phishing"
+        file: "content/blog/20.phishing/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0008"
+        label: "21.kerberos.conceito"
+        file: "content/blog/21.kerberos.conceito/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0009"
+        label: "22.idn.homograph.attack"
+        file: "content/blog/22.idn.homograph.attack/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0010"
+        label: "24.extensions"
+        file: "content/blog/24.extensions/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0011"
+        label: "25.C2-with-silenttrinity"
+        file: "content/blog/25.C2-with-silenttrinity/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0012"
+        label: "26.desenvolvendo-hunting"
+        file: "content/blog/26.desenvolvendo-hunting/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0013"
+        label: "27.engenharia.e.blue.team"
+        file: "content/blog/27.engenharia.e.blue.team/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0014"
+        label: "28.multiotp"
+        file: "content/blog/28.multiotp/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0015"
+        label: "29.criando.seu.proprio.port.scan"
+        file: "content/blog/29.criando.seu.proprio.port.scan/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0016"
+        label: "30.CVE-2025-26633"
+        file: "content/blog/30.CVE-2025-26633/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0017"
+        label: "31.analisando.powershell"
+        file: "content/blog/31.analisando.powershell/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0018"
+        label: "32.matrix.gut"
+        file: "content/blog/32.matrix.gut/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0019"
+        label: "33.vuln.vs.falha"
+        file: "content/blog/33.vuln.vs.falha/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0020"
+        label: "34.capev2"
+        file: "content/blog/34.capev2/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0021"
+        label: "35.piramide.da.dor"
+        file: "content/blog/35.piramide.da.dor/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0022"
+        label: "36.caso.de.uso"
+        file: "content/blog/36.caso.de.uso/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0023"
+        label: "37.fake.captcha"
+        file: "content/blog/37.fake.captcha/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0024"
+        label: "39.playbook.e.runbook"
+        file: "content/blog/39.playbook.e.runbook/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0025"
+        label: "40.passwd.not.required"
+        file: "content/blog/40.passwd.not.required/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0026"
+        label: "41.path.traversal"
+        file: "content/blog/41.path.traversal/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0027"
+        label: "42.sysmon.eid.23"
+        file: "content/blog/42.sysmon.eid.23/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0028"
+        label: "43.kerberoasting"
+        file: "content/blog/43.kerberoasting/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0029"
+        label: "44.detectando.c2"
+        file: "content/blog/44.detectando.c2/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0030"
+        label: "45.infra.de.c2"
+        file: "content/blog/45.infra.de.c2/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0031"
+        label: "46.hunting.powershell"
+        file: "content/blog/46.hunting.powershell/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0032"
+        label: "47.sss"
+        file: "content/blog/47.sss/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0033"
+        label: "5"
+        file: "content/blog/5/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0034"
+        label: "7"
+        file: "content/blog/7/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0035"
+        label: "9.entendendo-pasta-public"
+        file: "content/blog/9.entendendo-pasta-public/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0036"
+        label: "auditoria-de-gpo"
+        file: "content/blog/auditoria-de-gpo/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0037"
+        label: "CVE-2024-49113"
+        file: "content/blog/CVE-2024-49113/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0038"
+        label: "entenda-o-que-sao-contas-de-servicos-e-como-usa-las"
+        file: "content/blog/entenda-o-que-sao-contas-de-servicos-e-como-usa-las/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0039"
+        label: "exfiltracao-de-dados-via-icmp"
+        file: "content/blog/exfiltracao-de-dados-via-icmp/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
+      - name: "artigo-0040"
+        label: "msa-na-pratica"
+        file: "content/blog/msa-na-pratica/index.md"
+        fields:
+          - { label: "Título", name: "title", widget: "string" }
+          - { label: "URL personalizada", name: "url", widget: "string", required: false }
+          - { label: "Data", name: "date", widget: "datetime", required: false }
+          - { label: "Rascunho", name: "draft", widget: "boolean", required: false }
+          - { label: "Descrição", name: "description", widget: "text", required: false }
+          - { label: "Não indexar", name: "noindex", widget: "boolean", required: false }
+          - { label: "Destaque", name: "featured", widget: "boolean", required: false }
+          - { label: "Fixado", name: "pinned", widget: "boolean", required: false }
+          - { label: "Comentários", name: "comments", widget: "boolean", required: false }
+          - { label: "Séries", name: "series", widget: "list", required: false }
+          - { label: "Categorias", name: "categories", widget: "list", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false }
+          - { label: "Autores", name: "authors", widget: "list", required: false }
+          - { label: "Conteúdo", name: "body", widget: "markdown" }
