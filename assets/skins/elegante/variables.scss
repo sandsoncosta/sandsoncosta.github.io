@@ -1,0 +1,60 @@
+// Tema "elegante": escuro neutro, acento ciano/teal, Inter + JetBrains Mono.
+// Variáveis do Bootstrap e do HB.
+
+// Paleta
+$primary: #0f9f9a;
+$secondary: #5b6573;
+$danger: #e5484d;
+
+// Modo claro
+$body-bg: #f5f6f8;
+$body-color: #1d232b;
+$body-secondary-color: #5b6573;
+$body-tertiary-bg: #eceef2;
+$border-color: #e1e4e9;
+$headings-color: #0f141a;
+$link-color: #0b7c78;
+$link-hover-color: #075d5a;
+
+// Modo escuro
+$body-bg-dark: #0b0f14;
+$body-color-dark: #c9d1db;
+$body-secondary-color-dark: #8793a3;
+$body-secondary-bg-dark: #141a22;
+$body-tertiary-bg-dark: #10151c;
+$body-emphasis-color-dark: #eef2f6;
+$border-color-dark: #1f2731;
+$headings-color-dark: #eef2f6;
+$primary-text-emphasis-dark: #5ee0d6;
+$link-color-dark: #5ee0d6;
+$link-hover-color-dark: #a5f0ea;
+$code-color-dark: #f0a6c8;
+
+// Tipografia
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+$headings-font-family: $font-family-monospace;
+$headings-font-weight: 600;
+$headings-line-height: 1.25;
+$font-size-base: 1rem;
+$line-height-base: 1.65;
+$lead-font-weight: 400;
+
+$h1-font-size: 2rem;
+$h2-font-size: 1.5rem;
+$h3-font-size: 1.25rem;
+$h4-font-size: 1.1rem;
+$h5-font-size: 1rem;
+$h6-font-size: .9rem;
+
+// Formas
+$border-radius: .5rem;
+$border-radius-sm: .375rem;
+$border-radius-lg: .75rem;
+$enable-shadows: false;
+$box-shadow: 0 1px 2px rgba(15, 20, 26, .04), 0 8px 24px rgba(15, 20, 26, .06);
+
+$badge-font-weight: 500;
+$badge-border-radius: .375rem;
+
+$hb-module-margin-bottom: 1.25rem;

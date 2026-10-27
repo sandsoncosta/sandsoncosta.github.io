@@ -1,0 +1,29 @@
+{{- $pos := .Position -}}
+<div class="leia-tambem">
+  <span style="display:inline-block;margin-bottom:0.5rem;padding:0.2rem 0.6rem;font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#fff;background:#2563eb;border-radius:4px;">Leia também!</span>
+  {{- range .Params }}
+  {{- $p := site.GetPage . }}
+  {{- with $p }}
+  {{- $img := (.Resources.ByType "image").GetMatch "*featured*" }}
+  <figure class="kg-bookmark-card" style="margin:0 0 0.75rem 0;">
+    <a class="kg-bookmark-container" href="{{ .RelPermalink }}" style="overflow:hidden;">
+      <div class="kg-bookmark-content">
+        <div class="kg-bookmark-title">{{ .Title }}</div>
+        <div class="kg-bookmark-description" style="display:block;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible;max-height:none;white-space:normal;">{{ (or .Params.summary .Description .Summary) | plainify }}</div>
+<div class="kg-bookmark-metadata" style="display:flex;align-items:center;gap:0.5rem;">
+  <img class="kg-bookmark-icon" src="/img/sandson.png" alt="" style="width:28px;height:28px;max-width:none;border-radius:50%;object-fit:cover;">
+  <span style="font-size:0.9rem;font-weight:600;">Sandson Costa</span>
+</div>
+      </div>
+{{- with $img }}
+{{- $thumb := .Resize "600x webp" }}
+<div class="kg-bookmark-thumbnail" style="position:relative;overflow:hidden;">
+<img src="{{ $thumb.RelPermalink }}" alt="" loading="lazy" style="position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:contain;"></div>
+{{- end }}
+    </a>
+  </figure>
+  {{- else }}
+  {{- errorf "leia-tambem: artigo %q não encontrado (%s)" . $pos }}
+  {{- end }}
+  {{- end }}
+</div>

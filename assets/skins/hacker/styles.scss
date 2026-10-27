@@ -1,0 +1,255 @@
+// =============================================================================
+// Tema "hacker" (herda _base)
+// Terminal de fósforo verde: tudo em monoespaçada, títulos em VT323 com
+// prompt, cursor piscando no nome do site, linhas de varredura discretas e
+// imagens em verde fósforo (a cor real volta no hover).
+// =============================================================================
+
+:root {
+  --sc-bg: #eef3ea;
+  --sc-text: #0e2a16;
+  --sc-muted: #4b6b52;
+  --sc-heading: #06180b;
+  --sc-accent: #0a7a2e;
+  --sc-accent-ink: #ffffff;
+  --sc-line: #c6d6c4;
+  --sc-line-strong: #7f9f84;
+  --sc-surface: #dfe9db;
+  --sc-header-bg: rgba(238, 243, 234, .9);
+  --sc-code-bg: #030805;
+  --sc-code-line: #030805;
+  --sc-duo-shadow: #0b2a14;
+  --sc-duo-light: #c9f5d3;
+  --sc-scanline: transparent;
+
+  --sc-font-ui: "JetBrains Mono", ui-monospace, monospace;
+  --sc-font-display: "VT323", "JetBrains Mono", monospace;
+  --sc-font-body: "JetBrains Mono", ui-monospace, monospace;
+
+  --sc-display-weight: 400;
+  --sc-display-tracking: 0;
+  --sc-display-leading: 1;
+  --sc-post-title-size: clamp(2.75rem, 1.6rem + 5vw, 5rem);
+  --sc-card-title-size: 2rem;
+  --sc-body-size: .9375rem;
+  --sc-body-leading: 1.75;
+  --sc-radius: 0;
+  --sc-radius-btn: 0;
+}
+
+[data-bs-theme="dark"] {
+  --sc-bg: #030805;
+  --sc-text: #b6f5c3;
+  --sc-muted: #5fa874;
+  --sc-heading: #d8ffe0;
+  --sc-accent: #39ff6a;
+  --sc-accent-ink: #030805;
+  --sc-line: #12331d;
+  --sc-line-strong: #2a6b3d;
+  --sc-surface: #0a1a0f;
+  --sc-header-bg: rgba(3, 8, 5, .88);
+  --sc-code-bg: #000000;
+  --sc-code-line: #12331d;
+  --sc-duo-shadow: #021006;
+  --sc-duo-light: #7dffa0;
+  --sc-scanline: rgba(57, 255, 106, .035);
+}
+
+@include sc-duotone-listings;
+
+// Linhas de varredura do monitor (só no tema escuro, muito sutis)
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, var(--sc-scanline) 0, var(--sc-scanline) 1px, transparent 1px, transparent 3px);
+}
+
+[data-bs-theme="dark"] {
+  .hb-blog-post-title,
+  .hb-blog-post-intro .hb-blog-post-title,
+  .carousel-caption .h5 {
+    text-shadow: 0 0 18px rgba(57, 255, 106, .25);
+  }
+}
+
+// Nome do site com cursor piscando (a única animação do tema)
+.hb-header-nav .navbar-brand {
+  font-family: var(--sc-font-display);
+  font-size: 1.75rem;
+  letter-spacing: 0;
+
+  &::before {
+    content: "~/";
+    color: var(--sc-accent);
+    margin-right: .15rem;
+  }
+
+  &::after {
+    content: "";
+    display: inline-block;
+    width: .55em;
+    height: 1em;
+    margin-left: .2rem;
+    vertical-align: -.12em;
+    background: var(--sc-accent);
+    animation: sc-blink 1.1s steps(1) infinite;
+  }
+
+  img {
+    display: none !important;
+  }
+}
+
+@keyframes sc-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.hb-header-search-input-container .form-control {
+  font-family: var(--sc-font-ui);
+}
+
+// Fios tracejados no lugar dos contínuos
+.hb-main .hb-module {
+  border-top-style: dashed;
+}
+
+.hb-footer,
+.hb-header-nav {
+  border-style: dashed;
+  border-left: 0;
+  border-right: 0;
+}
+
+.hb-header-nav {
+  border-top: 0;
+}
+
+// Títulos com prompt
+.hb-blog-post-card .hb-blog-post-title-link::before {
+  content: "> ";
+  color: var(--sc-accent);
+}
+
+.hb-blog-post-intro.hb-module .hb-blog-post-title::before {
+  content: "$ ";
+  color: var(--sc-accent);
+}
+
+.hb-blog-post-card .hb-blog-post-title-link {
+  background-size: 0 1px;
+}
+
+.hb-blog-post-card:hover .hb-blog-post-title-link {
+  background-size: 100% 1px;
+}
+
+.hb-blog-post-card .hb-blog-post-summary,
+.hb-blog-post-intro .hb-blog-post-desc {
+  font-size: .875rem;
+}
+
+.hb-blog-post-intro.hb-module .hb-blog-post-desc {
+  font-size: 1rem;
+
+  &::before {
+    content: "# ";
+    color: var(--sc-muted);
+  }
+}
+
+.hb-blog-post-meta {
+  font-size: .8125rem;
+}
+
+.hb-blog-post-section .badge::before {
+  content: "[";
+}
+
+.hb-blog-post-section .badge::after {
+  content: "]";
+}
+
+// Conteúdo
+.hb-blog-post-content,
+.hb-docs-doc-content {
+  h2::before {
+    content: "## ";
+    color: var(--sc-accent);
+  }
+
+  h3::before {
+    content: "### ";
+    color: var(--sc-accent);
+  }
+
+  h2 {
+    font-size: 2.25rem;
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 1.5rem;
+
+    li::before {
+      content: "-";
+      color: var(--sc-accent);
+      margin-left: -1.25rem;
+      width: 1.25rem;
+      display: inline-block;
+    }
+  }
+
+  a:not(.btn):not(.badge):not(.heading-sign):not(.kg-bookmark-container) {
+    text-decoration-style: dashed;
+  }
+
+  .highlight pre {
+    border: 1px dashed var(--sc-line-strong);
+  }
+
+  > blockquote:not(.alert) {
+    font-style: normal;
+    font-size: 1rem;
+    border-left-style: dashed;
+  }
+}
+
+.hb-content blockquote.alert {
+  border-left-style: solid;
+
+  .alert-heading::before {
+    content: "[!] ";
+  }
+}
+
+#TableOfContents a.active::before {
+  content: "> ";
+  color: var(--sc-accent);
+}
+
+.sc-donate-btn::before {
+  content: "$ ";
+}
+
+.sc-donate-title::before {
+  content: "> ";
+  color: var(--sc-accent);
+}
+
+.hb-blog-sidebar-profile .hb-blog-sidebar-profile-title {
+  font-size: 2rem;
+}
+
+.taxonomy-term .taxonomy-term-title::before {
+  content: "./";
+  color: var(--sc-muted);
+}

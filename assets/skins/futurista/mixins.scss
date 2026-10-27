@@ -1,0 +1,6 @@
+// Mixins do tema futurista.
+
+// Chanfro: corta os cantos superior esquerdo e inferior direito
+@mixin sc-chamfer($cut: var(--sc-cut)) {
+  clip-path: polygon(#{$cut} 0, 100% 0, 100% calc(100% - #{$cut}), calc(100% - #{$cut}) 100%, 0 100%, 0 #{$cut});
+}

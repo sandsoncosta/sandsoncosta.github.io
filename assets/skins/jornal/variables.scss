@@ -1,0 +1,50 @@
+// Tema "jornal": papel de jornal, tinta preta e um vermelho editorial.
+// Bodoni Moda nas manchetes, Newsreader no texto, UnifrakturMaguntia só no nome do site.
+$newsprint: #f4f2ec;
+$ink: #1b1a17;
+$press-red: #a3161d;
+
+$primary: $press-red;
+$secondary: #5d5a52;
+$info: #2b4c7e;
+$warning: #8a5a00;
+$danger: $press-red;
+
+$body-bg: $newsprint;
+$body-color: $ink;
+$body-secondary-color: #5d5a52;
+$body-tertiary-bg: #ebe8df;
+$border-color: #cfcac0;
+$headings-color: $ink;
+$link-color: $press-red;
+$link-hover-color: #7a0f15;
+
+$body-bg-dark: #161513;
+$body-color-dark: #e8e3d6;
+$body-secondary-color-dark: #a19b8c;
+$body-secondary-bg-dark: #1f1d1a;
+$body-tertiary-bg-dark: #1b1a17;
+$body-emphasis-color-dark: #f6f2e8;
+$border-color-dark: #3a372f;
+$headings-color-dark: #f6f2e8;
+$primary-text-emphasis-dark: #e0565c;
+$link-color-dark: #e0565c;
+$link-hover-color-dark: #f08a8e;
+$info-text-emphasis-dark: #8fb2e6;
+
+$font-family-sans-serif: "Newsreader", Georgia, "Times New Roman", serif;
+$font-family-serif: "Newsreader", Georgia, "Times New Roman", serif;
+$font-family-monospace: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+$headings-font-family: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+$headings-font-weight: 700;
+$headings-line-height: 1.05;
+$font-size-base: 1.0625rem;
+$line-height-base: 1.55;
+
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$enable-shadows: false;
+$box-shadow: none;
+
+$hb-module-margin-bottom: 2rem;

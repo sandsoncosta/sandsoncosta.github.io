@@ -1,0 +1,54 @@
+// Mixins da base comum (_base). Ficam fora do mixin de estilos.
+
+// Imagem em duas cores (duotom) que volta à cor original no hover/foco do card.
+// Cores: --sc-duo-shadow (tons escuros) e --sc-duo-light (tons claros).
+@mixin sc-duotone-base {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--sc-duo-shadow);
+
+  img {
+    filter: grayscale(1) contrast(1.25) brightness(1.06);
+    mix-blend-mode: screen;
+    transition: filter .45s var(--sc-ease);
+    transform: none !important;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--sc-duo-light);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    transition: opacity .45s var(--sc-ease);
+  }
+}
+
+@mixin sc-duotone-reveal {
+  img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  &::after {
+    opacity: 0;
+  }
+}
+
+// Aplica o duotom às imagens de listagem (cards e carrossel).
+@mixin sc-duotone-listings {
+  .hb-blog-post-card .card-img-top,
+  .hb-carousel .carousel-item > a {
+    @include sc-duotone-base;
+  }
+
+  .hb-blog-post-card:hover .card-img-top,
+  .hb-blog-post-card:focus-within .card-img-top,
+  .hb-carousel:hover .carousel-item > a,
+  .hb-carousel:focus-within .carousel-item > a {
+    @include sc-duotone-reveal;
+  }
+}

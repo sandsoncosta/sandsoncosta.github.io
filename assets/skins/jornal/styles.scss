@@ -1,0 +1,247 @@
+// =============================================================================
+// Tema "jornal" (herda _base)
+// Primeira página de jornal: nome do site em letra gótica como cabeçalho do
+// periódico, manchetes em Bodoni, texto justificado com capitular, fotos em
+// preto e branco (a cor volta no hover) e fios entre as colunas.
+// =============================================================================
+
+:root {
+  --sc-bg: #f4f2ec;
+  --sc-text: #1b1a17;
+  --sc-muted: #5d5a52;
+  --sc-heading: #1b1a17;
+  --sc-accent: #a3161d;
+  --sc-accent-ink: #ffffff;
+  --sc-line: #cfcac0;
+  --sc-line-strong: #1b1a17;
+  --sc-surface: #e9e5da;
+  --sc-header-bg: rgba(244, 242, 236, .92);
+  --sc-code-bg: #1b1a17;
+  --sc-code-line: #1b1a17;
+  --sc-duo-shadow: #1b1a17;
+  --sc-duo-light: #f4f2ec;
+
+  --sc-font-ui: "Newsreader", Georgia, serif;
+  --sc-font-display: "Bodoni Moda", "Didot", Georgia, serif;
+  --sc-font-body: "Newsreader", Georgia, serif;
+  --sc-font-masthead: "UnifrakturMaguntia", "Bodoni Moda", serif;
+
+  --sc-display-weight: 700;
+  --sc-display-tracking: -.01em;
+  --sc-display-leading: 1.04;
+  --sc-post-title-size: clamp(2.25rem, 1.2rem + 4.5vw, 4.25rem);
+  --sc-card-title-size: 1.5rem;
+  --sc-body-size: 1.1875rem;
+  --sc-body-leading: 1.6;
+  --sc-radius: 0;
+  --sc-radius-btn: 0;
+}
+
+[data-bs-theme="dark"] {
+  --sc-bg: #161513;
+  --sc-text: #e8e3d6;
+  --sc-muted: #a19b8c;
+  --sc-heading: #f6f2e8;
+  --sc-accent: #e0565c;
+  --sc-accent-ink: #161513;
+  --sc-line: #3a372f;
+  --sc-line-strong: #e8e3d6;
+  --sc-surface: #24221e;
+  --sc-header-bg: rgba(22, 21, 19, .92);
+  --sc-code-bg: #0d0c0b;
+  --sc-code-line: #3a372f;
+  --sc-duo-shadow: #0d0c0b;
+  --sc-duo-light: #e8e3d6;
+}
+
+@include sc-duotone-listings;
+
+// Cabeçalho do periódico: nome em gótica, fio duplo embaixo
+.hb-header-nav {
+  border-bottom: 3px double var(--sc-line-strong);
+
+  .navbar-brand {
+    font-family: var(--sc-font-masthead);
+    font-weight: 400;
+    font-size: 1.75rem;
+    letter-spacing: 0;
+    line-height: 1;
+
+    img {
+      display: none !important;
+    }
+  }
+
+  .hb-header-menus .nav-link {
+    font-family: var(--sc-font-ui);
+    font-size: 1.0625rem;
+    font-style: italic;
+  }
+}
+
+.offcanvas .offcanvas-title {
+  font-family: var(--sc-font-masthead) !important;
+  font-weight: 400 !important;
+  font-size: 1.6rem !important;
+}
+
+// Datas e metadados em versalete, como na linha de crédito de uma matéria
+.hb-blog-post-meta {
+  font-variant-caps: all-small-caps;
+  letter-spacing: .04em;
+  font-size: .9375rem;
+}
+
+.hb-blog-post-taxonomy {
+  font-variant-caps: normal;
+  letter-spacing: 0;
+  font-style: italic;
+}
+
+// Manchetes
+.hb-blog-post-card {
+  .hb-blog-post-title {
+    font-weight: 800;
+  }
+
+  .hb-blog-post-summary {
+    font-size: 1.0625rem;
+    text-align: justify;
+    hyphens: auto;
+  }
+}
+
+.hb-blog-home-carousel .hb-carousel.carousel .carousel-caption .h5 {
+  font-weight: 800;
+}
+
+.hb-blog-home-carousel + .col-12 .hb-blog-post-card .hb-blog-post-title {
+  font-weight: 900;
+}
+
+// Colunas separadas por fio vertical, como numa página impressa
+.hb-blog-posts {
+  > .col {
+    border-top: 1px solid var(--sc-line-strong);
+    padding-top: 1rem;
+  }
+
+  @include media-breakpoint-up(md) {
+    --#{$prefix}gutter-x: 3rem;
+
+    > .col:nth-child(even) {
+      border-left: 1px solid var(--sc-line);
+    }
+  }
+}
+
+.hb-main .hb-module {
+  border-top-color: var(--sc-line-strong);
+}
+
+// Barra lateral como coluna de serviço
+.hb-blog-sidebar-profile {
+  .hb-blog-sidebar-profile-title {
+    font-family: var(--sc-font-masthead);
+    font-weight: 400;
+    font-size: 1.6rem;
+  }
+
+  .hb-blog-sidebar-profile-img {
+    filter: grayscale(1);
+  }
+}
+
+.hb-blog-sidebar .nav-pills .nav-link {
+  font-style: italic;
+  font-weight: 500;
+}
+
+// Abertura da matéria
+.hb-blog-post-intro.hb-module {
+  .hb-blog-post-title {
+    font-weight: 800;
+  }
+
+  .hb-blog-post-desc {
+    font-family: var(--sc-font-display);
+    font-style: italic;
+    font-weight: 400;
+  }
+}
+
+.hb-featured-img {
+  filter: grayscale(.2) contrast(1.05);
+}
+
+// Texto da matéria: justificado, com capitular
+.hb-blog-post-content,
+.hb-docs-doc-content {
+  text-align: justify;
+  hyphens: auto;
+
+  h2,
+  h3 {
+    text-align: left;
+  }
+
+  h2,
+  h3,
+  .highlight,
+  .table-responsive,
+  blockquote {
+    clear: both;
+  }
+
+  h2 {
+    font-weight: 800;
+    padding-top: .75rem;
+    border-top: 1px solid var(--sc-line-strong);
+  }
+
+  > p:first-of-type::first-letter {
+    float: left;
+    font-family: var(--sc-font-display);
+    font-weight: 800;
+    font-size: 4.1em;
+    line-height: .82;
+    padding: .06em .08em 0 0;
+    color: var(--sc-heading);
+  }
+
+  .highlight,
+  .table-responsive,
+  li {
+    text-align: left;
+  }
+
+  > blockquote:not(.alert) {
+    font-family: var(--sc-font-display);
+    font-weight: 500;
+    font-size: 1.5rem;
+    border-left: 0;
+    border-top: 1px solid var(--sc-line-strong);
+    border-bottom: 1px solid var(--sc-line-strong);
+    padding: 1rem 0;
+    text-align: center;
+  }
+}
+
+.hb-content blockquote.alert .alert-heading {
+  font-variant-caps: all-small-caps;
+  letter-spacing: .05em;
+}
+
+.hb-footer {
+  border-top: 3px double var(--sc-line-strong);
+
+  .h5 {
+    font-family: var(--sc-font-masthead);
+    font-weight: 400;
+    font-size: 1.75rem;
+  }
+}
+
+.sc-donate-title {
+  font-weight: 800;
+}

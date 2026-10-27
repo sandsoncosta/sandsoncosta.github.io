@@ -1,0 +1,48 @@
+// Tema "futurista": painel de missão orbital. Unbounded nos títulos, IBM Plex Sans no texto.
+$void: #060914;
+$ice-cyan: #7cf3ff;
+
+$primary: #0057d9;
+$secondary: #5a6283;
+$info: #0b7fb0;
+$warning: #9a6a00;
+$danger: #d0344f;
+
+$body-bg: #f3f5fb;
+$body-color: #121735;
+$body-secondary-color: #5a6283;
+$body-tertiary-bg: #e8ecf7;
+$border-color: #d8ddef;
+$headings-color: #0b1030;
+$link-color: #0057d9;
+$link-hover-color: #0042a8;
+
+$body-bg-dark: $void;
+$body-color-dark: #dde3f7;
+$body-secondary-color-dark: #8890b0;
+$body-secondary-bg-dark: #0d1430;
+$body-tertiary-bg-dark: #0a1024;
+$body-emphasis-color-dark: #f4f6ff;
+$border-color-dark: #1c2648;
+$headings-color-dark: #f4f6ff;
+$primary-text-emphasis-dark: $ice-cyan;
+$link-color-dark: $ice-cyan;
+$link-hover-color-dark: #c4fbff;
+$code-color-dark: #ffb4e1;
+$info-text-emphasis-dark: $ice-cyan;
+
+$font-family-sans-serif: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+$font-family-monospace: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+$headings-font-family: "Unbounded", "IBM Plex Sans", system-ui, sans-serif;
+$headings-font-weight: 500;
+$headings-line-height: 1.1;
+$font-size-base: 1rem;
+$line-height-base: 1.6;
+
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$enable-shadows: false;
+$box-shadow: none;
+
+$hb-module-margin-bottom: 2rem;

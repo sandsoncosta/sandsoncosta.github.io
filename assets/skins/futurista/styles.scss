@@ -1,0 +1,220 @@
+// =============================================================================
+// Tema "futurista" (herda _base)
+// Painel de missão orbital: títulos largos em Unbounded, cantos chanfrados
+// em cards, imagens e botões (a assinatura do tema), malha de pontos no topo
+// e um único brilho de horizonte atrás da capa.
+// =============================================================================
+
+:root {
+  --sc-bg: #f3f5fb;
+  --sc-text: #121735;
+  --sc-muted: #5a6283;
+  --sc-heading: #0b1030;
+  --sc-accent: #0057d9;
+  --sc-accent-ink: #ffffff;
+  --sc-line: #d8ddef;
+  --sc-line-strong: #9aa3c7;
+  --sc-surface: #e4e9f6;
+  --sc-header-bg: rgba(243, 245, 251, .8);
+  --sc-code-bg: #0a1024;
+  --sc-code-line: #0a1024;
+  --sc-dots: rgba(11, 16, 48, .09);
+  --sc-glow: rgba(0, 87, 217, .10);
+  --sc-panel: rgba(255, 255, 255, .7);
+
+  --sc-font-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --sc-font-display: "Unbounded", "IBM Plex Sans", sans-serif;
+  --sc-font-body: "IBM Plex Sans", system-ui, sans-serif;
+
+  --sc-display-weight: 500;
+  --sc-display-tracking: -.02em;
+  --sc-display-leading: 1.12;
+  --sc-post-title-size: clamp(1.875rem, 1.1rem + 3.5vw, 3.5rem);
+  --sc-card-title-size: 1.1875rem;
+  --sc-body-size: 1.0625rem;
+  --sc-body-leading: 1.75;
+  --sc-radius: 0;
+  --sc-radius-btn: 0;
+  --sc-cut: 14px;
+}
+
+[data-bs-theme="dark"] {
+  --sc-bg: #060914;
+  --sc-text: #dde3f7;
+  --sc-muted: #8890b0;
+  --sc-heading: #f4f6ff;
+  --sc-accent: #7cf3ff;
+  --sc-accent-ink: #060914;
+  --sc-line: #1c2648;
+  --sc-line-strong: #34407a;
+  --sc-surface: #111a3a;
+  --sc-header-bg: rgba(6, 9, 20, .72);
+  --sc-code-bg: #03050d;
+  --sc-code-line: #1c2648;
+  --sc-dots: rgba(124, 243, 255, .08);
+  --sc-glow: rgba(124, 243, 255, .09);
+  --sc-panel: rgba(13, 20, 48, .55);
+}
+
+// Malha de pontos no topo da página
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(var(--sc-dots) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 60%);
+  mask-image: linear-gradient(to bottom, #000, transparent 60%);
+}
+
+// Brilho de horizonte atrás da capa
+.hb-blog-home-carousel {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: -3rem;
+    height: 6rem;
+    z-index: -1;
+    background: radial-gradient(closest-side, var(--sc-glow), transparent);
+    pointer-events: none;
+  }
+}
+
+.hb-header-nav .navbar-brand {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.hb-header-search-input-container .form-control {
+  border-radius: 0 !important;
+  @include sc-chamfer(8px);
+}
+
+// Cards como painéis chanfrados com fio fino
+.hb-blog-posts {
+  --#{$prefix}gutter-x: 1.5rem;
+  --#{$prefix}gutter-y: 1.5rem;
+}
+
+.hb-blog-posts .hb-blog-post-card,
+.hb-blog-home-carousel + .col-12 .hb-blog-post-card {
+  background: var(--sc-panel) !important;
+  border: 0 !important;
+  padding: 1.25rem !important;
+  position: relative;
+  @include sc-chamfer;
+  box-shadow: inset 0 0 0 1px var(--sc-line);
+  transition: box-shadow .25s ease;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: inset 0 0 0 1px var(--sc-accent);
+  }
+}
+
+.hb-blog-post-card {
+  .card-img-top {
+    @include sc-chamfer(10px);
+  }
+
+  .hb-blog-post-title {
+    font-weight: 500;
+  }
+}
+
+.hb-blog-post-meta {
+  font-variant-numeric: tabular-nums;
+  font-size: .8125rem;
+}
+
+.hb-carousel.carousel .carousel-inner {
+  @include sc-chamfer(22px);
+}
+
+.hb-blog-home-carousel .hb-carousel.carousel .carousel-caption .h5 {
+  font-weight: 600;
+  letter-spacing: -.03em;
+}
+
+.hb-blog-home-carousel + .col-12 .hb-blog-post-card .hb-blog-post-title {
+  @include media-breakpoint-up(lg) {
+    font-size: 2.25rem;
+  }
+}
+
+// Post
+.hb-blog-post-intro.hb-module {
+  .hb-blog-post-title {
+    font-weight: 600;
+    letter-spacing: -.03em;
+  }
+
+  .hb-blog-post-desc {
+    font-weight: 300;
+  }
+}
+
+.hb-featured-img {
+  @include sc-chamfer(22px);
+}
+
+.hb-blog-post-content,
+.hb-docs-doc-content {
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  h3 {
+    font-size: 1.1875rem;
+    font-weight: 500;
+  }
+
+  .highlight pre {
+    @include sc-chamfer(12px);
+  }
+
+  img {
+    @include sc-chamfer(12px);
+  }
+
+  .table thead th {
+    font-family: var(--sc-font-display);
+    font-weight: 500;
+    font-size: .8125rem;
+  }
+}
+
+.hb-blog-post-toc .hb-module,
+.hb-blog-post-toc .h6 {
+  font-family: var(--sc-font-ui);
+}
+
+.sc-donate-btn,
+.hb-blog-post-nav a.hb-module {
+  border-radius: 0 !important;
+  @include sc-chamfer(10px);
+}
+
+.sc-donate-title,
+.hb-blog-sidebar-profile .hb-blog-sidebar-profile-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.hb-footer .h5 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.hb-content-panel {
+  border-radius: 0 !important;
+  @include sc-chamfer(10px);
+}

@@ -1,0 +1,83 @@
+// Override the Bootstrap and HB SCSS variables.
+// See https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss.
+// See https://github.com/twbs/bootstrap/blob/main/scss/_variables-dark.scss.
+
+// ---------------------------------------------------------------------------
+// Paleta "cianotipia": o azul das plantas técnicas, com um único acento em
+// âmbar (lâmpada de sódio). O âmbar só marca links, estado ativo e foco.
+// ---------------------------------------------------------------------------
+$prussia: #0b2340;   // fundo do modo escuro
+$prussia-2: #123058; // superfícies no modo escuro
+$ice: #e4ecf5;       // texto no modo escuro
+$slate: #8ea3bf;     // texto secundário no modo escuro
+$sodium: #f5a524;    // acento no modo escuro
+$paper: #eef2f7;     // fundo do modo claro
+$ink: #0e1f38;       // texto no modo claro
+$sodium-deep: #9a5600; // acento no modo claro (contraste AA sobre o papel)
+
+$primary: $sodium-deep;
+$secondary: #4a5f7d;
+$danger: #c2410c;
+$info: #2f6fb3;
+
+// Modo claro
+$body-bg: $paper;
+$body-color: $ink;
+$body-secondary-color: #4a5f7d;
+$body-tertiary-bg: #e3e9f1;
+$border-color: #cfd9e5;
+$headings-color: $ink;
+$link-color: $sodium-deep;
+$link-hover-color: #6f3e00;
+
+// Modo escuro
+$body-bg-dark: $prussia;
+$body-color-dark: $ice;
+$body-secondary-color-dark: $slate;
+$body-secondary-bg-dark: $prussia-2;
+$body-tertiary-bg-dark: #0e2849;
+$body-emphasis-color-dark: #f7fafd;
+$border-color-dark: #1f3e66;
+$headings-color-dark: #f7fafd;
+$primary-text-emphasis-dark: $sodium;
+$link-color-dark: $sodium;
+$link-hover-color-dark: #ffc766;
+$code-color-dark: #ffd08a;
+$info-text-emphasis-dark: #8cc2ff;
+
+// ---------------------------------------------------------------------------
+// Tipografia
+// Bricolage Grotesque: títulos e interface (usa a largura condensada nos títulos).
+// Newsreader: texto corrido dos posts. JetBrains Mono: só código.
+// ---------------------------------------------------------------------------
+$font-family-sans-serif: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+$font-family-serif: "Newsreader", Georgia, "Times New Roman", serif;
+$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+$headings-font-family: $font-family-sans-serif;
+$headings-font-weight: 700;
+$headings-line-height: 1.05;
+$font-size-base: 1rem;
+$line-height-base: 1.55;
+
+// Escala clássica (Bringhurst): 12 14 16 18 21 24 36 48 60 72
+$h1-font-size: 3rem;
+$h2-font-size: 2.25rem;
+$h3-font-size: 1.5rem;
+$h4-font-size: 1.3125rem;
+$h5-font-size: 1.125rem;
+$h6-font-size: 1rem;
+
+// ---------------------------------------------------------------------------
+// Formas: raio pequeno e só onde há imagem ou controle; nada de sombras.
+// ---------------------------------------------------------------------------
+$border-radius: .25rem;
+$border-radius-sm: .2rem;
+$border-radius-lg: .375rem;
+$enable-shadows: false;
+$box-shadow: none;
+$box-shadow-sm: none;
+
+$badge-font-weight: 500;
+$badge-border-radius: .2rem;
+
+$hb-module-margin-bottom: 2rem;

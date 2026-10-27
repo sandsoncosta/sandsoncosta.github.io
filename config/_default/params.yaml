@@ -1,11 +1,12 @@
-description: Um blog com algumas coisas de Blue Team, Red Team, Redes, Scripts, Forense e tudo de interessante que envolva Cybersecurity que eu vou aprendendo e colocando aqui. Ou pelo menos tentando...
+description: Um blog com algumas coisinhas...
 keywords: cybersecurity, forensics, malware, active directory, pentest
+skin: elegante #cianotipia, elegante, jornal, hacker, futurista, minimal
 
 hb:
   # override SASS variables, please replace the dash with underline, e.g. `list-group-color` should be `list_group_color`.
   # styles:
   #   primary: '#6610f2'
-  color: dark # tema inicial: dark, light ou auto (segue o sistema).
+  color: auto # tema inicial: dark, light ou auto (segue o sistema).
   js_bundle_name: main # the JS bundle name.
   css_bundle_name: main # the CSS bundle name.
   
@@ -58,7 +59,7 @@ hb:
       profile:
         # title: Profile title other than site title.
         # description: Profile description other than site description.
-        company: ISH
+        company: Vision Cybersecurity
         location: Earth
         socials:
           github: sandsoncosta

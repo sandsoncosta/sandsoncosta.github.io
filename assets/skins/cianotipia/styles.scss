@@ -1,0 +1,1429 @@
+// =============================================================================
+// Cianotipia — camada visual sobre o HB Framework
+//
+// Ideia: o blog é um caderno de engenharia de detecção, impresso em papel de
+// planta técnica. Fundo azul-prússia, tinta clara, um único acento âmbar.
+// O elemento marcante: nas listagens, toda imagem aparece em cianotipia
+// (duotom azul) e só ganha a cor real quando o leitor aponta ou foca o card.
+// Todo o resto fica quieto: sem caixas, sem sombras, alinhado à esquerda.
+//
+// Mobile-first: regras base para telas pequenas; media-breakpoint-up acrescenta.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// 1. Tokens
+// -----------------------------------------------------------------------------
+:root {
+  --sc-bg: #{$paper};
+  --sc-text: #{$ink};
+  --sc-muted: #4a5f7d;
+  --sc-heading: #{$ink};
+  --sc-accent: #{$sodium-deep};
+  --sc-accent-ink: #ffffff;           // texto sobre o acento
+  --sc-line: #cfd9e5;
+  --sc-line-strong: #9fb2ca;
+  --sc-surface: #e5ebf3;               // usado com parcimônia (código inline, campos)
+  --sc-header-bg: rgba(238, 242, 247, .82);
+  --sc-grain-opacity: .35;
+  --sc-grid: rgba(14, 31, 56, .045);
+  --sc-code-bg: #0e1f38;
+  --sc-code-line: #0e1f38;
+  // Duotom da cianotipia
+  --sc-duo-shadow: #123a6e;
+  --sc-duo-light: #dfe9f6;
+  --sc-sans: #{$font-family-sans-serif};
+  --sc-serif: #{$font-family-serif};
+  --sc-mono: #{$font-family-monospace};
+  --sc-ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+[data-bs-theme="dark"] {
+  --sc-bg: #{$prussia};
+  --sc-text: #{$ice};
+  --sc-muted: #{$slate};
+  --sc-heading: #f7fafd;
+  --sc-accent: #{$sodium};
+  --sc-accent-ink: #{$prussia};
+  --sc-line: #1f3e66;
+  --sc-line-strong: #34598a;
+  --sc-surface: #10305a;
+  --sc-header-bg: rgba(11, 35, 64, .8);
+  --sc-grain-opacity: .5;
+  --sc-grid: rgba(228, 236, 245, .035);
+  --sc-code-bg: #071a33;
+  --sc-code-line: #1f3e66;
+  --sc-duo-shadow: #0a2547;
+  --sc-duo-light: #cfe0f4;
+}
+
+// -----------------------------------------------------------------------------
+// 2. Base
+// -----------------------------------------------------------------------------
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--sc-bg);
+  color: var(--sc-text);
+  font-family: var(--sc-sans);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+// Papel: grão fino em toda a página e a malha da planta técnica só no topo.
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--sc-grid) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, var(--sc-grid) 1px, transparent 1px) 0 0 / 24px 24px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 55%);
+  mask-image: linear-gradient(to bottom, #000, transparent 55%);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--sc-grain-opacity);
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--sc-accent);
+  color: var(--sc-accent-ink);
+}
+
+a {
+  text-underline-offset: .18em;
+  text-decoration-thickness: 1px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--sc-sans);
+  font-stretch: 82%;
+  letter-spacing: -.015em;
+  color: var(--sc-heading);
+}
+
+.text-secondary,
+.text-body-secondary {
+  color: var(--sc-muted) !important;
+}
+
+.badge {
+  font-family: var(--sc-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 3. Cianotipia (o elemento marcante)
+// Aplica-se às imagens de listagem: cards, carrossel da home, destaques da
+// barra lateral. A cor real aparece em :hover e :focus-within do card.
+// -----------------------------------------------------------------------------
+.hb-blog-post-card .card-img-top,
+.hb-carousel .carousel-item > a {
+  @include sc-cyanotype-base;
+}
+
+.hb-blog-post-card:hover .card-img-top,
+.hb-blog-post-card:focus-within .card-img-top,
+.hb-carousel:hover .carousel-item > a,
+.hb-carousel:focus-within .carousel-item > a {
+  @include sc-cyanotype-reveal;
+}
+
+// Sem hover (telas de toque), a cor só aparece onde o leitor já está lendo:
+// mantemos a cianotipia, que é a identidade da listagem.
+
+// -----------------------------------------------------------------------------
+// 4. Cabeçalho
+// -----------------------------------------------------------------------------
+.hb-header-nav {
+  // Fundo translúcido num pseudo-elemento: backdrop-filter no próprio nav
+  // prende o menu lateral (offcanvas) do mobile dentro da barra.
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--sc-line);
+  min-height: 3.5rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--sc-header-bg);
+    -webkit-backdrop-filter: saturate(140%) blur(12px);
+    backdrop-filter: saturate(140%) blur(12px);
+    pointer-events: none;
+  }
+
+  .navbar-brand {
+    font-family: var(--sc-sans);
+    font-stretch: 78%;
+    font-weight: 750;
+    font-size: 1.3125rem;
+    letter-spacing: -.02em;
+    color: var(--sc-heading);
+
+    img {
+      width: 26px;
+      height: 26px;
+      margin-right: .6rem !important;
+    }
+  }
+
+  .nav-link,
+  .hb-header-search-icon {
+    color: var(--sc-muted);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--sc-heading);
+    }
+  }
+
+  .hb-header-menus .nav-link {
+    font-size: 1rem;
+    font-weight: 500;
+
+    &.active {
+      color: var(--sc-heading);
+      text-decoration: underline;
+      text-decoration-color: var(--sc-accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: .45em;
+    }
+  }
+
+  .vr {
+    opacity: .2;
+  }
+}
+
+.hb-header-search-input-container {
+  .form-control {
+    font-size: .875rem;
+    background-color: transparent;
+    border: 1px solid var(--sc-line-strong);
+    border-radius: 999px !important;
+    color: var(--sc-text);
+    min-width: 13rem;
+
+    &::placeholder {
+      color: var(--sc-muted);
+    }
+
+    &:focus {
+      border-color: var(--sc-accent);
+      box-shadow: none;
+    }
+  }
+
+  kbd {
+    font-family: var(--sc-sans);
+    font-size: .7rem;
+    background: transparent;
+    color: var(--sc-muted);
+    border: 1px solid var(--sc-line);
+    padding: 0 .3rem;
+  }
+}
+
+.offcanvas {
+  background-color: var(--sc-bg);
+  color: var(--sc-text);
+
+  @include media-breakpoint-down(lg) {
+    border-left: 1px solid var(--sc-line) !important;
+
+    .offcanvas-header {
+      border-bottom: 1px solid var(--sc-line);
+    }
+
+    .offcanvas-title {
+      font-stretch: 78%;
+      font-weight: 750;
+      font-size: 1.3125rem;
+    }
+
+    .hb-header-menus .nav-link {
+      font-size: 1.5rem;
+      font-stretch: 82%;
+      font-weight: 650;
+      color: var(--sc-heading);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 5. Estrutura: os módulos do HB perdem a caixa e viram seções com fio no topo
+// -----------------------------------------------------------------------------
+.hb-main {
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  .hb-module {
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--sc-line);
+    border-radius: 0;
+    padding: 1.25rem 0 0;
+    box-shadow: none;
+  }
+
+  // Blocos de imagem (carrossel, imagem destacada) não levam fio.
+  .hb-module.p-0,
+  .hb-blog-home-carousel .hb-module {
+    border-top: 0;
+    padding: 0;
+  }
+
+  .card {
+    --#{$prefix}card-bg: transparent;
+    --#{$prefix}card-color: var(--sc-text);
+  }
+
+  @include media-breakpoint-up(md) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+.hb-blog-main-container {
+  @include media-breakpoint-up(lg) {
+    column-gap: 3rem !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 6. Home: carrossel como capa
+// -----------------------------------------------------------------------------
+.hb-carousel.carousel {
+  .carousel-inner {
+    border: 0 !important;
+    border-radius: .25rem !important;
+  }
+
+  .carousel-img {
+    height: auto !important;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .carousel-caption {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    opacity: 1;
+    text-align: left !important;
+    padding: 5rem 1.25rem 2.5rem;
+    background: linear-gradient(to top, rgba(7, 26, 51, .92), rgba(7, 26, 51, .55) 55%, transparent);
+
+    .h5 {
+      margin: 0;
+      font-stretch: 75%;
+      font-weight: 750;
+      font-size: clamp(1.75rem, 1.1rem + 3vw, 3rem);
+      line-height: 1;
+      letter-spacing: -.02em;
+      text-wrap: balance;
+    }
+
+    .carousel-link {
+      color: #f7fafd;
+    }
+  }
+
+  // Indicadores como traços, não bolinhas
+  .carousel-indicators {
+    justify-content: flex-start !important;
+    margin: 0 1.25rem 1rem;
+    bottom: 0 !important;
+    z-index: 3;
+    gap: .35rem;
+
+    [data-bs-target],
+    button[data-bs-target] {
+      width: 1.5rem;
+      height: 2px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background-color: #f7fafd !important;
+      opacity: .35;
+      transition: opacity .3s ease, width .3s var(--sc-ease);
+
+      &.active,
+      &[aria-current="true"] {
+        width: 3rem;
+        opacity: 1;
+        background-color: var(--sc-accent) !important;
+      }
+    }
+  }
+
+  .carousel-controls {
+    z-index: 3;
+  }
+
+  @include media-breakpoint-up(md) {
+    .carousel-img {
+      aspect-ratio: 16 / 9;
+    }
+
+    .carousel-caption {
+      padding: 6rem 2rem 3rem;
+    }
+
+    .carousel-indicators {
+      margin-left: 2rem;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 7. Cards de posts: sem caixa, tipografia grande
+// -----------------------------------------------------------------------------
+.hb-blog-posts {
+  --#{$prefix}gutter-x: 2.5rem;
+  --#{$prefix}gutter-y: 2.5rem;
+}
+
+.hb-blog-post-card {
+  .card-img-top {
+    border: 0 !important;
+    border-radius: .25rem;
+    margin: .75rem 0 .25rem;
+  }
+
+  .hb-blog-post-card-img {
+    aspect-ratio: 16 / 10;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .card-body {
+    padding-top: .5rem !important;
+  }
+
+  .hb-blog-post-title {
+    font-size: 1.5rem;
+    font-stretch: 80%;
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -.015em;
+    margin-bottom: .6rem;
+    text-wrap: balance;
+  }
+
+  .hb-blog-post-title-link {
+    color: var(--sc-heading);
+    text-decoration: none;
+    background-image: linear-gradient(var(--sc-accent), var(--sc-accent));
+    background-size: 0 2px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size .35s var(--sc-ease);
+    display: inline !important;
+
+    .text-danger {
+      color: var(--sc-accent) !important;
+    }
+  }
+
+  &:hover .hb-blog-post-title-link,
+  .hb-blog-post-title-link:focus-visible {
+    background-size: 100% 2px;
+  }
+
+  .hb-blog-post-summary {
+    font-family: var(--sc-serif);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--sc-muted) !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  // O título já é o link: o "Ler artigo" repetido sai.
+  .hb-blog-post-summary + .mt-2 {
+    display: none;
+  }
+
+  @include media-breakpoint-up(md) {
+    .hb-blog-post-title {
+      font-size: 1.75rem;
+    }
+  }
+}
+
+// Home: o carrossel vira capa em largura total e o post fixado vem logo
+// abaixo, com imagem à esquerda e texto à direita.
+.hb-blog-home-carousel,
+.hb-blog-home-carousel + .col-12 {
+  @include media-breakpoint-up(lg) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+.hb-blog-home-carousel {
+  margin-bottom: 2rem;
+}
+
+.hb-blog-home-carousel .hb-carousel.carousel {
+  @include media-breakpoint-up(lg) {
+    .carousel-img {
+      aspect-ratio: 21 / 9;
+    }
+
+    .carousel-caption {
+      padding: 7rem 2.5rem 3.25rem;
+
+      .h5 {
+        font-size: 3.75rem;
+        max-width: 22ch;
+      }
+    }
+
+    .carousel-indicators {
+      margin-left: 2.5rem;
+    }
+  }
+}
+
+.hb-blog-home-carousel + .col-12 .hb-blog-post-card {
+  @include media-breakpoint-up(lg) {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 2.5rem;
+    align-items: start;
+
+    .card-img-top {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      margin: 0;
+    }
+
+    > .hb-blog-post-meta {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: end;
+    }
+
+    .card-body {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .hb-blog-post-title {
+      font-size: 3rem;
+      font-stretch: 75%;
+      line-height: 1;
+    }
+
+    .hb-blog-post-summary {
+      font-size: 1.1875rem;
+      -webkit-line-clamp: 5;
+    }
+  }
+}
+
+// Metadados: texto simples, sem etiquetas
+.hb-blog-post-meta {
+  font-size: .875rem;
+  color: var(--sc-muted);
+  flex-wrap: wrap;
+  row-gap: .15rem;
+  column-gap: .3rem;
+
+  > * {
+    margin: 0 !important;
+  }
+
+  .hb-blog-author-img-none,
+  .hb-blog-post-author-link:has(.hb-blog-author-img-none) {
+    display: none !important;
+  }
+}
+
+.hb-blog-post-section .badge {
+  background: none !important;
+  color: var(--sc-accent) !important;
+  font-size: inherit;
+  font-weight: 500;
+  padding: 0;
+  border-radius: 0;
+  vertical-align: baseline;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Categorias, séries e tags como texto corrido
+.hb-blog-post-taxonomy-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  column-gap: .75rem;
+  row-gap: .1rem;
+}
+
+.hb-blog-post-taxonomy {
+  background: none !important;
+  color: var(--sc-muted) !important;
+  font-size: .875rem !important;
+  font-weight: 400 !important;
+  padding: 0 !important;
+  border: 0;
+  border-radius: 0;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--sc-accent) !important;
+    text-decoration: underline;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 8. Barra lateral
+// -----------------------------------------------------------------------------
+.hb-blog-sidebar-profile {
+  align-items: flex-start !important;
+  text-align: left;
+
+  .hb-blog-sidebar-profile-img {
+    max-width: 64px;
+    border-radius: 50%;
+  }
+
+  .hb-blog-sidebar-profile-title {
+    text-align: left !important;
+    font-size: 1.5rem;
+    font-stretch: 78%;
+    font-weight: 750;
+    margin-bottom: .35rem !important;
+  }
+
+  .hb-blog-sidebar-profile-desc {
+    text-align: left !important;
+    font-family: var(--sc-serif);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--sc-muted);
+  }
+
+  .hb-blog-sidebar-profile-meta {
+    font-size: .875rem;
+    color: var(--sc-muted);
+
+    span:first-child {
+      margin-left: 0 !important;
+    }
+  }
+
+  .hb-footer-socials {
+    justify-content: flex-start !important;
+    margin-left: -.5rem;
+  }
+
+  .hb-social {
+    color: var(--sc-muted) !important;
+
+    &:hover {
+      color: var(--sc-accent) !important;
+    }
+
+    svg {
+      width: 1.15rem;
+      height: 1.15rem;
+      color: currentColor !important;
+    }
+  }
+}
+
+.hb-blog-sidebar .nav-pills .nav-link.active,
+.hb-blog-sidebar .nav-pills .show > .nav-link {
+  background: transparent !important;
+  color: var(--sc-heading) !important;
+}
+
+.hb-blog-sidebar .nav-pills {
+  --#{$prefix}nav-pills-border-radius: 0;
+  justify-content: flex-start;
+  gap: 1.25rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: .75rem !important;
+
+  .nav-item {
+    flex: 0 0 auto;
+  }
+
+  .nav-link {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sc-muted);
+    padding: 0 0 .35rem;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--sc-heading);
+    }
+
+    &.active {
+      border-bottom-color: var(--sc-accent);
+    }
+  }
+}
+
+.hb-blog-sidebar-posts {
+  .slide-item {
+    font-size: 1rem;
+  }
+
+  img {
+    border-radius: .25rem;
+    filter: grayscale(1) contrast(1.1);
+    transition: filter .45s var(--sc-ease);
+  }
+
+  .slide-item:hover img,
+  .slide-item:focus-within img {
+    filter: none;
+  }
+
+  .hb-blog-post-title {
+    font-stretch: 82%;
+  }
+}
+
+.taxonomy-term {
+  font-size: .9375rem !important;
+  color: var(--sc-text) !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: .1rem 0 !important;
+  margin: 0 1rem .35rem 0 !important;
+
+  &:hover {
+    color: var(--sc-accent) !important;
+    text-decoration: underline;
+  }
+
+  .taxonomy-term-count {
+    border: 0 !important;
+    padding: 0 !important;
+    margin-left: .2rem;
+    font-size: .75rem;
+    color: var(--sc-muted);
+    vertical-align: super;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 9. Paginação
+// -----------------------------------------------------------------------------
+.pagination {
+  --#{$prefix}pagination-bg: transparent;
+  --#{$prefix}pagination-border-color: transparent;
+  --#{$prefix}pagination-color: var(--sc-muted);
+  --#{$prefix}pagination-hover-color: var(--sc-heading);
+  --#{$prefix}pagination-hover-bg: transparent;
+  --#{$prefix}pagination-hover-border-color: transparent;
+  --#{$prefix}pagination-active-bg: transparent;
+  --#{$prefix}pagination-active-border-color: var(--sc-accent);
+  --#{$prefix}pagination-active-color: var(--sc-heading);
+  --#{$prefix}pagination-focus-box-shadow: none;
+  font-size: 1rem;
+  gap: .25rem;
+
+  .page-link {
+    border-radius: 0 !important;
+    border-width: 0 0 2px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 10. Página do post
+// -----------------------------------------------------------------------------
+.hb-breadcrumb {
+  --#{$prefix}breadcrumb-divider: "/";
+  --#{$prefix}breadcrumb-divider-color: var(--sc-line-strong);
+  --#{$prefix}breadcrumb-item-padding-x: .5rem;
+  font-size: .875rem;
+
+  .breadcrumb-item {
+    background: none !important;
+    clip-path: none !important;
+    margin-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-right: 0 !important;
+    color: var(--sc-muted);
+
+    & + .breadcrumb-item {
+      padding-left: 0;
+    }
+
+    & + .breadcrumb-item::before {
+      content: "/" !important;
+      float: none;
+      padding: 0 .55rem;
+      color: var(--sc-line-strong);
+    }
+
+    &:first-child {
+      padding-right: 0;
+    }
+
+    a {
+      padding: 0 !important;
+      color: var(--sc-muted);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--sc-accent);
+      }
+    }
+
+    &.active {
+      color: var(--sc-heading) !important;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+// Abertura do post: título enorme e condensado
+.hb-blog-post-intro.hb-module {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+
+  .hb-blog-post-title {
+    font-size: clamp(2.25rem, 1.2rem + 5vw, 4.5rem);
+    font-stretch: 75%;
+    font-weight: 750;
+    line-height: .98;
+    letter-spacing: -.025em;
+    margin-bottom: 1.25rem;
+    text-wrap: balance;
+  }
+
+  .hb-blog-post-meta {
+    display: flex;
+    align-items: center;
+  }
+
+
+  .hb-blog-post-desc {
+    font-family: var(--sc-serif);
+    font-size: 1.3125rem;
+    line-height: 1.45;
+    font-style: italic;
+    color: var(--sc-muted);
+    margin-top: 1.25rem !important;
+  }
+
+  @include media-breakpoint-up(md) {
+    .hb-blog-post-desc {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.hb-featured-img {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  border-radius: .25rem;
+  width: 100%;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+// Corpo do texto: serifa, na mesma largura da imagem destacada
+.hb-blog-post-content,
+.hb-docs-doc-content {
+  font-family: var(--sc-serif);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+  border-top: 0 !important;
+
+  @include media-breakpoint-up(md) {
+    font-size: 1.1875rem;
+    padding-top: .5rem !important;
+  }
+
+  h2,
+  h3,
+  h4 {
+    font-family: var(--sc-sans);
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: 1.875rem;
+    font-stretch: 80%;
+    margin-top: 3.25rem !important;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.3125rem;
+    font-stretch: 85%;
+    margin-top: 2.25rem !important;
+    margin-bottom: .75rem;
+  }
+
+  > h2:first-child,
+  > p:first-child + h2 {
+    margin-top: 1.5rem !important;
+  }
+
+  p,
+  ul,
+  ol {
+    margin-bottom: 1.25rem;
+  }
+
+  li + li {
+    margin-top: .35rem;
+  }
+
+  ul li::marker {
+    color: var(--sc-accent);
+  }
+
+  strong {
+    font-weight: 650;
+    color: var(--sc-heading);
+  }
+
+  a:not(.btn):not(.badge):not(.heading-sign):not(.kg-bookmark-container) {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--sc-accent);
+    text-decoration-thickness: 1px;
+
+    &:hover {
+      color: var(--sc-accent);
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--sc-line);
+    opacity: 1;
+    margin: 3rem 0;
+  }
+
+  img {
+    border-radius: .25rem;
+  }
+
+  // Código inline
+  :not(pre) > code {
+    font-size: .8em;
+    padding: .1em .35em;
+    border-radius: .2rem;
+    background-color: var(--sc-surface);
+    color: inherit;
+    word-break: break-word;
+  }
+
+  // Blocos de código: placa escura nos dois temas
+  .highlight {
+    margin: 1.5rem 0;
+
+    pre {
+      font-size: .8125rem;
+      line-height: 1.7;
+      padding: 1.1rem 1.25rem;
+      margin: 0;
+      border-radius: .25rem;
+      background-color: var(--sc-code-bg) !important;
+      border: 1px solid var(--sc-code-line);
+    }
+
+    .ln {
+      opacity: .35;
+      margin-right: 1rem;
+    }
+  }
+
+  // Tabelas
+  .table-responsive {
+    margin: 1.5rem 0;
+  }
+
+  .table {
+    --#{$prefix}table-bg: transparent;
+    --#{$prefix}table-striped-bg: transparent;
+    --#{$prefix}table-hover-bg: var(--sc-surface);
+    --#{$prefix}table-border-color: var(--sc-line);
+    --#{$prefix}table-color: var(--sc-text);
+    font-family: var(--sc-sans);
+    font-size: .9375rem;
+    margin-bottom: 0;
+
+    > :not(caption) > * > * {
+      padding: .7rem .75rem .7rem 0;
+    }
+
+    &.table-bordered > :not(caption) > * > * {
+      border-width: 0 0 1px;
+    }
+
+    thead th {
+      font-weight: 650;
+      color: var(--sc-heading);
+      border-bottom: 2px solid var(--sc-heading) !important;
+    }
+  }
+
+  // Citação: frase em destaque
+  > blockquote:not(.alert) {
+    border-left: 2px solid var(--sc-accent);
+    padding: .1rem 0 .1rem 1.25rem;
+    margin: 2rem 0;
+    font-size: 1.3125rem;
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--sc-heading);
+  }
+}
+
+// Alertas ([!NOTE], [!WARNING]...): fio colorido à esquerda, sem fundo cheio
+.hb-content blockquote.alert {
+  border: 0;
+  border-left: 2px solid var(--#{$prefix}alert-color);
+  border-radius: 0;
+  background: none;
+  color: var(--sc-text);
+  padding: .1rem 0 .1rem 1.25rem;
+  margin: 2rem 0;
+  font-size: 1.0625rem;
+
+  .alert-heading {
+    font-family: var(--sc-sans);
+    font-size: 1rem;
+    font-weight: 650;
+    color: var(--#{$prefix}alert-color);
+    margin-bottom: .25rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Índice (Nesta página)
+.hb-blog-post-toc,
+.hb-docs-doc-toc {
+  .hb-module {
+    padding: 1rem 0 0 !important;
+  }
+
+  .h6 {
+    font-size: 1rem;
+    font-weight: 650;
+    color: var(--sc-heading);
+    margin-bottom: .75rem;
+  }
+
+  hr {
+    display: none !important;
+  }
+
+  .btn-secondary {
+    font-size: 1rem;
+    font-weight: 600;
+    background: none;
+    color: var(--sc-heading);
+    border: 0;
+    border-bottom: 1px solid var(--sc-line);
+    border-radius: 0;
+    padding: .25rem 0 .6rem;
+  }
+}
+
+#TableOfContents {
+  font-size: .9375rem;
+  line-height: 1.35;
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+
+    ul a {
+      padding-left: 1.6rem;
+    }
+  }
+
+  li {
+    margin: 0;
+  }
+
+  a {
+    display: block;
+    padding: .32rem 0 .32rem .85rem;
+    border-left: 2px solid var(--sc-line);
+    color: var(--sc-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--sc-heading);
+    }
+
+    &.active {
+      color: var(--sc-heading);
+      border-left-color: var(--sc-accent);
+    }
+  }
+}
+
+// Revisão, compartilhar, autores, navegação entre posts
+.hb-revision {
+  font-size: .875rem !important;
+}
+
+.hb-social-share-buttons {
+  gap: .25rem !important;
+  justify-content: flex-start !important;
+
+  // Largura automática: só ícone, só texto ou os dois.
+  .hb-social-share-button {
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 .5rem;
+    gap: .4rem;
+    justify-content: center;
+    font-size: .875rem;
+    white-space: nowrap;
+    border-radius: 999px;
+    color: var(--sc-muted) !important;
+    background: none !important;
+    margin: 0 !important;
+    transition: color .15s ease;
+
+    &:hover {
+      color: var(--sc-accent) !important;
+    }
+
+    // ícones monocromáticos, como o resto da página
+    svg {
+      color: currentColor !important;
+      flex-shrink: 0;
+      margin: 0 !important;
+    }
+  }
+}
+
+.hb-blog-post-authors {
+  > .h5 {
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  .hb-blog-post-author {
+    border-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
+.hb-blog-post-nav {
+  a.hb-module {
+    text-decoration: none;
+    color: var(--sc-heading);
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-stretch: 85%;
+
+    &:hover {
+      color: var(--sc-accent);
+    }
+  }
+}
+
+.hb-blog-related-posts {
+  .hb-blog-post-card {
+    border-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .hb-blog-post-title {
+    font-size: 1.3125rem !important;
+  }
+}
+
+// Painel flutuante (comentários/editar)
+.hb-content-panel {
+  background-color: var(--sc-header-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--sc-line-strong);
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+
+// -----------------------------------------------------------------------------
+// 11. Rodapé
+// -----------------------------------------------------------------------------
+.hb-footer {
+  background: transparent !important;
+  border-top: 1px solid var(--sc-line);
+  margin-top: 3rem;
+  font-size: .9375rem;
+  color: var(--sc-muted);
+
+  .h5 {
+    font-size: 1.5rem;
+    font-stretch: 78%;
+    font-weight: 750;
+  }
+
+  a.text-body-emphasis {
+    color: var(--sc-heading) !important;
+    text-decoration-color: var(--sc-line-strong);
+  }
+
+  .hb-social {
+    color: var(--sc-muted) !important;
+
+    &:hover {
+      color: var(--sc-accent) !important;
+    }
+
+    svg {
+      color: currentColor !important;
+    }
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sc-line-strong) transparent;
+  }
+}
+
+// =============================================================================
+// Bookmark cards (.kg-bookmark-*) usados dentro dos posts
+// =============================================================================
+.kg-bookmark-card {
+  margin: 2rem 0;
+}
+
+.kg-bookmark-card a.kg-bookmark-container,
+a.kg-bookmark-container:hover {
+  display: flex;
+  flex-direction: column-reverse;
+  background: none;
+  text-decoration: none;
+  border-radius: .25rem !important;
+  border: 1px solid var(--sc-line-strong);
+  overflow: hidden;
+  color: var(--sc-text);
+  font-family: var(--sc-sans);
+  transition: border-color .2s ease;
+}
+
+a.kg-bookmark-container:hover {
+  border-color: var(--sc-accent);
+}
+
+.kg-bookmark-content {
+  padding: 1rem 1.15rem;
+  min-width: 0;
+}
+
+.kg-bookmark-title {
+  font-weight: 650;
+  font-size: 1.0625rem;
+  line-height: 1.25;
+  color: var(--sc-heading);
+}
+
+.kg-bookmark-card .kg-bookmark-description {
+  font-family: var(--sc-serif);
+  font-size: .9375rem;
+  margin-top: .3em;
+  max-height: none;
+  color: var(--sc-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.kg-bookmark-metadata {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: .8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.kg-bookmark-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+.kg-bookmark-metadata > :not(img) {
+  opacity: .75;
+}
+
+.kg-bookmark-metadata > span:last-of-type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kg-bookmark-thumbnail {
+  position: relative;
+  aspect-ratio: 16 / 9;
+}
+
+.kg-bookmark-thumbnail img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 !important;
+}
+
+@include media-breakpoint-up(md) {
+  .kg-bookmark-card a.kg-bookmark-container,
+  a.kg-bookmark-container:hover {
+    flex-direction: row;
+  }
+
+  .kg-bookmark-content {
+    flex: 1 1 60%;
+  }
+
+  .kg-bookmark-thumbnail {
+    flex: 0 0 34%;
+    aspect-ratio: auto;
+    min-height: 140px;
+  }
+}
+
+img {
+  height: auto;
+}
+
+// =============================================================================
+// Doação (layouts/partials/custom/donate.html)
+// =============================================================================
+.sc-donate {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.sc-donate-icon {
+  display: none;
+}
+
+.sc-donate-title {
+  font-size: 1.5rem;
+  font-stretch: 80%;
+  font-weight: 750;
+  line-height: 1.1;
+  color: var(--sc-heading);
+  margin: 0 0 .35rem;
+}
+
+.sc-donate-text {
+  font-family: var(--sc-serif);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--sc-muted);
+  margin: 0;
+  max-width: 36rem;
+}
+
+.sc-donate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-height: 2.75rem;
+  padding: .55rem 1.25rem;
+  border-radius: 999px;
+  background: var(--sc-accent);
+  color: var(--sc-accent-ink);
+  font-size: 1rem;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+  justify-self: start;
+  transition: filter .15s ease;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: var(--sc-accent-ink);
+    filter: brightness(1.08);
+  }
+}
+
+.sc-donate-post {
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 2rem;
+  }
+}
+
+.sc-donate-sidebar {
+  .sc-donate-title {
+    font-size: 1.3125rem;
+  }
+
+  .sc-donate-text {
+    font-size: 1rem;
+  }
+}

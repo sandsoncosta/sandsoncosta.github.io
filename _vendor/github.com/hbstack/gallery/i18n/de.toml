@@ -1,8 +1,0 @@
-[gallery_img_info_author]
-other = "Autor: {{ . }}"
-
-[gallery_img_info_source]
-other = "Quelle: {{ . }}"
-
-[view_more]
-other = "mehr anzeigen"

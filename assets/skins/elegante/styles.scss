@@ -1,0 +1,1261 @@
+// =============================================================================
+// Estilo do blog — camada sobre o HB Framework
+// Mobile-first: regras base valem para telas pequenas; os media-breakpoint-up
+// só acrescentam ajustes para telas maiores.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// 1. Tokens
+// -----------------------------------------------------------------------------
+:root {
+  --sc-surface: #ffffff;
+  --sc-surface-hover: #ffffff;
+  --sc-line: #e3e6eb;
+  --sc-line-strong: #cfd4db;
+  --sc-muted: #5b6573;
+  --sc-heading: #0f141a;
+  --sc-accent: #0b7c78;
+  --sc-accent-soft: rgba(15, 159, 154, .10);
+  --sc-chip-bg: #eef0f3;
+  --sc-chip-fg: #3d4651;
+  --sc-header-bg: rgba(245, 246, 248, .78);
+  --sc-glow-1: rgba(15, 159, 154, .10);
+  --sc-glow-2: rgba(99, 102, 241, .07);
+  --sc-grid: rgba(15, 20, 26, .035);
+  --sc-shadow: 0 1px 2px rgba(15, 20, 26, .04), 0 10px 30px -12px rgba(15, 20, 26, .12);
+  --sc-code-bg: #0f141b;
+  --sc-code-border: #1c242e;
+  --sc-radius: .75rem;
+  --sc-radius-sm: .5rem;
+  --sc-mono: #{$font-family-monospace};
+  --sc-ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+[data-bs-theme="dark"] {
+  --sc-surface: rgba(17, 22, 29, .78);
+  --sc-surface-hover: rgba(21, 28, 37, .9);
+  --sc-line: rgba(255, 255, 255, .06);
+  --sc-line-strong: rgba(255, 255, 255, .12);
+  --sc-muted: #8793a3;
+  --sc-heading: #eef2f6;
+  --sc-accent: #5ee0d6;
+  --sc-accent-soft: rgba(94, 224, 214, .10);
+  --sc-chip-bg: rgba(255, 255, 255, .06);
+  --sc-chip-fg: #b4bfcc;
+  --sc-header-bg: rgba(11, 15, 20, .72);
+  --sc-glow-1: rgba(20, 184, 166, .13);
+  --sc-glow-2: rgba(99, 102, 241, .10);
+  --sc-grid: rgba(255, 255, 255, .025);
+  --sc-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 32px -16px rgba(0, 0, 0, .6);
+  --sc-code-bg: #0d1117;
+  --sc-code-border: rgba(255, 255, 255, .07);
+}
+
+// -----------------------------------------------------------------------------
+// 2. Base
+// -----------------------------------------------------------------------------
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--#{$prefix}body-bg);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv11", "ss01";
+}
+
+// Fundo: dois brilhos suaves e uma grade discreta que some para baixo.
+// Feito num pseudo-elemento fixo (background-attachment: fixed falha no iOS).
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 30rem at 0% -10%, var(--sc-glow-1), transparent 70%),
+    radial-gradient(50rem 28rem at 100% 0%, var(--sc-glow-2), transparent 70%),
+    linear-gradient(var(--sc-grid) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, var(--sc-grid) 1px, transparent 1px) 0 0 / 32px 32px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 85%);
+}
+
+::selection {
+  background: var(--sc-accent);
+  color: var(--#{$prefix}body-bg);
+}
+
+a {
+  text-underline-offset: .2em;
+  text-decoration-thickness: 1px;
+  transition: color .15s ease;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 2px;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  letter-spacing: -.01em;
+  color: var(--sc-heading);
+}
+
+.text-secondary {
+  color: var(--sc-muted) !important;
+}
+
+.badge {
+  font-family: var(--sc-mono);
+  letter-spacing: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 3. Cabeçalho
+// -----------------------------------------------------------------------------
+.hb-header-nav {
+  // O fundo translúcido com desfoque fica num pseudo-elemento: backdrop-filter
+  // no próprio nav vira contêiner dos filhos position: fixed e prende o menu
+  // lateral (offcanvas) do mobile dentro da barra.
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--sc-line);
+  min-height: 3.5rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--sc-header-bg);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    backdrop-filter: saturate(160%) blur(14px);
+    pointer-events: none;
+  }
+
+  .navbar-brand {
+    font-family: var(--sc-mono);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -.02em;
+    color: var(--sc-heading);
+
+    img {
+      width: 28px;
+      height: 28px;
+      margin-right: .55rem !important;
+    }
+  }
+
+  .nav-link,
+  .hb-header-search-icon {
+    color: var(--sc-muted);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--sc-heading);
+    }
+  }
+
+  .hb-header-menus .nav-link {
+    font-family: var(--sc-mono);
+    font-size: .875rem;
+
+    &.active {
+      color: var(--sc-heading);
+    }
+  }
+
+  .vr {
+    opacity: .15;
+  }
+}
+
+.hb-header-search-input-container {
+  .form-control {
+    font-family: var(--sc-mono);
+    font-size: .8rem;
+    background-color: var(--sc-chip-bg);
+    border-color: var(--sc-line);
+    border-radius: var(--sc-radius-sm) !important;
+    min-width: 13rem;
+
+    &:focus {
+      border-color: var(--sc-accent);
+      box-shadow: 0 0 0 3px var(--sc-accent-soft);
+    }
+  }
+
+  kbd {
+    font-family: var(--sc-mono);
+    font-size: .65rem;
+    background: transparent;
+    color: var(--sc-muted);
+    border: 1px solid var(--sc-line-strong);
+    padding: .05rem .3rem;
+  }
+}
+
+.offcanvas {
+  background-color: var(--#{$prefix}body-bg);
+
+  @include media-breakpoint-down(lg) {
+    border-left: 1px solid var(--sc-line) !important;
+
+    .offcanvas-header {
+      border-bottom: 1px solid var(--sc-line);
+    }
+
+    .offcanvas-title {
+      font-family: var(--sc-mono);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 4. Painéis (módulos do HB)
+// -----------------------------------------------------------------------------
+.hb-main {
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  .hb-module {
+    background-color: var(--sc-surface);
+    border: 1px solid var(--sc-line);
+    border-radius: var(--sc-radius);
+    padding: 1rem;
+    box-shadow: var(--sc-shadow);
+  }
+
+  .hb-module.p-0 {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .card {
+    --#{$prefix}card-bg: transparent;
+    --#{$prefix}card-color: var(--#{$prefix}body-color);
+  }
+
+  @include media-breakpoint-up(md) {
+    .hb-module {
+      padding: 1.25rem;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 5. Cards de posts
+// -----------------------------------------------------------------------------
+.hb-blog-post-card {
+  transition: border-color .25s var(--sc-ease), transform .25s var(--sc-ease), background-color .25s ease;
+
+  &:hover {
+    border-color: var(--sc-line-strong) !important;
+    background-color: var(--sc-surface-hover) !important;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .card-img-top {
+    display: block;
+    border: 0 !important;
+    border-radius: var(--sc-radius-sm);
+    margin: .75rem 0 .25rem;
+  }
+
+  .hb-blog-post-card-img {
+    transition: transform .6s var(--sc-ease);
+
+    &:hover {
+      transform: scale(1.04);
+    }
+  }
+
+  .hb-blog-post-title {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    margin-bottom: .5rem;
+  }
+
+  .hb-blog-post-title-link {
+    color: var(--sc-heading);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--sc-accent);
+    }
+
+    .text-danger {
+      color: var(--sc-accent) !important;
+    }
+  }
+
+  .hb-blog-post-summary {
+    font-size: .925rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hb-blog-post-summary + .mt-2 a {
+    font-family: var(--sc-mono);
+    font-size: .8rem;
+    color: var(--sc-accent) !important;
+    text-decoration: none;
+
+    &::after {
+      content: " →";
+      display: inline-block;
+      transition: transform .2s var(--sc-ease);
+    }
+
+    &:hover::after {
+      transform: translateX(3px);
+    }
+  }
+}
+
+// Linha de metadados (data, leitura, seção)
+.hb-blog-post-meta {
+  font-family: var(--sc-mono);
+  font-size: .75rem;
+  color: var(--sc-muted);
+  flex-wrap: wrap;
+  row-gap: .25rem;
+  column-gap: .3rem;
+
+  > * {
+    margin: 0 !important;
+  }
+
+  // Placeholder cinza de autor sem foto: só ocupa espaço.
+  .hb-blog-author-img-none,
+  .hb-blog-post-author-link:has(.hb-blog-author-img-none) {
+    display: none !important;
+  }
+}
+
+// Chips de seção, categoria, série e tag
+.hb-blog-post-section .badge,
+.hb-blog-post-taxonomy {
+  font-family: var(--sc-mono);
+  font-size: .7rem !important;
+  font-weight: 500 !important;
+  background-color: var(--sc-chip-bg) !important;
+  color: var(--sc-chip-fg) !important;
+  border: 1px solid var(--sc-line);
+  border-radius: .375rem;
+  padding: .2rem .45rem;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+
+  &:hover {
+    color: var(--sc-accent) !important;
+    border-color: var(--sc-accent);
+    background-color: var(--sc-accent-soft) !important;
+  }
+}
+
+.hb-blog-post-taxonomy-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+}
+
+.hb-blog-posts {
+  --#{$prefix}gutter-y: 1.25rem;
+}
+
+// -----------------------------------------------------------------------------
+// 6. Carrossel de destaques
+// -----------------------------------------------------------------------------
+.hb-carousel {
+  .carousel-inner {
+    border: 0 !important;
+    border-radius: var(--sc-radius) !important;
+  }
+
+  .carousel-img {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .carousel-caption {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 3rem 1.25rem 2.75rem;
+    background: linear-gradient(to top, rgba(6, 9, 13, .88), rgba(6, 9, 13, .45) 55%, transparent);
+
+    .h5 {
+      font-family: var(--sc-mono);
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .carousel-link {
+      color: #fff;
+    }
+  }
+
+  .carousel-indicators {
+    margin-bottom: .75rem;
+
+    [data-bs-target] {
+      width: .5rem;
+      height: .5rem;
+      border-radius: 999px;
+      border: 0;
+      opacity: .45;
+      transition: width .3s var(--sc-ease), opacity .3s ease;
+
+      &.active {
+        width: 1.5rem;
+        opacity: 1;
+        background-color: #fff;
+      }
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    .carousel-caption {
+      padding: 4rem 1.5rem 2.5rem;
+
+      .h5 {
+        font-size: 1.15rem;
+      }
+    }
+
+    .carousel-indicators {
+      margin-left: 1.5rem;
+    }
+  }
+}
+
+.hb-blog-home-carousel .hb-module {
+  padding: 0;
+  overflow: hidden;
+}
+
+// -----------------------------------------------------------------------------
+// 7. Barra lateral
+// -----------------------------------------------------------------------------
+.hb-blog-sidebar-profile {
+  align-items: center;
+  text-align: center;
+
+  .hb-blog-sidebar-profile-img {
+    max-width: 96px;
+    padding: 3px;
+    border: 1px solid var(--sc-line-strong);
+    background: var(--#{$prefix}body-bg);
+  }
+
+  .hb-blog-sidebar-profile-title {
+    font-family: var(--sc-mono);
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .hb-blog-sidebar-profile-desc {
+    font-size: .875rem;
+    line-height: 1.55;
+    color: var(--sc-muted);
+  }
+
+  .hb-blog-sidebar-profile-meta {
+    font-family: var(--sc-mono);
+    font-size: .75rem;
+    color: var(--sc-muted);
+  }
+
+  .hb-social {
+    color: var(--sc-muted) !important;
+
+    &:hover {
+      color: var(--sc-heading) !important;
+    }
+
+    svg {
+      width: 1.15rem;
+      height: 1.15rem;
+    }
+  }
+}
+
+// Abas (Destaque/Recente, Autores/Categorias/Séries/Tags) no estilo sublinhado
+.hb-blog-sidebar .nav-pills .nav-link.active,
+.hb-blog-sidebar .nav-pills .show > .nav-link {
+  background: transparent !important;
+  color: var(--sc-heading) !important;
+}
+
+.hb-blog-sidebar .nav-pills {
+  --#{$prefix}nav-pills-link-active-bg: transparent;
+  --#{$prefix}nav-pills-link-active-color: var(--sc-heading);
+  --#{$prefix}nav-pills-border-radius: 0;
+  border-bottom: 1px solid var(--sc-line);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  .nav-link {
+    font-family: var(--sc-mono);
+    font-size: .8rem;
+    color: var(--sc-muted);
+    padding: .5rem .4rem;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--sc-heading);
+    }
+
+    &.active {
+      border-bottom-color: var(--sc-accent);
+      font-weight: 600;
+    }
+  }
+}
+
+.hb-blog-sidebar-posts {
+  .slide-item {
+    font-size: .9rem;
+  }
+
+  img {
+    border-radius: var(--sc-radius-sm);
+  }
+}
+
+.taxonomy-term {
+  font-family: var(--sc-mono);
+  font-size: .75rem !important;
+  color: var(--sc-chip-fg) !important;
+  background-color: var(--sc-chip-bg);
+  border: 1px solid var(--sc-line) !important;
+  border-radius: .375rem !important;
+  padding: .2rem .5rem !important;
+  margin: 0 .25rem .4rem 0 !important;
+
+  &:hover {
+    color: var(--sc-accent) !important;
+    border-color: var(--sc-accent) !important;
+    background-color: var(--sc-accent-soft);
+  }
+
+  .taxonomy-term-count {
+    border: 0 !important;
+    margin-left: .25rem;
+    padding: 0 !important;
+    opacity: .6;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 8. Paginação
+// -----------------------------------------------------------------------------
+.pagination {
+  --#{$prefix}pagination-bg: var(--sc-surface);
+  --#{$prefix}pagination-border-color: var(--sc-line);
+  --#{$prefix}pagination-color: var(--sc-muted);
+  --#{$prefix}pagination-hover-color: var(--sc-heading);
+  --#{$prefix}pagination-hover-bg: var(--sc-surface-hover);
+  --#{$prefix}pagination-hover-border-color: var(--sc-line-strong);
+  --#{$prefix}pagination-active-bg: var(--sc-accent);
+  --#{$prefix}pagination-active-border-color: var(--sc-accent);
+  --#{$prefix}pagination-active-color: var(--#{$prefix}body-bg);
+  font-family: var(--sc-mono);
+  font-size: .85rem;
+  gap: .35rem;
+
+  .page-link {
+    border-radius: var(--sc-radius-sm) !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 9. Página do post
+// -----------------------------------------------------------------------------
+.hb-breadcrumb {
+  --#{$prefix}breadcrumb-divider: "/";
+  --#{$prefix}breadcrumb-divider-color: var(--sc-line-strong);
+  --#{$prefix}breadcrumb-item-padding-x: .5rem;
+  font-family: var(--sc-mono);
+  font-size: .78rem;
+
+  .breadcrumb-item {
+    background: none !important;
+    clip-path: none !important;
+    margin-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-right: 0 !important;
+    color: var(--sc-muted);
+
+    a {
+      padding: 0 !important;
+      color: var(--sc-muted);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--sc-accent);
+      }
+    }
+
+    & + .breadcrumb-item {
+      padding-left: 0;
+    }
+
+    & + .breadcrumb-item::before {
+      content: "/" !important;
+      float: none;
+      padding: 0 .55rem;
+      color: var(--sc-line-strong);
+    }
+
+    &.active {
+      color: var(--sc-heading) !important;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.hb-blog-post-intro {
+  .hb-blog-post-title {
+    font-size: clamp(1.5rem, 1.1rem + 2vw, 2.25rem);
+    line-height: 1.2;
+    letter-spacing: -.025em;
+    margin-bottom: .9rem;
+  }
+
+  .hb-blog-post-meta {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+  }
+
+  .hb-blog-post-desc {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--sc-muted);
+    margin-top: .9rem !important;
+  }
+
+  @include media-breakpoint-up(md) {
+    padding: 1.75rem !important;
+  }
+}
+
+.hb-featured-img {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+// Corpo do texto
+.hb-blog-post-content,
+.hb-docs-doc-content {
+  font-size: 1rem;
+  line-height: 1.75;
+  overflow-wrap: break-word;
+
+  @include media-breakpoint-up(md) {
+    font-size: 1.0625rem;
+    padding: 2rem 2.25rem !important;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--sc-line);
+    margin-bottom: 1.1rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    margin-top: 2rem;
+    margin-bottom: .75rem;
+  }
+
+  p,
+  ul,
+  ol {
+    margin-bottom: 1.15rem;
+  }
+
+  li + li {
+    margin-top: .3rem;
+  }
+
+  ul li::marker {
+    color: var(--sc-accent);
+  }
+
+  strong {
+    color: var(--sc-heading);
+    font-weight: 600;
+  }
+
+  a:not(.btn):not(.badge):not(.heading-sign):not(.kg-bookmark-container) {
+    color: var(--sc-accent);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--sc-accent) 40%, transparent);
+
+    &:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  hr {
+    border-color: var(--sc-line-strong);
+    opacity: 1;
+    margin: 2.5rem 0;
+  }
+
+  img {
+    border-radius: var(--sc-radius-sm);
+  }
+
+  // Código inline
+  :not(pre) > code {
+    font-size: .85em;
+    padding: .12em .4em;
+    border-radius: .3rem;
+    background-color: var(--sc-chip-bg);
+    border: 1px solid var(--sc-line);
+    color: inherit;
+    word-break: break-word;
+  }
+
+  // Blocos de código
+  .highlight {
+    margin-bottom: 1.25rem;
+
+    pre {
+      font-size: .825rem;
+      line-height: 1.65;
+      padding: 1rem 1.1rem;
+      margin: 0;
+      border-radius: var(--sc-radius-sm);
+      background-color: var(--sc-code-bg) !important;
+      border: 1px solid var(--sc-code-border);
+    }
+
+    .ln {
+      opacity: .35;
+      margin-right: 1rem;
+    }
+  }
+
+  // Tabelas
+  .table-responsive {
+    border: 1px solid var(--sc-line);
+    border-radius: var(--sc-radius-sm);
+    margin-bottom: 1.25rem;
+  }
+
+  .table {
+    --#{$prefix}table-bg: transparent;
+    --#{$prefix}table-striped-bg: transparent;
+    --#{$prefix}table-hover-bg: var(--sc-accent-soft);
+    --#{$prefix}table-border-color: var(--sc-line);
+    font-size: .9rem;
+    margin-bottom: 0;
+
+    > :not(caption) > * > * {
+      padding: .65rem .9rem;
+    }
+
+    &.table-bordered > :not(caption) > * > * {
+      border-width: 0 0 1px;
+    }
+
+    tbody tr:last-child > * {
+      border-bottom: 0;
+    }
+
+    thead th {
+      font-family: var(--sc-mono);
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--sc-muted);
+      background-color: var(--sc-chip-bg);
+    }
+  }
+
+  // Citações comuns
+  > blockquote:not(.alert) {
+    border-left: 3px solid var(--sc-line-strong);
+    padding: .25rem 0 .25rem 1.1rem;
+    color: var(--sc-muted);
+    font-style: italic;
+  }
+}
+
+// Alertas ([!NOTE], [!WARNING]...)
+.hb-content blockquote.alert {
+  border: 1px solid var(--sc-line);
+  border-left: 3px solid var(--#{$prefix}alert-color);
+  border-radius: var(--sc-radius-sm);
+  background-color: color-mix(in srgb, var(--#{$prefix}alert-color) 7%, transparent);
+  color: var(--#{$prefix}body-color);
+  padding: .9rem 1.1rem;
+  font-size: .95rem;
+
+  .alert-heading {
+    font-family: var(--sc-mono);
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--#{$prefix}alert-color);
+    margin-bottom: .35rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Índice (Nesta página)
+.hb-blog-post-toc,
+.hb-docs-doc-toc {
+  .hb-module {
+    padding: 1rem 1rem .5rem;
+  }
+
+  .h6 {
+    font-family: var(--sc-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--sc-muted);
+  }
+
+  hr {
+    border-color: var(--sc-line);
+    opacity: 1;
+    margin: .6rem 0;
+  }
+
+  .btn-secondary {
+    font-family: var(--sc-mono);
+    font-size: .85rem;
+    background-color: var(--sc-chip-bg);
+    color: var(--#{$prefix}body-color);
+    border-color: var(--sc-line);
+  }
+}
+
+#TableOfContents {
+  font-size: .8rem;
+  line-height: 1.45;
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+
+    ul a {
+      padding-left: 1.4rem;
+    }
+  }
+
+  li {
+    margin: 0;
+  }
+
+  a {
+    display: block;
+    padding: .28rem 0 .28rem .7rem;
+    border-left: 2px solid var(--sc-line);
+    color: var(--sc-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--sc-heading);
+    }
+
+    &.active {
+      color: var(--sc-accent);
+      border-left-color: var(--sc-accent);
+    }
+  }
+}
+
+// Revisão, compartilhamento, autores, navegação entre posts
+.hb-revision {
+  font-family: var(--sc-mono);
+  font-size: .75rem !important;
+}
+
+.hb-social-share-buttons {
+  gap: .5rem;
+
+  // Largura automática: funciona com só ícone (vira círculo), só texto ou os dois.
+  .hb-social-share-button {
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 .5rem;
+    gap: .4rem;
+    justify-content: center;
+    font-family: var(--sc-mono);
+    font-size: .75rem;
+    white-space: nowrap;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid var(--sc-line);
+    color: var(--sc-muted) !important;
+    background-color: transparent !important;
+    margin: 0 !important;
+    transition: color .15s ease, border-color .15s ease;
+
+    &:hover {
+      color: var(--sc-accent) !important;
+      border-color: var(--sc-accent);
+    }
+
+    .hb-social-share-button-icon {
+      flex-shrink: 0;
+      margin: 0 !important;
+    }
+
+    .hb-social-share-button-label {
+      padding-right: .2rem;
+    }
+  }
+}
+
+.hb-blog-post-authors {
+  > .h5 {
+    font-family: var(--sc-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--sc-muted);
+  }
+
+  .hb-blog-post-author {
+    border-color: var(--sc-line) !important;
+  }
+}
+
+.hb-blog-post-nav {
+  a.hb-module {
+    text-decoration: none;
+    color: var(--#{$prefix}body-color);
+    font-size: .9rem;
+    transition: border-color .2s ease;
+
+    &:hover {
+      border-color: var(--sc-accent) !important;
+      color: var(--sc-heading);
+    }
+  }
+}
+
+.hb-blog-related-posts {
+  .hb-blog-post-card {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+// Painel flutuante (comentários/editar)
+.hb-content-panel {
+  background-color: var(--sc-surface);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--sc-line-strong);
+  border-radius: 999px !important;
+  box-shadow: var(--sc-shadow) !important;
+}
+
+// -----------------------------------------------------------------------------
+// 10. Rodapé
+// -----------------------------------------------------------------------------
+.hb-footer {
+  background: transparent !important;
+  border-top: 1px solid var(--sc-line);
+  margin-top: 2rem;
+  font-size: .85rem;
+  color: var(--sc-muted);
+
+  .h5 {
+    font-family: var(--sc-mono);
+    font-size: 1rem;
+  }
+
+  a.text-body-emphasis {
+    color: var(--sc-heading) !important;
+    text-decoration-color: var(--sc-line-strong);
+  }
+
+  .hb-social {
+    color: var(--sc-muted) !important;
+
+    &:hover {
+      color: var(--sc-heading) !important;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 11. Barra de rolagem
+// -----------------------------------------------------------------------------
+@include media-breakpoint-up(lg) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sc-line-strong) transparent;
+  }
+}
+
+// =============================================================================
+// Bookmark cards (.kg-bookmark-*) usados dentro dos posts
+// =============================================================================
+.kg-bookmark-card {
+  margin: 1.5rem 0;
+}
+
+.kg-bookmark-card a.kg-bookmark-container,
+a.kg-bookmark-container:hover {
+  display: flex;
+  flex-direction: column-reverse;
+  background: var(--sc-surface);
+  text-decoration: none;
+  border-radius: var(--sc-radius-sm) !important;
+  border: 1px solid var(--sc-line-strong);
+  overflow: hidden;
+  color: var(--#{$prefix}body-color);
+  transition: border-color .2s ease;
+}
+
+a.kg-bookmark-container:hover {
+  border-color: var(--sc-accent);
+}
+
+.kg-bookmark-content {
+  padding: 1rem 1.15rem;
+  min-width: 0;
+}
+
+.kg-bookmark-title {
+  font-family: var(--sc-mono);
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--sc-heading);
+}
+
+.kg-bookmark-card .kg-bookmark-description {
+  font-size: .85rem;
+  margin-top: .3em;
+  max-height: none;
+  color: var(--sc-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.kg-bookmark-metadata {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  font-family: var(--sc-mono);
+  font-size: .75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.kg-bookmark-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+.kg-bookmark-metadata > :not(img) {
+  opacity: .7;
+}
+
+.kg-bookmark-metadata > span:last-of-type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kg-bookmark-thumbnail {
+  position: relative;
+  aspect-ratio: 16 / 9;
+}
+
+.kg-bookmark-thumbnail img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 !important;
+}
+
+@include media-breakpoint-up(md) {
+  .kg-bookmark-card a.kg-bookmark-container,
+  a.kg-bookmark-container:hover {
+    flex-direction: row;
+  }
+
+  .kg-bookmark-content {
+    flex: 1 1 60%;
+  }
+
+  .kg-bookmark-thumbnail {
+    flex: 0 0 34%;
+    aspect-ratio: auto;
+    min-height: 140px;
+  }
+}
+
+img {
+  height: auto;
+}
+
+// =============================================================================
+// Doação (layouts/partials/custom/donate.html)
+// =============================================================================
+.sc-donate {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .9rem 1rem;
+  align-items: start;
+  position: relative;
+  overflow: hidden;
+
+  // leve brilho no canto, no mesmo tom do acento
+  &::before {
+    content: "";
+    position: absolute;
+    inset: auto -20% -60% auto;
+    width: 60%;
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, var(--sc-accent-soft), transparent);
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+  }
+}
+
+.sc-donate-icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--sc-radius-sm);
+  background: var(--sc-accent-soft);
+  color: var(--sc-accent);
+  border: 1px solid color-mix(in srgb, var(--sc-accent) 25%, transparent);
+
+  svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
+
+.sc-donate-title {
+  font-family: var(--sc-mono);
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--sc-heading);
+  margin: 0 0 .2rem;
+}
+
+.sc-donate-text {
+  font-size: .875rem;
+  line-height: 1.55;
+  color: var(--sc-muted);
+  margin: 0;
+}
+
+.sc-donate-btn {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-height: 2.75rem; // alvo de toque confortável
+  padding: .55rem 1.1rem;
+  border-radius: var(--sc-radius-sm);
+  background: var(--sc-accent);
+  color: var(--#{$prefix}body-bg);
+  font-family: var(--sc-mono);
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: filter .15s ease, transform .15s var(--sc-ease);
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: var(--#{$prefix}body-bg);
+    filter: brightness(1.08);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+// No fim do post: em telas médias o botão vai para a direita.
+.sc-donate-post {
+  @include media-breakpoint-up(md) {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+
+    .sc-donate-btn {
+      grid-column: auto;
+    }
+  }
+}
+
+// Na barra lateral: sempre empilhado e centralizado.
+.sc-donate-sidebar {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+  gap: .75rem;
+
+  .sc-donate-btn {
+    width: 100%;
+  }
+}
+

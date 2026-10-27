@@ -1,0 +1,203 @@
+// =============================================================================
+// Tema "minimal" (herda _base)
+// Branco, uma família tipográfica, um azul. Nada de fios nem etiquetas nos
+// cards: só imagem, título e resumo, com muito espaço entre os blocos.
+// =============================================================================
+
+:root {
+  --sc-bg: #ffffff;
+  --sc-text: #1c1c1c;
+  --sc-muted: #6e6e6e;
+  --sc-heading: #0a0a0a;
+  --sc-accent: #2348d8;
+  --sc-accent-ink: #ffffff;
+  --sc-line: #ececec;
+  --sc-line-strong: #d4d4d4;
+  --sc-surface: #f4f4f4;
+  --sc-header-bg: rgba(255, 255, 255, .88);
+  --sc-code-bg: #18181b;
+  --sc-code-line: #18181b;
+
+  --sc-font-ui: "Instrument Sans", system-ui, sans-serif;
+  --sc-font-display: "Instrument Sans", system-ui, sans-serif;
+  --sc-font-body: "Instrument Sans", system-ui, sans-serif;
+
+  --sc-display-weight: 600;
+  --sc-display-tracking: -.02em;
+  --sc-display-leading: 1.18;
+  --sc-post-title-size: clamp(2rem, 1.3rem + 3vw, 3.25rem);
+  --sc-card-title-size: 1.25rem;
+  --sc-body-size: 1.125rem;
+  --sc-body-leading: 1.75;
+  --sc-radius: .75rem;
+  --sc-radius-btn: 999px;
+}
+
+[data-bs-theme="dark"] {
+  --sc-bg: #141414;
+  --sc-text: #e6e6e6;
+  --sc-muted: #9a9a9a;
+  --sc-heading: #fafafa;
+  --sc-accent: #8ea6ff;
+  --sc-accent-ink: #141414;
+  --sc-line: #262626;
+  --sc-line-strong: #3a3a3a;
+  --sc-surface: #1f1f1f;
+  --sc-header-bg: rgba(20, 20, 20, .88);
+  --sc-code-bg: #0c0c0d;
+  --sc-code-line: #262626;
+}
+
+// Sem fios entre os blocos: só espaço
+.hb-main .hb-module {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.hb-header-nav {
+  border-bottom-color: transparent;
+
+  .navbar-brand {
+    font-size: 1.0625rem;
+    font-weight: 600;
+
+    img {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}
+
+// Cards: imagem, título e resumo. Tags e seção saem.
+.hb-blog-posts {
+  --#{$prefix}gutter-x: 3rem;
+  --#{$prefix}gutter-y: 3.5rem;
+}
+
+.hb-blog-post-card {
+  > .hb-blog-post-meta {
+    order: 3;
+  }
+
+  .hb-blog-post-meta.d-block,
+  .hb-blog-post-section {
+    display: none !important;
+  }
+
+  .hb-blog-post-meta .hb-blog-post-reading-time::after {
+    content: none;
+  }
+
+  .card-img-top {
+    margin-top: 0;
+    margin-bottom: .75rem;
+  }
+
+  .hb-blog-post-card-img {
+    transition: opacity .3s ease;
+  }
+
+  &:hover .hb-blog-post-card-img {
+    opacity: .88;
+  }
+
+  .hb-blog-post-title-link {
+    background-image: none;
+  }
+
+  &:hover .hb-blog-post-title-link {
+    color: var(--sc-accent);
+  }
+
+  .hb-blog-post-summary {
+    -webkit-line-clamp: 2;
+  }
+}
+
+.hb-blog-home-carousel .hb-carousel.carousel .carousel-caption {
+  background: linear-gradient(to top, rgba(0, 0, 0, .6), transparent);
+
+  .h5 {
+    font-weight: 600;
+  }
+}
+
+.hb-blog-home-carousel + .col-12 .hb-blog-post-card .hb-blog-post-title {
+  @include media-breakpoint-up(lg) {
+    font-size: 2.25rem;
+  }
+}
+
+// Barra lateral mais leve
+.hb-blog-sidebar-profile .hb-blog-sidebar-profile-title {
+  font-size: 1.125rem;
+}
+
+.hb-blog-sidebar .nav-pills .nav-link {
+  font-weight: 500;
+  border-bottom-width: 1px;
+}
+
+// Post
+.hb-blog-post-intro.hb-module .hb-blog-post-desc {
+  font-size: 1.25rem;
+}
+
+.hb-blog-post-content,
+.hb-docs-doc-content {
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.1875rem;
+  }
+
+  :not(pre) > code {
+    background: var(--sc-surface);
+  }
+
+  .table thead th {
+    border-bottom-width: 1px !important;
+    color: var(--sc-muted);
+    font-weight: 500;
+  }
+
+  > blockquote:not(.alert) {
+    font-style: normal;
+    border-left-width: 3px;
+  }
+}
+
+.hb-content blockquote.alert {
+  border-left: 0;
+  border-radius: var(--sc-radius);
+  background: var(--sc-surface);
+  padding: 1rem 1.25rem;
+}
+
+#TableOfContents a {
+  border-left: 0;
+  padding-left: 0;
+
+  &.active {
+    color: var(--sc-accent);
+  }
+}
+
+#TableOfContents ul ul a {
+  padding-left: .9rem;
+}
+
+.hb-footer {
+  border-top-color: transparent;
+
+  .h5 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+}
+
+.sc-donate-title {
+  font-size: 1.25rem;
+}

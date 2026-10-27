@@ -1,0 +1,37 @@
+// Mixins auxiliares do tema cianotipia (definidos fora do mixin de estilos).
+
+@mixin sc-cyanotype-base {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--sc-duo-shadow);
+
+  img {
+    filter: grayscale(1) contrast(1.25) brightness(1.06);
+    mix-blend-mode: screen;
+    transition: filter .45s var(--sc-ease);
+    transform: none !important;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--sc-duo-light);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    transition: opacity .45s var(--sc-ease);
+  }
+}
+
+@mixin sc-cyanotype-reveal {
+  img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  &::after {
+    opacity: 0;
+  }
+}

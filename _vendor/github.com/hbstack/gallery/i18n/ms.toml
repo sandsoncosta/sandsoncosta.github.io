@@ -1,8 +1,0 @@
-[gallery_img_info_author]
-other = "Karyawan: {{ . }}"
-
-[gallery_img_info_source]
-other = "Sumber: {{ . }}"
-
-[view_more]
-other = "Lihat lebih lanjut"

@@ -1,0 +1,49 @@
+// Tema "hacker": terminal de fósforo verde. VT323 nos títulos, JetBrains Mono no resto.
+$phosphor: #39ff6a;
+$crt: #030805;
+
+$primary: #0a7a2e;
+$secondary: #4b6b52;
+$info: #1f7a8c;
+$warning: #a37300;
+$danger: #c0392b;
+
+$body-bg: #eef3ea;
+$body-color: #0e2a16;
+$body-secondary-color: #4b6b52;
+$body-tertiary-bg: #e2eadd;
+$border-color: #c6d6c4;
+$headings-color: #06180b;
+$link-color: #0a7a2e;
+$link-hover-color: #075a21;
+
+$body-bg-dark: $crt;
+$body-color-dark: #b6f5c3;
+$body-secondary-color-dark: #5fa874;
+$body-secondary-bg-dark: #0a1a0f;
+$body-tertiary-bg-dark: #06110a;
+$body-emphasis-color-dark: #d8ffe0;
+$border-color-dark: #12331d;
+$headings-color-dark: #d8ffe0;
+$primary-text-emphasis-dark: $phosphor;
+$link-color-dark: $phosphor;
+$link-hover-color-dark: #9dffb6;
+$code-color-dark: #ffd166;
+$info-text-emphasis-dark: #6fe3f5;
+$warning-text-emphasis-dark: #ffd166;
+
+$font-family-sans-serif: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+$font-family-monospace: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+$headings-font-family: "VT323", "JetBrains Mono", ui-monospace, monospace;
+$headings-font-weight: 400;
+$headings-line-height: 1;
+$font-size-base: .9375rem;
+$line-height-base: 1.65;
+
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$enable-shadows: false;
+$box-shadow: none;
+
+$hb-module-margin-bottom: 2rem;

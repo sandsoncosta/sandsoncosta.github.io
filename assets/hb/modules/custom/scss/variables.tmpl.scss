@@ -1,70 +1,38 @@
-// Override the Bootstrap and HB SCSS variables.
-// See https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss.
-// See https://github.com/twbs/bootstrap/blob/main/scss/_variables-dark.scss.
+// -----------------------------------------------------------------------------
+// Seletor de tema visual.
+// O tema ativo vem de `skin` em config/_default/params.yaml e os arquivos ficam
+// em assets/skins/<nome>/:
+//   variables.scss  variáveis do Bootstrap/HB (obrigatório)
+//   styles.scss     regras CSS (obrigatório)
+//   mixins.scss     mixins auxiliares usados em styles.scss (opcional)
+//   extends.txt     nome de outro tema cujos estilos vêm antes, ex.: _base (opcional)
+// As fontes de cada tema ficam em layouts/partials/skins/<nome>/head.html.
+// -----------------------------------------------------------------------------
+{{- $skin := default "cianotipia" site.Params.skin }}
+{{- $dir := printf "skins/%s/" $skin }}
+{{- $vars := resources.Get (print $dir "variables.scss") }}
+{{- $styles := resources.Get (print $dir "styles.scss") }}
+{{- if not (and $vars $styles) }}
+  {{- errorf "[skin] tema %q não encontrado: crie assets/skins/%s/variables.scss e styles.scss" $skin $skin }}
+{{- end }}
+{{- $parent := "" }}
+{{- with resources.Get (print $dir "extends.txt") }}
+  {{- $parent = printf "skins/%s/" (trim .Content " \r\n\t") }}
+  {{- if not (resources.Get (print $parent "styles.scss")) }}
+    {{- errorf "[skin] o tema %q herda de %q, que não tem styles.scss" $skin $parent }}
+  {{- end }}
+{{- end }}
 
-// ---------------------------------------------------------------------------
-// Paleta
-// ---------------------------------------------------------------------------
-// Acento único (ciano/teal). Todo o resto é neutro, para o destaque ficar
-// reservado a links, estado ativo e foco.
-$primary: #0f9f9a;
-$secondary: #5b6573;
-$danger: #e5484d;
+$sc-skin: "{{ $skin }}";
 
-// Modo claro
-$body-bg: #f5f6f8;
-$body-color: #1d232b;
-$body-secondary-color: #5b6573;
-$body-tertiary-bg: #eceef2;
-$border-color: #e1e4e9;
-$headings-color: #0f141a;
-$link-color: #0b7c78;
-$link-hover-color: #075d5a;
+{{ $vars.Content }}
 
-// Modo escuro
-$body-bg-dark: #0b0f14;
-$body-color-dark: #c9d1db;
-$body-secondary-color-dark: #8793a3;
-$body-secondary-bg-dark: #141a22;
-$body-tertiary-bg-dark: #10151c;
-$body-emphasis-color-dark: #eef2f6;
-$border-color-dark: #1f2731;
-$headings-color-dark: #eef2f6;
-$primary-text-emphasis-dark: #5ee0d6;
-$link-color-dark: #5ee0d6;
-$link-hover-color-dark: #a5f0ea;
-$code-color-dark: #f0a6c8;
+{{ with $parent }}{{ with resources.Get (print . "mixins.scss") }}{{ .Content }}{{ end }}{{ end }}
+{{ with resources.Get (print $dir "mixins.scss") }}{{ .Content }}{{ end }}
 
-// ---------------------------------------------------------------------------
-// Tipografia
-// ---------------------------------------------------------------------------
-$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-$headings-font-family: $font-family-monospace;
-$headings-font-weight: 600;
-$headings-line-height: 1.25;
-$font-size-base: 1rem;
-$line-height-base: 1.65;
-$lead-font-weight: 400;
-
-$h1-font-size: 2rem;
-$h2-font-size: 1.5rem;
-$h3-font-size: 1.25rem;
-$h4-font-size: 1.1rem;
-$h5-font-size: 1rem;
-$h6-font-size: .9rem;
-
-// ---------------------------------------------------------------------------
-// Formas
-// ---------------------------------------------------------------------------
-$border-radius: .5rem;
-$border-radius-sm: .375rem;
-$border-radius-lg: .75rem;
-$enable-shadows: false;
-$box-shadow: 0 1px 2px rgba(15, 20, 26, .04), 0 8px 24px rgba(15, 20, 26, .06);
-
-$badge-font-weight: 500;
-$badge-border-radius: .375rem;
-
-// Espaço entre os blocos (módulos) do HB.
-$hb-module-margin-bottom: 1.25rem;
+// Os estilos entram num mixin porque este arquivo é lido antes do Bootstrap;
+// o @include fica em index.scss, depois de tudo.
+@mixin sc-skin-styles {
+{{ with $parent }}{{ (resources.Get (print . "styles.scss")).Content }}{{ end }}
+{{ $styles.Content }}
+}

@@ -1,0 +1,5 @@
+<ul>
+{{- range where site.RegularPages "Section" "blog" }}
+  <li><code>{{ .Path }}</code> — {{ .Title }}</li>
+{{- end }}
+</ul>
