@@ -1,5 +1,6 @@
 ﻿---
 title: "Configurando a GPO para restringir o Anonymous Logon"
+url: "/blog/configurando-a-gpo-para-restringir-o-anonymous-logon"
 date: 2026-10-27T12:00:00-03:00
 draft: false
 description: "Passo a passo para aplicar via Group Policy as políticas que restringem o acesso anônimo no Windows: GPMC, equivalentes em PowerShell/registro, o cuidado com RestrictRemoteSam e como validar no laboratório."
