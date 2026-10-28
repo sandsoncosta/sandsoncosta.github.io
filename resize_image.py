@@ -19,13 +19,13 @@ def resize_image(input_path, output_path, new_width, new_height=None):
 
 # Caminho da imagem de entrada e saída
 # input_image_path = "E:\\HUGO\\liga\\static\\images\\teenagers-lifestyle-city_23-2149196064.jpg"
-input_image_path = "C:\\Users\\sands\\Downloads\\Firewall Neon e Hub de Segurança.png"
+input_image_path = "C:\\Users\\sands\\Downloads\\1.jpg"
 # output_image_path = "E:\\HUGO\\liga\\content\\blog\\7.com.quem.voce.anda\\featured-sample.webp"
 output_image_path = "F:\\HUGO\\blog\\content\\blog\\12.anonymous.logon\\featured-sample.webp"
 
 # Largura e altura oficial
 new_width = 1120
-new_height = 640  # Defina a altura, ou deixe None para calcular automaticamente
+new_height = 630  # Defina a altura, ou deixe None para calcular automaticamente
 
 # Alternativa
 #new_width = 1349
