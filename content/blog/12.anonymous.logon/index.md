@@ -1,5 +1,6 @@
 ﻿---
 title: "Anonymous Logon no Windows: separando sessão, acesso e enumeração"
+url: "/blog/anonymous-logon-no-windows-separando-sessao-acesso-e-enumeracao/"
 date: 2026-10-27T02:16:13-03:00
 draft: false
 description: "O que é o ANONYMOUS LOGON, por que não é incidente por si só, e como separar sessão, acesso e enumeração no Active Directory — com demonstração no GOAD, baseline e hardening."
