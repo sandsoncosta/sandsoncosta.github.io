@@ -10,7 +10,7 @@ config/_default/params.en.yaml
 
 #ARTIGOS
 content\blog\9.cve2023-30367-mremoteng\index.en.md
-
+10.entendendo-pasta-public
 17.desenvolvendo.hunting
 18.engenharia.e.blue.team
 20.criando.seu.proprio.port.scan
