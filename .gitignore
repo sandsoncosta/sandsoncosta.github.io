@@ -10,7 +10,7 @@ config/_default/params.en.yaml
 
 #ARTIGOS
 content\blog\9.cve2023-30367-mremoteng\index.en.md
-10.entendendo-pasta-public
+
 17.desenvolvendo.hunting
 18.engenharia.e.blue.team
 20.criando.seu.proprio.port.scan
@@ -20,7 +20,7 @@ content\blog\9.cve2023-30367-mremoteng\index.en.md
 32.path.traversal
 33.sysmon.eid.23
 34.kerberoasting
-35.detectando.c2
+
 36.infra.de.c2
 37.alguem.esta.roubando.os.dados
 39.kerberos.fundamentos
@@ -71,4 +71,4 @@ content\blog\9.cve2023-30367-mremoteng\index.en.md
 84.credenciais.timeroasting
 85.credenciais.hardening
 87.authentication.policy.silos
-old3
+88.auditoria.windows.gpo
