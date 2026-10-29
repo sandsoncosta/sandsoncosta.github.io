@@ -7,6 +7,7 @@ tips.txt
 .env
 /content/about/
 config/_default/params.en.yaml
+resize_image.py
 
 #ARTIGOS
 content\blog\9.cve2023-30367-mremoteng\index.en.md
