@@ -1,7 +1,5 @@
 # 🛡️ Sandson Costa | Security Research & Threat Hunting
 
-<div align="center">
-
 ### ⚙️ Sistema em atualização
 
 **Threat Hunting • Detection Engineering • Incident Response • Blue Team**
@@ -12,11 +10,11 @@
 
 ---
 
-### 🚧 Estamos preparando o ambiente
+## 🚧 Estamos preparando o ambiente
 
 O blog está passando por atualizações, melhorias de desempenho e publicação de novos conteúdos técnicos.
 
-```text
+```bash
 $ ./deploy.sh
 
 [+] Inicializando Hugo...
@@ -26,17 +24,17 @@ $ ./deploy.sh
 [*] Aguardando finalização do deploy...
 ```
 
-### 🔍 O que você encontrará por aqui?
+## 🔍 O que você encontrará por aqui?
 
-🔹 Threat Hunting e análise de ameaças  
-🔹 Detection Engineering e regras Sigma/YARA  
-🔹 Active Directory Security e Windows Internals  
-🔹 SIEM, SOAR e resposta a incidentes  
-🔹 Laboratórios práticos e simulações de ataques  
+- 🔹 Threat Hunting e análise de ameaças
+- 🔹 Detection Engineering e regras Sigma/YARA
+- 🔹 Active Directory Security e Windows Internals
+- 🔹 SIEM, SOAR e resposta a incidentes
+- 🔹 Laboratórios práticos e simulações de ataques
 
 ---
 
-### 🌐 Acesse o blog
+## 🌐 Acesse o blog
 
 **[sandsoncosta.github.io](https://sandsoncosta.github.io)**
 
@@ -47,5 +45,3 @@ $ ./deploy.sh
 *Segurança não é um produto. É um processo contínuo.*
 
 **© 2026 Sandson Costa**
-
-</div>
