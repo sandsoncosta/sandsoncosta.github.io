@@ -1,6 +1,6 @@
 description: Um blog com algumas coisinhas...
 keywords: cybersecurity, forensics, malware, active directory, pentest
-skin: elegante #cianotipia, elegante, jornal, hacker, futurista, minimal
+skin: elegante #cianotipia, elegante, jornal, hacker, futurista, minimal, ofensiva
 
 hb:
   # override SASS variables, please replace the dash with underline, e.g. `list-group-color` should be `list_group_color`.

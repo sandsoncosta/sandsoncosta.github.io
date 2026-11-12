@@ -38,7 +38,7 @@ As políticas e seus valores:
 | Restrict anonymous access to Named Pipes and Shares | Habilitado | `RestrictNullSessAccess = 1` |
 | Restrict clients allowed to make remote calls to SAM | Administradores | `RestrictRemoteSam` (SDDL) |
 
-Cada uma dessas políticas governa um canal diferente — enumeração do SAM, tradução de SID/nome, acesso a named pipes e chamadas remotas ao SAM —, e não existe um controle único que resolva tudo de uma vez. Para os conceitos por trás disso (o que é o ANONYMOUS LOGON, como a enumeração acontece na prática e o que os logs nativos registram), há um artigo complementar.
+Cada uma dessas políticas governa um canal diferente: enumeração do SAM, tradução de SID/nome, acesso a named pipes e chamadas remotas ao SAM. E não existe um controle único que resolva tudo de uma vez. Para os conceitos por trás disso (o que é o ANONYMOUS LOGON, como a enumeração acontece na prática e o que os logs nativos registram), há um artigo complementar.
 
 {{< leia-tambem "blog/12.anonymous.logon">}}
 
@@ -80,6 +80,27 @@ gpupdate /force
 
 Em domínio, aguarde a replicação entre DCs ou rode o `gpupdate` no computador-alvo. Nenhuma dessas políticas exige reinicialização.
 
+### 2.5 O lado do diretório: operações anônimas via LDAP (dsHeuristics)
+
+Assim como o SMB tem suas restrições de enumeração anônima, o lado do diretório
+tem a sua: o atributo `dsHeuristics` controla, em toda a floresta, se um cliente
+anônimo pode operar no LDAP além da leitura do rootDSE. Não é uma Opção de
+Segurança nem entra na GPO acima — é um único atributo na partição de
+Configuração, de efeito forest-wide.
+
+Do Windows Server 2003 em diante o padrão já é seguro: o acesso anônimo é negado
+em todas as partições, exceto o rootDSE. O risco aparece em florestas migradas ou
+em que alguém alterou o atributo. Para conferir:
+
+```powershell
+Get-ADObject -Identity "CN=Directory Service,CN=Windows NT,CN=Services,$((Get-ADRootDSE).configurationNamingContext)" -Properties dSHeuristics |
+  Select-Object -ExpandProperty dSHeuristics
+```
+
+Vazio ou 7º caractere diferente de `2` mantém o anônimo restrito ao rootDSE. Esse é o ponto em que o anônimo encosta no LDAP, mas o LDAP tem um eixo de hardening próprio: signing e channel binding, que trato por completo no artigo dedicado.
+
+{{< leia-tambem "blog/90.ldap.bind.anonymous">}}
+
 ## 3. Alternativa local (host único ou laboratório)
 
 Para um único host, ou no lab onde não há domínio, use a Local Security Policy (`secpol.msc`), no mesmo caminho `Local Policies > Security Options`. As políticas e valores são idênticos, muda só o escopo, que passa a ser a máquina local.
@@ -101,6 +122,14 @@ nxc smb 192.168.56.10 -u '' -p '' --users
 
 Com as políticas aplicadas, a chamada passa a retornar `NT_STATUS_ACCESS_DENIED` em vez da lista de contas. Esse antes/depois é a evidência de que a GPO surtiu efeito.
 
+Vale incluir o teste de shares, que expõe bem a diferença entre sessão e acesso:
+
+```bash
+nxc smb 192.168.56.10 -u '' -p '' --shares
+```
+
+A saída traz `(Null Auth:True)` junto de `STATUS_ACCESS_DENIED`. Os dois juntos contam a história certa: a sessão anônima ainda se estabelece — o `Null Auth:True` é esperado e por design —, mas a enumeração, que é o acesso que importa, é negada. A sessão acontecer não significa que o acesso aconteceu.
+
 Para confirmar que a diretiva chegou ao host, independentemente do teste de enumeração:
 
 ```powershell
@@ -110,7 +139,7 @@ gpresult /r            # mostra as GPOs aplicadas
 
 ## 6. Conclusão
 
-Restringir o acesso anônimo é um passo básico no hardening de Active Directory. Ele tira de um atacante sem credencial uma via fácil de reconhecimento — nomes de conta, RIDs e política de senha — e, na maioria dos ambientes, não interfere na operação legítima. Como o controle está repartido em políticas independentes, a proteção só fica completa quando todas são revisadas em conjunto. Não há uma única chave que resolva.
+Restringir o acesso anônimo é um passo básico no hardening de Active Directory. Ele tira de um atacante sem credencial uma via fácil de reconhecimento, nomes de conta, RIDs e política de senha e, na maioria dos ambientes, não interfere na operação legítima. Como o controle está repartido em políticas independentes, a proteção só fica completa quando todas são revisadas em conjunto. Não há uma única chave que resolva.
 
 A GPO é a forma de aplicar em escala, enquanto o `secpol.msc` e o registro atendem a hosts isolados e ao laboratório. A exceção que pede cuidado é o `RestrictRemoteSam`, que pode afetar aplicações legítimas e deve ser validado em auditoria antes de impor. Depois da mudança, confirme a diretiva efetiva no host e verifique que a enumeração anônima, antes bem-sucedida, passou a falhar.
 

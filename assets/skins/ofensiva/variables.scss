@@ -1,0 +1,51 @@
+// Tema "ofensiva": consultoria de segurança ofensiva. Grafite escuro, painéis
+// com fio fino, rótulos em mono vermelho-alaranjado, títulos condensados.
+$graphite: #19181d;
+$signal: #ff5a47;
+
+$primary: #c7321f;
+$secondary: #5d5b66;
+$info: #2f6db5;
+$warning: #a36a00;
+$danger: #c7321f;
+
+$body-bg: #f4f4f6;
+$body-color: #2a2930;
+$body-secondary-color: #62606b;
+$body-tertiary-bg: #ebebef;
+$border-color: #d9d8de;
+$headings-color: #141318;
+$link-color: #c7321f;
+$link-hover-color: #9c2516;
+
+$body-bg-dark: $graphite;
+$body-color-dark: #b9b7c1;
+$body-secondary-color-dark: #85838e;
+$body-secondary-bg-dark: #1e1d23;
+$body-tertiary-bg-dark: #1c1b20;
+$body-emphasis-color-dark: #f2f0f4;
+$border-color-dark: #2e2d34;
+$headings-color-dark: #f2f0f4;
+$primary-text-emphasis-dark: $signal;
+$link-color-dark: $signal;
+$link-hover-color-dark: #ff8a7a;
+$code-color-dark: #ffb86b;
+$info-text-emphasis-dark: #7fb0f0;
+$warning-text-emphasis-dark: #f5b041;
+$danger-text-emphasis-dark: $signal;
+
+$font-family-sans-serif: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+$font-family-monospace: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+$headings-font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+$headings-font-weight: 700;
+$headings-line-height: 1.05;
+$font-size-base: 1rem;
+$line-height-base: 1.65;
+
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$enable-shadows: false;
+$box-shadow: none;
+
+$hb-module-margin-bottom: 1.5rem;

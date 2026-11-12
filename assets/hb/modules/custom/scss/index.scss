@@ -1,3 +1,207 @@
 // Estilos do tema visual ativo (params: skin).
 // Os arquivos de cada tema ficam em assets/skins/<nome>/; veja variables.tmpl.scss.
 @include sc-skin-styles;
+
+// -----------------------------------------------------------------------------
+// Impressão / PDF
+// Fica depois do skin e vale para qualquer tema. O tema claro na impressão é
+// forçado em body-end.html (beforeprint/afterprint); as variáveis abaixo são só
+// o fallback para quando o JS não roda (ex.: geração de PDF headless).
+// -----------------------------------------------------------------------------
+@page {
+  size: A4;
+  margin: 18mm 16mm 20mm;
+}
+
+@media print {
+  :root,
+  [data-bs-theme] {
+    --#{$prefix}body-bg: #fff;
+    --#{$prefix}body-color: #1a1a1a;
+    --#{$prefix}emphasis-color: #000;
+    --#{$prefix}heading-color: #000;
+    --#{$prefix}secondary-color: #555;
+    --#{$prefix}border-color: #ccc;
+    --#{$prefix}link-color: #1a1a1a;
+    --#{$prefix}link-hover-color: #1a1a1a;
+    --#{$prefix}code-color: #1a1a1a;
+  }
+
+  html {
+    font-size: 10.5pt;
+  }
+
+  body {
+    background: #fff !important;
+    color: #1a1a1a;
+    line-height: 1.55;
+  }
+
+  // Navegação, comentários e elementos interativos.
+  // Alguns seletores dependem de módulos que podem não estar ativos; sem efeito se não existirem.
+  .hb-header,
+  .hb-footer,
+  .hb-blog-sidebar,
+  .hb-back-to-top,
+  .hb-breadcrumb,
+  .hb-blog-post-share,
+  .hb-blog-post-nav,
+  .hb-blog-post-related,
+  .giscus,
+  .giscus-frame,
+  .highlight button,
+  .toast-container,
+  .offcanvas,
+  nav[aria-label="breadcrumb"] {
+    display: none !important;
+  }
+
+  // Sem a sidebar, a coluna do artigo ocupa a largura da página.
+  .container,
+  .container-fluid,
+  .container-lg,
+  .container-xl,
+  .container-xxl {
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  main .row > [class*="col-"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  .card {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .card-body {
+    padding: 0 !important;
+  }
+
+  // Texto
+  p,
+  li,
+  blockquote {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #000;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  h2 {
+    margin-top: 1.6em;
+  }
+
+  // Âncoras de cabeçalho não fazem sentido no papel.
+  .anchor,
+  .heading-anchor,
+  .hb-heading-anchor {
+    display: none !important;
+  }
+
+  // Links externos do corpo do artigo mostram o endereço.
+  .hb-blog-post-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #555;
+    word-break: break-all;
+  }
+
+  a {
+    text-decoration: underline;
+    text-decoration-thickness: 0.5px;
+  }
+
+  // Código: quebra linha em vez de cortar na margem.
+  pre,
+  .highlight pre,
+  .chroma {
+    white-space: pre-wrap !important;
+    word-break: break-word;
+    overflow: visible !important;
+    max-height: none !important;
+    font-size: 8.5pt;
+    line-height: 1.45;
+    border: 0.5pt solid #ccc;
+    border-radius: 3px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .highlight,
+  pre {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  // Bloco de código maior que uma página: deixa quebrar.
+  .highlight.sc-print-allow-break,
+  pre.sc-print-allow-break {
+    break-inside: auto;
+  }
+
+  :not(pre) > code {
+    border: 0.5pt solid #ddd;
+    background: #f4f4f4 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  // Imagens, figuras e tabelas
+  img,
+  svg,
+  figure {
+    max-width: 100% !important;
+    height: auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  figcaption {
+    font-size: 8.5pt;
+    color: #555;
+  }
+
+  table {
+    font-size: 9pt;
+    break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  // Alertas e callouts: mantém a cor de fundo e a borda.
+  .alert,
+  blockquote {
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  // Linha de fonte no fim do artigo (hb-blog-post-content-end.html).
+  .sc-print-source {
+    margin-top: 2em;
+    padding-top: 0.6em;
+    border-top: 0.5pt solid #ccc;
+    font-size: 8.5pt;
+    color: #555;
+  }
+}

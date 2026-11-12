@@ -1,1 +1,7 @@
-{{- partial "custom/donate" (dict "Page" .Page "Variant" "post") -}}
+<div class="d-print-none">
+  {{- partial "custom/donate" (dict "Page" .Page "Variant" "post") -}}
+</div>
+<p class="sc-print-source d-none d-print-block">
+  {{ .Page.Title }} · {{ .Page.Date | time.Format ":date_long" }}<br>
+  {{ .Page.Permalink }}
+</p>

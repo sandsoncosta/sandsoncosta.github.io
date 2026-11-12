@@ -1,0 +1,513 @@
+// =============================================================================
+// Tema "ofensiva" (herda _base)
+// Visual de consultoria de segurança ofensiva: grafite escuro, malha larga no
+// topo, títulos condensados em negrito, rótulos em mono caixa-alta no
+// vermelho-alaranjado e painéis de fio fino com linha de cabeçalho, como uma
+// tabela de CVEs. Botões retos; o principal é cheio e claro.
+// =============================================================================
+
+:root {
+  --sc-bg: #f4f4f6;
+  --sc-text: #2a2930;
+  --sc-muted: #62606b;
+  --sc-heading: #141318;
+  --sc-accent: #c7321f;
+  --sc-accent-ink: #ffffff;
+  --sc-line: #d9d8de;
+  --sc-line-strong: #b9b8c0;
+  --sc-surface: #ebebef;
+  --sc-panel: #ffffff;
+  --sc-panel-head: #f8f8fa;
+  --sc-header-bg: rgba(244, 244, 246, .9);
+  --sc-code-bg: #19181d;
+  --sc-code-line: #19181d;
+  --sc-grid: rgba(20, 19, 24, .05);
+  --sc-btn-bg: #19181d;
+  --sc-btn-ink: #f2f0f4;
+
+  --sc-font-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --sc-font-display: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --sc-font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --sc-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  --sc-display-weight: 700;
+  --sc-display-tracking: -.012em;
+  --sc-display-leading: 1.06;
+  --sc-post-title-size: clamp(2rem, 1.2rem + 3.4vw, 3.5rem);
+  --sc-card-title-size: 1.25rem;
+  --sc-body-size: 1.0625rem;
+  --sc-body-leading: 1.75;
+  --sc-radius: 0;
+  --sc-radius-btn: 0;
+}
+
+[data-bs-theme="dark"] {
+  --sc-bg: #19181d;
+  --sc-text: #b9b7c1;
+  --sc-muted: #85838e;
+  --sc-heading: #f2f0f4;
+  --sc-accent: #ff5a47;
+  --sc-accent-ink: #19181d;
+  --sc-line: #2e2d34;
+  --sc-line-strong: #45434c;
+  --sc-surface: #24232a;
+  --sc-panel: #1d1c22;
+  --sc-panel-head: #1f1e24;
+  --sc-header-bg: rgba(25, 24, 29, .9);
+  --sc-code-bg: #141318;
+  --sc-code-line: #2e2d34;
+  --sc-grid: rgba(255, 255, 255, .03);
+  --sc-btn-bg: #f2f0f4;
+  --sc-btn-ink: #19181d;
+}
+
+// -----------------------------------------------------------------------------
+// Fundo: malha larga que some para baixo
+// -----------------------------------------------------------------------------
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--sc-grid) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, var(--sc-grid) 1px, transparent 1px) 0 0 / 64px 64px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  mask-image: linear-gradient(to bottom, #000, transparent 70%);
+}
+
+// -----------------------------------------------------------------------------
+// Cabeçalho: nome em caixa-alta com ponto final
+// -----------------------------------------------------------------------------
+.hb-header-nav {
+  min-height: 4.5rem;
+
+  .navbar-brand {
+    font-family: var(--sc-font-ui);
+    font-weight: 700;
+    font-size: 1.375rem;
+    letter-spacing: .01em;
+    text-transform: uppercase;
+
+    &::after {
+      content: ".";
+    }
+
+    img {
+      display: none !important;
+    }
+  }
+
+  .hb-header-menus .nav-link {
+    font-weight: 500;
+    font-size: .9375rem;
+    color: var(--sc-text);
+    padding-left: .55rem !important;
+    padding-right: .55rem !important;
+
+    &:hover,
+    &.active {
+      color: var(--sc-heading);
+    }
+  }
+}
+
+.hb-header-search-input-container .form-control {
+  border-radius: 0 !important;
+  border-color: var(--sc-line-strong);
+}
+
+.offcanvas .offcanvas-title {
+  text-transform: uppercase;
+  font-family: var(--sc-font-ui) !important;
+
+  &::after {
+    content: ".";
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Painéis: fio de 1px, fundo levemente destacado, sem raio
+// -----------------------------------------------------------------------------
+.hb-main .hb-module {
+  background: var(--sc-panel);
+  border: 1px solid var(--sc-line);
+  padding: 1.25rem;
+}
+
+// Blocos que ficam soltos na página, sem painel
+.hb-main {
+  .hb-blog-post-intro.hb-module,
+  .hb-blog-post-content.hb-module,
+  .hb-docs-doc-content.hb-module,
+  .hb-blog-post-nav .hb-module,
+  .hb-module.p-0,
+  .hb-blog-home-carousel .hb-module {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+
+  .hb-blog-post-content.hb-module {
+    padding-top: .5rem;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Carrossel da home
+// -----------------------------------------------------------------------------
+.hb-carousel.carousel {
+  border: 1px solid var(--sc-line);
+
+  .carousel-caption .h5 {
+    font-weight: 700;
+    letter-spacing: -.015em;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Cards: painel com linha de cabeçalho (data, leitura, seção)
+// -----------------------------------------------------------------------------
+.hb-blog-posts {
+  --#{$prefix}gutter-x: 1.5rem;
+  --#{$prefix}gutter-y: 1.5rem;
+}
+
+.hb-main .hb-blog-post-card.hb-module {
+  padding: 0;
+  transition: border-color .2s ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--sc-line-strong);
+  }
+
+  > .hb-blog-post-meta {
+    @include sc-panel-head;
+    padding: .7rem 1rem;
+    margin-bottom: 0 !important;
+  }
+
+  .card-img-top {
+    margin: 0;
+    border-bottom: 1px solid var(--sc-line) !important;
+  }
+
+  .card-body {
+    padding: 1rem 1rem 1.25rem !important;
+  }
+
+  .hb-blog-post-title {
+    font-weight: 700;
+  }
+
+  .hb-blog-post-title-link {
+    background-size: 0 1px;
+  }
+
+  &:hover .hb-blog-post-title-link {
+    background-size: 100% 1px;
+  }
+
+  .hb-blog-post-summary {
+    font-size: .9375rem;
+  }
+}
+
+.hb-blog-post-section .badge {
+  @include sc-eyebrow;
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+
+.hb-blog-post-taxonomy {
+  font-family: var(--sc-mono);
+  font-size: .78rem !important;
+}
+
+// Post fixado ao lado da capa: linha de cabeçalho em cima de tudo
+.hb-blog-home-carousel + .col-12 .hb-blog-post-card.hb-module {
+  @include media-breakpoint-up(lg) {
+    grid-template-rows: auto auto 1fr;
+    column-gap: 0;
+
+    > .hb-blog-post-meta {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      align-self: stretch;
+    }
+
+    .card-img-top {
+      grid-row: 2 / span 2;
+      border-bottom: 0 !important;
+      border-right: 1px solid var(--sc-line) !important;
+    }
+
+    .card-body {
+      grid-row: 2 / span 2;
+      padding: 1.5rem 1.75rem !important;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Barra lateral
+// -----------------------------------------------------------------------------
+.hb-blog-sidebar-profile {
+  .hb-blog-sidebar-profile-title {
+    font-family: var(--sc-font-ui);
+    font-size: 1.25rem;
+    text-transform: uppercase;
+
+    &::after {
+      content: ".";
+      margin-left: -.25em;
+    }
+  }
+
+  .hb-blog-sidebar-profile-img {
+    border-radius: 50%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .hb-blog-sidebar-profile-meta {
+    font-family: var(--sc-mono);
+    font-size: .78rem;
+  }
+}
+
+.hb-blog-sidebar .nav-pills {
+  margin: -1.25rem -1.25rem 1rem !important;
+  padding: .75rem 1.25rem 0;
+  @include sc-panel-head;
+
+  .nav-link {
+    font-family: var(--sc-mono);
+    font-size: .72rem;
+    font-weight: 400;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding-bottom: .65rem;
+  }
+}
+
+.taxonomy-term {
+  font-family: var(--sc-mono);
+  font-size: .8125rem !important;
+}
+
+// -----------------------------------------------------------------------------
+// Post
+// -----------------------------------------------------------------------------
+// Breadcrumb como o rótulo acima do título
+.hb-breadcrumb {
+  @include sc-eyebrow;
+
+  .breadcrumb-item,
+  .breadcrumb-item a {
+    color: var(--sc-accent) !important;
+  }
+
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: "·" !important;
+    color: var(--sc-accent);
+  }
+}
+
+.hb-blog-post-intro.hb-module {
+  .hb-blog-post-title {
+    letter-spacing: -.02em;
+    line-height: 1.02;
+  }
+
+  .hb-blog-post-meta {
+    font-family: var(--sc-mono);
+    font-size: .8125rem;
+  }
+
+  .hb-blog-post-desc {
+    color: var(--sc-text);
+  }
+}
+
+.hb-featured-img {
+  border: 1px solid var(--sc-line) !important;
+}
+
+.hb-blog-post-content,
+.hb-docs-doc-content {
+  h2 {
+    font-size: 2rem;
+    letter-spacing: -.015em;
+  }
+
+  h3 {
+    font-size: 1.375rem;
+  }
+
+  a:not(.btn):not(.badge):not(.heading-sign):not(.kg-bookmark-container) {
+    color: var(--sc-heading);
+  }
+
+  // Tabelas como o painel de CVEs
+  .table-responsive {
+    border: 1px solid var(--sc-line);
+    background: var(--sc-panel);
+  }
+
+  .table {
+    font-family: var(--sc-mono);
+    font-size: .8125rem;
+
+    > :not(caption) > * > * {
+      padding: .75rem 1rem;
+    }
+
+    thead th {
+      @include sc-panel-head;
+      font-weight: 400;
+      border-bottom: 1px solid var(--sc-line) !important;
+    }
+
+    tbody td:first-child {
+      color: var(--sc-muted);
+    }
+
+    tbody td:not(:first-child) {
+      color: var(--sc-heading);
+    }
+  }
+
+  .highlight pre {
+    border: 1px solid var(--sc-code-line);
+  }
+
+  > blockquote:not(.alert) {
+    font-style: normal;
+    font-family: var(--sc-font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.25;
+    border-left-color: var(--sc-accent);
+  }
+}
+
+.hb-content blockquote.alert {
+  border: 1px solid var(--sc-line);
+  border-left: 2px solid var(--#{$prefix}alert-color);
+  background: var(--sc-panel);
+  padding: .9rem 1.1rem;
+
+  .alert-heading {
+    @include sc-eyebrow(var(--#{$prefix}alert-color));
+  }
+}
+
+// Índice como painel com cabeçalho
+.hb-blog-post-toc .hb-module,
+.hb-docs-doc-toc .hb-module {
+  padding: 0 !important;
+}
+
+// No mobile o índice vira um botão recolhível: estilo de cabeçalho de painel
+.hb-blog-post-toc .btn-secondary,
+.hb-docs-doc-toc .btn-secondary {
+  @include sc-panel-head;
+  border-bottom: 0;
+  padding: .8rem 1rem !important;
+  color: var(--sc-heading);
+}
+
+.hb-blog-post-toc .h6,
+.hb-docs-doc-toc .h6 {
+  @include sc-panel-head;
+  padding: .7rem 1rem;
+  margin-bottom: .6rem !important;
+}
+
+#TableOfContents {
+  padding: 0 1rem .75rem;
+  font-size: .875rem;
+
+  a {
+    border-left: 0;
+    padding-left: 0;
+
+    &.active {
+      color: var(--sc-accent);
+    }
+  }
+
+  ul ul a {
+    padding-left: .9rem;
+  }
+}
+
+.hb-blog-post-nav a.hb-module {
+  border: 1px solid var(--sc-line) !important;
+  padding: 1rem 1.25rem !important;
+
+  &:hover {
+    border-color: var(--sc-line-strong) !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Botões retos: o principal é cheio e claro (no escuro)
+// -----------------------------------------------------------------------------
+.sc-donate-btn {
+  background: var(--sc-btn-bg);
+  color: var(--sc-btn-ink);
+  font-family: var(--sc-font-ui);
+  font-weight: 600;
+  padding: .85rem 1.5rem;
+
+  &:hover {
+    color: var(--sc-btn-ink);
+    filter: none;
+    background: var(--sc-accent);
+  }
+}
+
+.sc-donate-title {
+  font-size: 1.5rem;
+}
+
+.sc-donate-sidebar .sc-donate-btn {
+  width: 100%;
+}
+
+.hb-social-share-buttons .hb-social-share-button {
+  border: 1px solid var(--sc-line);
+}
+
+.pagination .page-link {
+  font-family: var(--sc-mono);
+  font-size: .875rem;
+}
+
+// -----------------------------------------------------------------------------
+// Rodapé
+// -----------------------------------------------------------------------------
+.hb-footer {
+  font-family: var(--sc-mono);
+  font-size: .8125rem;
+
+  .h5 {
+    font-family: var(--sc-font-ui);
+    font-weight: 700;
+    text-transform: uppercase;
+
+    &::after {
+      content: ".";
+    }
+  }
+}
+
+.hb-blog-home-carousel + .col-12 .hb-blog-post-card .hb-blog-post-title {
+  @include media-breakpoint-up(lg) {
+    font-size: 2.25rem;
+  }
+}

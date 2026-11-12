@@ -1,6 +1,6 @@
 {{/* Put custom HTML markup before the end of <head>. */}}
 {{- /* Cabeçalho do tema ativo (params: skin): layouts/partials/skins/<nome>/head.html */ -}}
-{{- $skin := default "cianotipia" site.Params.skin }}
+{{- $skin := default "elegante" site.Params.skin }}
 {{- $head := printf "skins/%s/head.html" $skin }}
 {{- if templates.Exists (printf "partials/%s" $head) }}
   {{- partial $head . }}

@@ -1,0 +1,22 @@
+// Mixins do tema ofensiva.
+
+// Rótulo: mono, caixa-alta, espaçado, no vermelho-alaranjado.
+@mixin sc-eyebrow($color: var(--sc-accent)) {
+  font-family: var(--sc-mono);
+  font-size: .75rem;
+  font-weight: 400;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: $color;
+}
+
+// Linha de cabeçalho de painel (como o topo da tabela de CVEs).
+@mixin sc-panel-head {
+  font-family: var(--sc-mono);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--sc-muted);
+  background: var(--sc-panel-head);
+  border-bottom: 1px solid var(--sc-line);
+}

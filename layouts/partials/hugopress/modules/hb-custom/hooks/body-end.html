@@ -25,3 +25,25 @@
   })
 })()
 </script>
+{{- /*
+  Impressão: troca para o tema claro durante a impressão e restaura depois.
+  Assim o skin e o realce de código usam as próprias cores claras, em vez de
+  texto claro sobre papel branco (o navegador não imprime o fundo escuro).
+  Só altera o atributo; não toca na preferência salva pelo botão de tema.
+*/ -}}
+<script>
+(() => {
+  const root = document.documentElement
+  let prev
+  window.addEventListener('beforeprint', () => {
+    prev = root.getAttribute('data-bs-theme')
+    root.setAttribute('data-bs-theme', 'light')
+  })
+  window.addEventListener('afterprint', () => {
+    if (prev === undefined) return
+    if (prev === null) root.removeAttribute('data-bs-theme')
+    else root.setAttribute('data-bs-theme', prev)
+    prev = undefined
+  })
+})()
+</script>

@@ -3,7 +3,7 @@ title: "Anonymous Logon no Windows: separando sessão, acesso e enumeração"
 url: "/blog/anonymous-logon-no-windows-separando-sessao-acesso-e-enumeracao/"
 date: 2026-10-27T02:16:13-03:00
 draft: false
-description: "O que é o ANONYMOUS LOGON, por que não é incidente por si só, e como separar sessão, acesso e enumeração no Active Directory — com demonstração no GOAD, baseline e hardening."
+description: "O que é o ANONYMOUS LOGON, por que não é incidente por si só, e como separar sessão, acesso e enumeração no Active Directory, com demonstração no GOAD, baseline e hardening."
 noindex: false
 featured: false
 pinned: false
@@ -31,7 +31,7 @@ Um exemplo clássico é a **null session**: uma sessão SMB sem credenciais de u
 
 Neste artigo, vamos distinguir conexão de autorização, demonstrar comportamentos diferentes em dois controladores de domínio do laboratório GOAD e mapear quais eventos nativos do Windows registram o acesso anônimo. O ponto central é evitar uma conclusão precipitada: **acesso anônimo ao `IPC$` ou ao pipe `samr` não comprova, sozinho, enumeração de contas**.
 
-Vale situar este episódio dentro da série. O acesso anônimo é o caso mais fácil de fechar por configuração e o mais ruidoso de monitorar: procurar `ANONYMOUS LOGON` de forma genérica é agulha no palheiro, porque o volume é alto e quase todo benigno. Por isso o papel deste texto é desmistificação, baseline e hardening, não uma regra de alerta. A detecção de maior valor vem nos episódios seguintes, enumeração autenticada e coerção com NTLM relay, onde o sinal tem forma e não só volume.
+O acesso anônimo é o caso mais fácil de fechar por configuração e o mais ruidoso de monitorar: procurar `ANONYMOUS LOGON` de forma genérica é agulha no palheiro, porque o volume é alto e quase todo benigno. Por isso o papel deste texto é desmistificação, baseline e hardening, não uma regra de alerta. A detecção de maior valor vem nos episódios seguintes, enumeração autenticada e coerção com NTLM relay, onde o sinal tem forma e não só volume.
 
 ## 2. O que é ANONYMOUS LOGON?
 
@@ -142,7 +142,7 @@ index: 0x18ab RID: 0x45d acb: 0x00000210 Account: hodor         Desc: Brainless 
 index: 0x18af RID: 0x45f acb: 0x00000210 Account: samwell.tarly Desc: Samwell Tarly (Password : Heartsbane)
 ```
 
-A descrição de `samwell.tarly` contém uma senha em texto claro — um dado inserido propositalmente no laboratório. O exemplo ilustra um risco real: **campos descritivos de contas não devem armazenar credenciais**, pois podem ser consultados por identidades que tenham permissão de leitura.
+A descrição de `samwell.tarly` contém uma senha em texto claro, um dado inserido propositalmente no laboratório. O exemplo ilustra um risco real: **campos descritivos de contas não devem armazenar credenciais**, pois podem ser consultados por identidades que tenham permissão de leitura.
 
 Com um RID específico, o `queryuser` detalha uma conta, por exemplo `queryuser 0x456` para a `arya.stark`, trazendo data da última troca de senha, flags da conta e contadores de logon.
 
@@ -187,6 +187,9 @@ Os dois primeiros níveis não comprovam automaticamente o terceiro, e a auditor
 | **5140** | Security | Acesso a compartilhamentos, como `IPC$` | Não identifica enumeração |
 | **5145** | Security | Verificação de acesso a arquivos e *named pipes*, como `samr` e `lsarpc` | Não revela o método RPC invocado |
 | **4661** | Security | Solicitação de acesso a objetos SAM, quando auditada | Pode não ser gerado para cada consulta; não comprova sucesso da enumeração |
+| **4627** | Security | Associação de grupos do token do logon, inclusive de sessões `ANONYMOUS LOGON` | Mostra os grupos do contexto, não as operações RPC; exige a subcategoria `Audit Group Membership` |
+
+O **4627** acompanha o 4624 e lista os grupos presentes no token daquele logon. Numa sessão anônima, é onde se vê o que o contexto `ANONYMOUS LOGON` realmente carrega, tipicamente `Everyone` e `NT AUTHORITY\NETWORK`. Se o `Pre-Windows 2000 Compatible Access` aparecer aí, é o sinal concreto de que o anônimo recebeu a pertinência que reabre a enumeração discutida na seção 6. Como o 4624, o 4627 descreve a sessão, não os métodos RPC executados, e exige a subcategoria de auditoria `Audit Group Membership` (Logon/Logoff).
 
 A geração dos eventos depende da configuração de auditoria, da versão do Windows e das operações realizadas. Em especial, o **5145 exige a subcategoria de auditoria `Detailed File Share`**, e o **4661 depende da auditoria aplicável a objetos SAM**.
 
@@ -198,7 +201,7 @@ Em um evento **5145**, o campo `RelativeTargetName` pode apresentar `samr`, indi
 
 O ponto a fixar: **`samr` no 5145 não equivale a `enumdomusers`**. O evento registra que o pipe foi acessado, não qual chamada RPC foi executada, e o `AccessMask` também não distingue enumeração ofensiva de acesso legítimo. Pela mesma razão, o pipe `netlogon` não serve como indicador isolado de enumeração: ele participa de operações normais e frequentes do domínio.
 
-É essa limitação que define o valor defensivo deste episódio. Os eventos contextualizam uma conexão anônima durante uma investigação, mas não provam enumeração. O ganho prático está em conhecer o que é normal no ambiente — quais origens falam anônimo com os controladores de domínio — e em endurecer a configuração, não em alertar sobre cada ocorrência.
+É essa limitação que define o valor defensivo deste cenário. Os eventos contextualizam uma conexão anônima durante uma investigação, mas não provam enumeração. O ganho prático está em conhecer o que é normal no ambiente — quais origens falam anônimo com os controladores de domínio — e em endurecer a configuração, não em alertar sobre cada ocorrência.
 
 ## 6. Hardening: políticas a revisar
 

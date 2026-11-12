@@ -105,7 +105,7 @@ Este guia foca em **correlações contextuais** e **análise comportamental** pa
 
 # Técnica 1: Netsh IPv4/IPv6 task offloading disabled - Comando via `cmd`
 
-<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<kbd>T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
 
 ## O que essa técnica faz na prática?
 
@@ -262,9 +262,9 @@ A partir do Windows 8 / Windows Server 2012, o TCP Chimney Offload foi oficialme
 
 # Técnica 2: Disable Task Offloading
 
-<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<kbd>T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
 <br>
-<kbd>**MITRE ATT&CK:** T1059.001 (Command and Scripting Interpreter: PowerShell)</kbd>
+<kbd>T1059.001 (Command and Scripting Interpreter: PowerShell)</kbd>
 
 É o equivalente à **Técnica 1: Netsh IPv4/IPv6 task offloading disabled**, porém, via PowerShell.
 
@@ -339,7 +339,7 @@ Análise prática de um script PowerShell ofuscado, revelando passo a passo da s
 
 # Técnica 3: Netsh Port Forwarding
 
-<kbd>**MITRE ATT&CK:** T1090.001 (Proxy: Internal Proxy)</kbd>
+<kbd>T1090.001 (Proxy: Internal Proxy)</kbd>
 
 ## O que é?
 
@@ -582,7 +582,7 @@ Veja o uso do netsh sendo chamado via powershell:
 
 # Técnica 4: Netsh Firewall Advfirewall Manipulation
 
-<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<kbd>T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
 
 ## O que é?
 
@@ -683,9 +683,9 @@ level: medium
 
 # Técnica 5: Firewall Manipulation via PowerShell
 
-<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<kbd>T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
 <br>
-<kbd>**MITRE ATT&CK:** T1059.001 (Command and Scripting Interpreter: PowerShell)</kbd>
+<kbd>T1059.001 (Command and Scripting Interpreter: PowerShell)</kbd>
 
 É o equivalente à **Técnica 4: Netsh Firewall Advfirewall Manipulation**, porém, via PowerShell.
 
@@ -737,9 +737,9 @@ level: high
 ```
 # Técnica 6: Native Domain Pivoting
 
-<kbd>**MITRE ATT&CK:** T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
+<kbd>T1562.004 (Impair Defenses: Disable or Modify System Firewall)</kbd>
 <br>
-<kbd>**MITRE ATT&CK:** T1090.001 (Proxy: Internal Proxy)</kbd>
+<kbd>T1090.001 (Proxy: Internal Proxy)</kbd>
 
 ## Visão geral
 
